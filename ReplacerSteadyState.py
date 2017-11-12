@@ -1,16 +1,27 @@
-#selects the random individuals and replaces them with the children
+# -*- coding: utf-8 -*-
+"""
+Created on Sun Nov 12 14:27:32 2017
+
+@author: Till
+"""
+
+
+#selects n random individuals and replaces them with the n children
 import random
 
-def SteadyState(population,children)
-childrensize = len(children) - 1
-populationsize = len(population) - 1
+def SteadyState(population,children):
+    childrensize = len(children) 
+    populationsize = len(population) -1
 
 #select random parents from the population and remove them
-for i in range(0,childrensize):
-  kill = random.randint(0:populationsize)
-  population.remove(kill)
+    for i in range(0,childrensize):
+        kill = random.randint(0,populationsize)
+        population.remove(population[kill])
+        populationsize = populationsize -1
 
 #Children take place in new population
-population.appennd(children)
-
-return population
+    for i in range(0,childrensize):
+        population.append(children[i])
+    
+    print(population)    
+    return population
