@@ -26,3 +26,4 @@ def initialize():
     c1,c2 = onepoint(p1,p2)
     
     print(c1)
+    print(c2)
