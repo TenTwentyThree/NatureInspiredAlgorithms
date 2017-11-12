@@ -30,7 +30,7 @@ def onepoint(p1,p2):
         c2.append(p1[j])
     return c1,c2
 
-def crossover2():
+def method2():
     '''
     TODO
     '''
@@ -42,30 +42,41 @@ def recombine(matingpool):
     childs
     '''
     children = []
+    #which reombination method we want to use, untill now just 1
     recomMethod = 1
-    while not matingpool:
+
+    #recombine 2 parents from the matingpool untill the mating pool ist empty
+    while len(matingpool) > 0:
+        #in every iteration compute the matingpool size again, because its shrinking
         sizeMatingPool = len(matingpool)-1
         choice1 = -1
         choice2 = -1
 
+        #select two random differnet parents from the mating pool
         while choice1 == choice2:
             choice1 = random.randint(0,sizeMatingPool)
             choice2 = random.randint(0,sizeMatingPool)
 
+        #save the two parents
+        parent1 = matingpool[choice1]
+        parent2 = matingpool[choice2]
+
+        #execute the recombination method of your choice and save the new children in c1 and c2
         if recomMethod == 1:
-            c1,c2 = onepoint(matingpool[choice1],matingpool[choice2])
-            children.append(c1)
-            children.append(c2)
-            matingpool.remove(matingpool[choice1])
-            matingpool.remove(matingpool[choice2])
-        '''
+            c1,c2 = onepoint(parent1,parent2)
         elif recomMethod == 2:
-            c1,c2 = crossover2(matingpool[choice1],matingpool[choice2])
-            children.append(c1)
-            children.append(c2)
-        '''
+            c1,c2 = method2(parent1,parent2)
 
+        #add new children to the set of all children
+        children.append(c1)
+        children.append(c2)
+        #remove the parents from the matingpool
+        matingpool.remove(parent1)
+        matingpool.remove(parent2)
+
+
+
+
+    #return the new subset of children 
     return children
-
-
 
