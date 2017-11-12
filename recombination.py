@@ -30,11 +30,37 @@ def onepoint(p1,p2):
         c2.append(p1[j])
     return c1,c2
 
-def method2():
+def uniformCrossover(p1,p2):
     '''
-    TODO
+    Generate a template with floats betwen 0,1 and if the value of the template at point i is bigger then
+    our threshold(0.5) copy the i-th value of p1, else copy the i-th value of p2 in child 1 and respectively for child 2
     '''
-    return true
+    #save parentlenth for quick exces
+    parentlength = (len(p1))
+    #define a treshold to choose from which parent you take the genom
+    threshold = 0.5
+    c1=[]
+    c2=[]
+
+    #create a random template of length parentlength with values (0,1)
+    template = []
+    for i in range(parentlength):
+        template.append(random.uniform(0,1))
+    print(template)
+
+    '''
+    iterate though the parents, if value of template is bigger than threshold
+    copy gene from p1 in c1 else p2 (and respectively for c2)
+    '''
+    for i in range(parentlength):
+        if template[i] > threshold:
+            c1.append(p1[i])
+            c2.append(p2[i])
+        else:
+            c1.append(p2[i])
+            c2.append(p1[i])
+    #return the new children 
+    return c1,c2
 
 def recombine(matingpool):
     '''
@@ -43,7 +69,7 @@ def recombine(matingpool):
     '''
     children = []
     #which reombination method we want to use, untill now just 1
-    recomMethod = 1
+    recomMethod = 2
 
     #recombine 2 parents from the matingpool untill the mating pool ist empty
     while len(matingpool) > 0:
@@ -65,7 +91,7 @@ def recombine(matingpool):
         if recomMethod == 1:
             c1,c2 = onepoint(parent1,parent2)
         elif recomMethod == 2:
-            c1,c2 = method2(parent1,parent2)
+            c1,c2 = uniformCrossover(parent1,parent2)
 
         #add new children to the set of all children
         children.append(c1)
@@ -74,9 +100,5 @@ def recombine(matingpool):
         matingpool.remove(parent1)
         matingpool.remove(parent2)
 
-
-
-
-    #return the new subset of children 
     return children
 
