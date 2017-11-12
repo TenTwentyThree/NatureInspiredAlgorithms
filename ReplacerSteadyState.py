@@ -6,7 +6,7 @@ Created on Sun Nov 12 14:27:32 2017
 """
 
 
-#selects the random individuals and replaces them with the children
+#selects n random individuals and replaces them with the n children
 import random
 
 def SteadyState(population,children):
