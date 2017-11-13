@@ -10,9 +10,14 @@ import random
 
 def onepoint(p1,p2):
     '''
-    Generate a crossover point and then copy
-    sublist 1 of p1 in c1 and of p2 in c2 and then copy
-    sublist 2 of p1 in c2 and of p2 in c1
+    Generate a crossover point and then copy sublist 1 of p1 in c1 and of p2 in c2 and then copy sublist 2 of p1 in c2 and of p2 in c1
+    INPUT:
+    p1: List of Parent one for crossover operation
+    p2: List of Parent two for crossover operation 
+    
+    OUTPUT:
+    c1: List of Child one, offspring of p1,p2
+    c2: List of Child two, offspring of p1,p2
     '''
     parentlength = (len(p1)-1)
     #create children 1 and 2
@@ -25,6 +30,17 @@ def onepoint(p1,p2):
     return c1,c2
 
 def uniformCrossover(p1,p2):
+    '''
+    Generate a random template and if if value of template is bigger than threshold
+    copy gene from p1 in c1 else p2 (and respectively for c2)
+    INPUT:
+    p1: List of Parent one for crossover operation
+    p2: List of Parent two for crossover operation 
+    
+    OUTPUT:
+    c1: List of Child one, offspring of p1,p2
+    c2: List of Child two, offspring of p1,p2
+    '''
     #save parentlenth for quick exces
     parentlength = (len(p1))
     #define a treshold to choose from which parent you take the genom
@@ -54,8 +70,11 @@ def uniformCrossover(p1,p2):
 
 def recombine(matingpool):
     '''
-    Get's the selected matingpool and returns a sub-population with the recombined
-    childs
+    Generates new offsprings from the matingpool
+    INPUT:
+    matingpool: List of individuals selcted for the mating process
+    OUTPUT:
+    children: List of generated offsprings from the matingpool
     '''
     children = []
     #which reombination method we want to use, untill now just 1
