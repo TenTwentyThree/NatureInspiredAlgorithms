@@ -184,7 +184,7 @@ def initalize():
     
     itemlist = []
     
-    limit = 50000
+    limit = 1000
     print("Initializing with ",limit," Items to choose from")
     sack = generatesack(limit)
     
