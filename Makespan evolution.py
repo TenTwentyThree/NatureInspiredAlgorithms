@@ -1,26 +1,20 @@
 # -*- coding: utf-8 -*-
 """
 Created on Sat Nov 11 08:39:05 2017
-
 @author: JoJo
 """
 
 import random
 
-
-# ---------------------------------------------------------------P R E D E F I N I T I O N   O F   E X P E R I M E N T   A N D   O B J E C T S --------------------
-
-class Individual:
+#---------------------------------------------------------------P R E D E F I N I T I O N   O F   E X P E R I M E N T   A N D   O B J E C T S --------------------
+class individual:
     """an indivdual is a python object that has the values "genome" and "fitness"
     The genome is a list of integer between 1 and 20, encoding job distribution. Its length is determined by the number of jobs
     fitness is the eucledian distance between all total machine runtimes. If the distance is low, the fitness is high."""
-
     def __init__(self, genome, fitness):
         self.genome = genome
         self.fitness = fitness
         """the fitness of an individual is updated with simply calling individual.update_fitness()"""
-<<<<<<< HEAD
-=======
         
     def update_fitness(self):
         totaldistance = 0
@@ -36,62 +30,38 @@ class Individual:
             
             
 
->>>>>>> 775debe136ff050e558f9dba71e41d067b66ecdf
 
-    def update_fitness(self):
-        pass
-
-
+        
 def gen_rand_standard(nmbofitems):
     """This generator generates jobs for experiment 1&2"""
     standardlist = []
     while nmbofitems != 0:
-<<<<<<< HEAD
-        newjob = random.randint(10, 1000)
-        yield newjob
-
-
-=======
         newjob = random.randint(10,1000)
         standardlist.append(newjob)
         nmbofitems -= 1
     return standardlist
         
         
->>>>>>> 775debe136ff050e558f9dba71e41d067b66ecdf
 def gen_rand_one(nmbofitems):
     """This generator generates jobs for the FIRST experiment involing runtimes between 100 and 300"""
     onelist = []
     while nmbofitems != 0:
-<<<<<<< HEAD
-        newjob = random.randint(100, 300)
-        yield newjob
-
-
-=======
         newjob = random.randint(100,300)
         onelist.append(newjob)
         nmbofitems -= 1
     return onelist
         
->>>>>>> 775debe136ff050e558f9dba71e41d067b66ecdf
 def gen_rand_two(nmbofitems):
     """This generator generates jobs for the SECOND experiment involing runtimes between 400 and 700"""
     twolist = []
     while nmbofitems != 0:
-<<<<<<< HEAD
-        newjob = random.randint(400, 700)
-        yield newjob
-=======
         newjob = random.randint(400,700)
         nmbofitems -= 1
         twolist.append(newjob)
     
->>>>>>> 775debe136ff050e558f9dba71e41d067b66ecdf
 
-
-# ---------------------------------------------------------------I M P L E M E N T A T I O N   O F   G E N E T I C   A L G O R I T H M -------------------------------------
-
+#---------------------------------------------------------------I M P L E M E N T A T I O N   O F   P O P U L A T I O N   G E N E R A T I O N -------------------------------------
+        
 def generate_population_from_genes(listofgenomes):
     """This function generates individuals from the list of genomes that is passed into it. it returns a list of individuals which is the new population.
     This function can be used universally across all experiments
@@ -107,20 +77,15 @@ def generate_population_from_genes(listofgenomes):
         newindividual.update_fitness()
         population.append(newindividual)
         indexofgenomes -= 1
-
-    return population
-<<<<<<< HEAD
-
-
-def generate_initial_population(numberofgenes, numberofmachines):
-=======
         
+    return population
+
+      
     
-    
+
     
     
 def generate_initial_population(numberofindividuals):
->>>>>>> 775debe136ff050e558f9dba71e41d067b66ecdf
     """This function generates a random list of chromosoms that is equivalent to the number of individuals.
     in the list, there are chromosoms, (or in other words the individual's genes) with a random number in the range between 1 and the number of machines
     this function is only called once per experiment, as one only needs one initial population. the initial population is then manipulated by other functions such
@@ -131,14 +96,10 @@ def generate_initial_population(numberofindividuals):
     Number of genes. This is equivalent to the total number of jobs to distribute
     Number of machines. This is important to distribute the integer range of single genes. In our case, this is always 20
     
-    OUTPUT: A list of random individuals (first population) which corresponds to individuals with"""
-
+    OUTPUT: A list of random individuals (first population)"""
     initialgenes = []
-<<<<<<< HEAD
-=======
     genecount = len(joblist)
     
->>>>>>> 775debe136ff050e558f9dba71e41d067b66ecdf
     for individual in range(numberofindividuals):
         genome = []
         genes = genecount
@@ -146,18 +107,12 @@ def generate_initial_population(numberofindividuals):
             genome.append(random.randint(1, numberofmachines))
             genes -= 1
         initialgenes.append(genome)
-<<<<<<< HEAD
-
-    return initialgenes
-
-x = generate_initial_population(numberofmachines=20, )
-print(x)
-=======
     initialpop = generate_population_from_genes(initialgenes)
     
     return initialpop
 
-
+#---------------------------------------------------------------M U T A T I O N   F U N C T I O N S -------------------------------------
+        
 
 def mutation(population):
     probability = 0.06
@@ -171,7 +126,7 @@ def mutation(population):
                 mutateRandomResetting(population[i])
             elif mutation2:
                 mutateReverse(population[i])
-    print(population)
+    return population
 
 #mutates a specific machine to an other at a random place
 #mutates a random allel in a chromosome
@@ -184,6 +139,7 @@ def mutateRandomResetting(chromosome):
         mutateMachine = random.randint(0,numberofmachines)
 
     chromosome[mutatePlace] = mutateMachine
+    return chromosome
 
 def mutateReverse(chromosome):
     '''
@@ -210,29 +166,134 @@ def mutateReverse(chromosome):
 
     return  chromosome
 
+#---------------------------------------------------------------R E C O M B I N A T I O N   O P E R A T I O N S------------------------
+        
 
+def onepoint(p1,p2):
+    '''
+    Generate a crossover point and then copy sublist 1 of p1 in c1 and of p2 in c2 and then copy sublist 2 of p1 in c2 and of p2 in c1
+    INPUT:
+    p1: List of Parent one for crossover operation
+    p2: List of Parent two for crossover operation 
+    
+    OUTPUT:
+    c1: List of Child one, offspring of p1,p2
+    c2: List of Child two, offspring of p1,p2
+    '''
+    parentlength = (len(p1)-1)
+    #create children 1 and 2
+    c1 = []
+    c2 = []
+    #generate random cuttpoint
+    cutpoint = random.randint(1,parentlength)
+    #Copy Sublist into respective parents
+    c1, c2 = (p1[:cutpoint] + p2[cutpoint:], p2[:cutpoint] + p1[cutpoint:])
+    return c1,c2
+
+def uniformCrossover(p1,p2):
+    '''
+    Generate a random template and if if value of template is bigger than threshold
+    copy gene from p1 in c1 else p2 (and respectively for c2)
+    INPUT:
+    p1: List of Parent one for crossover operation
+    p2: List of Parent two for crossover operation 
+    
+    OUTPUT:
+    c1: List of Child one, offspring of p1,p2
+    c2: List of Child two, offspring of p1,p2
+    '''
+    #save parentlenth for quick exces
+    parentlength = (len(p1))
+    #define a treshold to choose from which parent you take the genom
+    threshold = 0.5
+    c1=[]
+    c2=[]
+
+    #create a random template of length parentlength with values (0,1)
+    template = []
+    for i in range(parentlength):
+        template.append(random.uniform(0,1))
+
+    '''
+    iterate though the parents, if value of template is bigger than threshold
+    copy gene from p1 in c1 else p2 (and respectively for c2)
+    '''
+    for i in range(parentlength):
+        if template[i] > threshold:
+            c1.append(p1[i])
+            c2.append(p2[i])
+        else:
+            c1.append(p2[i])
+            c2.append(p1[i])
+    #return the new children
+    return c1,c2
+
+def recombine(matingpool):
+    '''
+    Generates new offsprings from the matingpool
+    INPUT:
+    matingpool: List of individuals selcted for the mating process
+    OUTPUT:
+    children: List of generated offsprings from the matingpool
+    '''
+    children = []
+    #which reombination method we want to use, untill now just 1
+    recomMethod = 1
+
+    #recombine 2 parents from the matingpool untill the mating pool ist empty
+    while len(matingpool) > 0:
+        #in every iteration compute the matingpool size again, because its shrinking
+        sizeMatingPool = len(matingpool)-1
+        choice1 = -1
+        choice2 = -1
+
+        #select two random differnet parents from the mating pool
+        while choice1 == choice2:
+            choice1 = random.randint(0,sizeMatingPool)
+            choice2 = random.randint(0,sizeMatingPool)
+
+        #save the two parents
+        parent1 = matingpool[choice1]
+        parent2 = matingpool[choice2]
+
+        #execute the recombination method of your choice and save the new children in c1 and c2
+        if recomMethod == 1:
+            c1,c2 = onepoint(parent1,parent2)
+        elif recomMethod == 2:
+            c1,c2 = uniformCrossover(parent1,parent2)
+
+        #add new children to the set of all children
+        children.append(c1)
+        children.append(c2)
+        #remove the parents from the matingpool
+        matingpool.remove(parent1)
+        matingpool.remove(parent2)
+
+
+    return children
 
 
 
 #---------------------------------------------------------------I M P L E M E N T A T I O N   O F   U S E R   I N P U T   A N D   E X E C U T I O N -----------------------------------------
 def user_input():
-    return False
-
+    individuals = int(input("Please enter the number of individuals per generation: "))
+    return individuals
+    
 def initalize():
+    global mutation1
+    global mutation2
     global joblist
     global numberofmachines
+    mutation1 = True
+    mutation2 = False
     numberofmachines = 20
     joblist = gen_rand_standard(200) + gen_rand_one(100)
-    pop = generate_initial_population(100)
-    for index in pop:
-        print(index.fitness)
+    usercommands = user_input()
+    print("Initializing population with",usercommands,"individuals.")
+    generate_initial_population(usercommands)
+    
         
     
     
     
 initalize()
-    
-    
-    
-    
->>>>>>> 775debe136ff050e558f9dba71e41d067b66ecdf
