@@ -20,21 +20,11 @@ def onepoint(p1,p2):
     c2 = []
     #generate random cuttpoint
     cutpoint = random.randint(1,parentlength)
-    #copy sublists of p1 and p2 into the childs
-    for i in range(cutpoint):
-        c1.append(p1[i])
-        c2.append(p2[i])
-    #copy second sublists of p1 and p2 into the childs
-    for j in range(cutpoint,parentlength+1):
-        c1.append(p2[j])
-        c2.append(p1[j])
+    #Copy Sublist into respective parents
+    c1, c2 = ([p1[:cutpoint] + p2[cutpoint:]], [p2[:cutpoint] + p1[cutpoint:]])
     return c1,c2
 
 def uniformCrossover(p1,p2):
-    '''
-    Generate a template with floats betwen 0,1 and if the value of the template at point i is bigger then
-    our threshold(0.5) copy the i-th value of p1, else copy the i-th value of p2 in child 1 and respectively for child 2
-    '''
     #save parentlenth for quick exces
     parentlength = (len(p1))
     #define a treshold to choose from which parent you take the genom
@@ -59,7 +49,7 @@ def uniformCrossover(p1,p2):
         else:
             c1.append(p2[i])
             c2.append(p1[i])
-    #return the new children 
+    #return the new children
     return c1,c2
 
 def recombine(matingpool):
@@ -69,7 +59,7 @@ def recombine(matingpool):
     '''
     children = []
     #which reombination method we want to use, untill now just 1
-    recomMethod = 2
+    recomMethod = 1
 
     #recombine 2 parents from the matingpool untill the mating pool ist empty
     while len(matingpool) > 0:
@@ -100,5 +90,12 @@ def recombine(matingpool):
         matingpool.remove(parent1)
         matingpool.remove(parent2)
 
+
+
+
+
     return children
+
+
+
 
