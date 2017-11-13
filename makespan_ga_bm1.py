@@ -113,13 +113,12 @@ def roulette_wheel_selection(population, machines):
         fitness_values.append(fitness_value)
 
     # Create roulette wheel. Reference, wikipedia
-
+    prob_intervals = None
     for i in range(0, len(population)):
         prob_survival = [fitness_value / np.sum(fitness_values) for fitness_value in fitness_values ]
         # Generate intervals between the prob_survivals
         prob_intervals = [sum(prob_survival[:i+1]) for i in range(len(prob_survival))]
 
-    print("rouletter wheel", prob_intervals)
     # Rotate the wheel and get the new population
     new_population = []
     for _candidate in range(0, len(population)-1):
@@ -133,10 +132,38 @@ def roulette_wheel_selection(population, machines):
     return new_population
 
 machines = [1,1,1,1]
-print(roulette_wheel_selection(pop,machines))
+print(roulette_wheel_selection(pop, machines))
 
+def roulette_wheel_selection_(population):
+
+    """
+    Args:
+        population(list): List of objects which include  tuple of individuals(genome, fitness)
+    Returns:
+        new_population(list): List of objects selected for next generation
+    """
+
+    # Create roulette wheel. Reference, wikipedia
+    prob_intervals = None
+    for i in range(0, len(population)):
+        genomes = [genome for genome,fitness in individuals]
+        prob_survival = [fitness_value / np.sum(fitness_values) for fitness_value in fitness_values]
+        # Generate intervals between the prob_survivals
+        prob_intervals = [sum(prob_survival[:i + 1]) for i in range(len(prob_survival))]
+
+    # Rotate the wheel and get the new population
+    new_population = []
+    for _candidate in range(0, len(population) - 1):
+        rand_num = np.random.rand()
+        for i, candidate in enumerate(population):
+            # print(rand_num, prob_intervals[i])
+            if rand_num < prob_intervals[i]:
+                new_population.append(candidate)
+                break
+
+    return new_population
 def mutate(population):
-    # Choose a candidate in popuation and mutate it by randomly choosing two genes and swap them
+    # Choose a candidate in population and mutate it by randomly choosing two genes and swap them
 
     """
         Args:
