@@ -120,17 +120,80 @@ def mutation(population):
 
 #if the mutationprobability is matched we mutate the chromosome
     for i in range(populationsize):
-        mutation = random.uniform(0,1)
-        if mutation <= probability:
-            if mutation1:
+        mutate = random.uniform(0,1)
+        if mutate <= probability:
+            if mutation == 1:
                 mutateRandomResetting(population[i])
-            elif mutation2:
+            elif mutation == 2:
                 mutateReverse(population[i])
     return population
 
-#mutates a specific machine to an other at a random place
-#mutates a random allel in a chromosome
+def mutationProbabilistic(population):
+    """
+    randomly mutates one int to another. So gives a job to another machine.
+    the mutation probability is set to 0.06
+    With the channce 0f 1/2 we choose the highest ranked mutation method, else we choose one randomly
+    needs a global variable numberOfMachines
+    INPUT:
+    population - the current population
+  
+    OUTPUT:
+    population - the mutated population
+    """
+    probability = 0.06
+    populationsize = len(population)
+
+#if the mutationprobability is matched we mutate the chromosome
+    for i in range(populationsize):
+        mutate = random.uniform(0,1)
+        if mutate <= probability:
+            # Choose random mutation method or the best one
+            randorchoice = random.uniform(0,1)
+            
+            #if randorchoice is bigger equal to 0.5 choose the best mutation method, else choose one by chance
+            if randorchoice >= 0.5 :
+                mutation = mutationChoice.index(max(mutationChoice))
+            else:
+                mutation = random.randint(0,2)
+
+            #hold fitness of choromosom to compare later
+            #needs to be update to get the real fitnnes of the individual
+            fit = fittnes(population[i])
+
+            #mutate with the choosen method
+            if mutation == 0:
+                #mutate
+                population[i] = mutateRandomResetting(population[i])
+            elif mutation == 1:
+                #mutate
+                population[i] = mutateReverse(population[i])
+            elif mutation == 2:
+                #mutate
+                population[i] = mutateScramble(population[i])
+
+
+            '''
+            evaluate new fittnes, if the fittness is better,
+            the method gets a better rank and is choosen more often.
+            If the fittness is worse, it also gets a worse rank
+            '''
+            #needs to be update to get the real fitnnes of the individual
+            newfit = fittnes(population[i])
+            fitdif = newfit-fit
+            if fitdif > 0:
+                mutationChoice[mutation] += fitdif
+            else:
+                mutationChoice[choice] -= fitdif
+
+
+    return population
+
+
 def mutateRandomResetting(chromosome):
+    """
+    mutates a specific machine to an other at a random place
+    mutates a random allel in a chromosome
+    """
     mutateMachine = random.randint(0,numberofmachines)
     mutatePlace = random.randint(0,len(chromosome)-1)
 
@@ -141,10 +204,12 @@ def mutateRandomResetting(chromosome):
     chromosome[mutatePlace] = mutateMachine
     return chromosome
 
+
+
 def mutateReverse(chromosome):
-    '''
+    """
     choose two random points and flip array in between 
-    '''
+    """
     #save length for quick access
     chromosomesize = len(chromosome)
 
@@ -165,6 +230,32 @@ def mutateReverse(chromosome):
         chromosome[i] = sublist[i-m1]
 
     return  chromosome
+
+def mutateScramble(chromosome):
+    """
+    Generate 2 random cutpoints in the chromosome and scramble the allleles between those two cutpoints randomly
+    INPUT:
+    chromosome - chromosome choosen for mutation
+    
+    OUTPUT:
+    chromosome - mutated chromosome
+    """
+    chromosomesize = len(chromosome)
+
+    m1 = -1
+    m2 = -1
+    while m2-m1 <= 2 :
+        m1 = random.randint(0,chromosomesize-1)
+        m2 = random.randint(0,chromosomesize-1)
+    sublist = chromosome[m1:m2]
+
+    for i in range(m1,m2):
+        sublistLength = len(sublist)-1
+        gene = random.randint(0,sublistLength)
+        chromosome[i] = sublist[gene]
+        sublist.remove(sublist[gene])
+
+    return chromosome
 
 #---------------------------------------------------------------R E C O M B I N A T I O N   O P E R A T I O N S------------------------
         
@@ -280,12 +371,13 @@ def user_input():
     return individuals
     
 def initalize():
-    global mutation1
-    global mutation2
+    global mutation
+    global mutationChoice
     global joblist
     global numberofmachines
-    mutation1 = True
-    mutation2 = False
+    mutation = 0
+    #holds the 'fittness' of th emutation methods for probabilistc muatating
+    mutationChoice = [0,0,0]
     numberofmachines = 20
     joblist = gen_rand_standard(200) + gen_rand_one(100)
     usercommands = user_input()
