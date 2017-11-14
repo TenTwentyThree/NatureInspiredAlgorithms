@@ -10,7 +10,7 @@ def selectionTurnament(population):
         fitnessValues.append(currentfitness)
     '''
 
-    #defines how many individuals are in the matingpool
+    #defines how many individuals are in the matingpool needs to be an even number 
     sizeMatingPool = 100
     while sizeMatingPool > 0:
         #store population length for quick exces
