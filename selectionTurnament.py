@@ -13,7 +13,7 @@ def selectionTurnament(population):
     '''
 
     #defines how many individuals are in the matingpool needs to be an even number 
-    sizeMatingPool = (len(population) // 3) * 2
+    sizeMatingPool = len(population)
     if sizeMatingPool % 2 == 1:
         sizeMatingPool -= 1
     if len(competitors) % 2 == 1:

@@ -9,24 +9,24 @@ Created on Sun Nov 12 14:27:32 2017
 import random
 
 
-def steadystate(population, children):
-    childrensize = len(children)
-    populationsize = len(population) - 1
-
-    # select random parents from the population and remove them
-    for i in range(0, childrensize):
-        kill = random.randint(0, populationsize)
-        population.remove(population[kill])
-        populationsize = populationsize - 1
-
-    # Children take place in new population
-    for i in range(0, childrensize):
-        population.append(children[i])
-
-    print(population)
-    return population
-
 def steady_state(population, children):
+    picklistparent = []
     number_of_selected = random.randint(1,len(population))
+    print(number_of_selected)
+
     while number_of_selected > 0:
         
+        selectreplaceparent = random.randint(0,len(population) - 1)
+        selectreplacechild = random.randint(0,len(children) - 1)
+        
+        while selectreplaceparent in picklistparent:
+            selectreplaceparent = random.randint(0,len(population) - 1)
+
+            
+        population[selectreplaceparent] = children[selectreplacechild]
+        picklistparent.append(selectreplaceparent)
+        
+        del children[selectreplacechild]
+        number_of_selected -= 1
+
+    return population

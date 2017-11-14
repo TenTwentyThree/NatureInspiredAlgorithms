@@ -1,6 +1,5 @@
 import numpy as np
 import random
-import recombination
 
 def roulette_wheel_selection_(population):
 

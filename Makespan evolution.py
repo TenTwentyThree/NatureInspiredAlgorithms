@@ -6,7 +6,7 @@ Created on Sat Nov 11 08:39:05 2017
 
 import random
 
-#---------------------------------------------------------------P R E D E F I N I T I O N   O F   E X P E R I M E N T   A N D   O B J E C T S --------------------
+#--------------------------------------------------------------- P R E D E F I N I T I O N   O F   E X P E R I M E N T   A N D   O B J E C T S --------------------
 class individual:
     """an indivdual is a python object that has the values "genome" and "fitness"
     The genome is a list of integer between 1 and 20, encoding job distribution. Its length is determined by the number of jobs
@@ -113,7 +113,7 @@ def generate_initial_population(numberofindividuals):
 
 #--------------------------------------------------------------- S E L E C T I O N   D E F I N I T I O N -------------------------------------
 
-def selectionTurnament(population):
+def selectionTournament(population):
     competitors = population
     #fitnessValues = []
     matingpool = []
@@ -126,13 +126,13 @@ def selectionTurnament(population):
     '''
 
     #defines how many individuals are in the matingpool needs to be an even number 
-    sizeMatingPool = (len(population) // 3) * 2
-    if sizeMatingPool % 2 == 1:
-        sizeMatingPool -= 1
+    
     if len(competitors) % 2 == 1:
         del competitors[random.randint(0,len(competitors) - 1)]
+    sizeMatingPool = len(population)
         
-    while sizeMatingPool > 0:
+    while sizeMatingPool > 1:
+        print(sizeMatingPool)
         #store population length for quick exces
         sizeCompetitors = len(competitors)
         #set parents to invalid values
@@ -170,7 +170,7 @@ def selectionTurnament(population):
             sizeMatingPool -= 2
             
     return matingpool
-#---------------------------------------------------------------M U T A T I O N   F U N C T I O N S -------------------------------------
+#--------------------------------------------------------------- M U T A T I O N   F U N C T I O N S -------------------------------------
         
 
 def mutation(population):
@@ -225,7 +225,7 @@ def mutateReverse(chromosome):
 
     return  chromosome
 
-#---------------------------------------------------------------R E C O M B I N A T I O N   O P E R A T I O N S------------------------
+#--------------------------------------------------------------- R E C O M B I N A T I O N   O P E R A T I O N S------------------------
         
 
 def onepoint(p1,p2):
@@ -287,7 +287,7 @@ def uniformCrossover(p1,p2):
     #return the new children
     return c1,c2
 
-def recombine(matingpool):
+def recombine(matingpool, recomMethod):
     '''
     Generates new offsprings from the matingpool
     INPUT:
@@ -297,7 +297,6 @@ def recombine(matingpool):
     '''
     children = []
     #which reombination method we want to use, untill now just 1
-    recomMethod = 1
 
     #recombine 2 parents from the matingpool untill the mating pool ist empty
     while len(matingpool) > 0:
@@ -334,10 +333,36 @@ def recombine(matingpool):
 
 #--------------------------------------------------------------- R E P L A C E R -------------------------------------------------------------------------------
 
-def delete_all(population):
+def delete_all(population, children):
+    population = children
+    return population
+    
+    
+def steady_state(population, children):
+    picklistparent = []
+    number_of_selected = random.randint(1,len(population))
+    print(number_of_selected)
+
+    while number_of_selected > 0:
+        
+        selectreplaceparent = random.randint(0,len(population) - 1)
+        selectreplacechild = random.randint(0,len(children) - 1)
+        
+        while selectreplaceparent in picklistparent:
+            selectreplaceparent = random.randint(0,len(population) - 1)
+
+            
+        population[selectreplaceparent] = children[selectreplacechild]
+        picklistparent.append(selectreplaceparent)
+        
+        del children[selectreplacechild]
+        number_of_selected -= 1
+
+    return population
     
 
-#---------------------------------------------------------------I M P L E M E N T A T I O N   O F   U S E R   I N P U T   A N D   E X E C U T I O N -----------------------------------------
+#--------------------------------------------------------------- I M P L E M E N T A T I O N   O F   U S E R   I N P U T   A N D   E X E C U T I O N -----------------------------------------
+
 def user_input():
     individuals = int(input("Please enter the number of individuals per generation: "))
     return individuals
@@ -354,7 +379,12 @@ def initalize():
     
     usercommands = user_input()
     print("Initializing population with",usercommands,"individuals.")
-    pop = generate_initial_population(usercommands)
+    
+    population = generate_initial_population(usercommands)
+    sec = selectionTournament(population)
+    for item in sec:
+        print(item.genome)
+    
     
     
         
