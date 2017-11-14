@@ -129,7 +129,7 @@ def selectionTournament(population):
     
     if len(competitors) % 2 == 1:
         del competitors[random.randint(0,len(competitors) - 1)]
-    sizeMatingPool = len(population)
+    sizeMatingPool = ((len(population) // 3) * 2)
         
     while sizeMatingPool > 1:
         print(sizeMatingPool)
@@ -170,6 +170,14 @@ def selectionTournament(population):
             sizeMatingPool -= 2
             
     return matingpool
+
+
+def FPselection(population):
+    selectionlist = []
+    sortedpop = sorted(population, key=lambda individual: individual.fitness)
+    
+    
+    
 #--------------------------------------------------------------- M U T A T I O N   F U N C T I O N S -------------------------------------
         
 
@@ -333,7 +341,7 @@ def recombine(matingpool, recomMethod):
 
 #--------------------------------------------------------------- R E P L A C E R -------------------------------------------------------------------------------
 
-def delete_all(population, children):
+def mantis(population, children):
     population = children
     return population
     
@@ -382,8 +390,6 @@ def initalize():
     
     population = generate_initial_population(usercommands)
     sec = selectionTournament(population)
-    for item in sec:
-        print(item.genome)
     
     
     
