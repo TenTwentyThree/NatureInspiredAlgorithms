@@ -25,3 +25,8 @@ def steadystate(population, children):
 
     print(population)
     return population
+
+def steady_state(population, children):
+    number_of_selected = random.randint(1,len(population))
+    while number_of_selected > 0:
+        

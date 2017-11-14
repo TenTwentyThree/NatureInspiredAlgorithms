@@ -111,6 +111,65 @@ def generate_initial_population(numberofindividuals):
     
     return initialpop
 
+#--------------------------------------------------------------- S E L E C T I O N   D E F I N I T I O N -------------------------------------
+
+def selectionTurnament(population):
+    competitors = population
+    #fitnessValues = []
+    matingpool = []
+
+    '''
+    #for each individum in the population mapp the fitnessvalue in a list
+    for individum in competitors:
+        currentfitness = individum.fitness
+        fitnessValues.append(currentfitness)
+    '''
+
+    #defines how many individuals are in the matingpool needs to be an even number 
+    sizeMatingPool = (len(population) // 3) * 2
+    if sizeMatingPool % 2 == 1:
+        sizeMatingPool -= 1
+    if len(competitors) % 2 == 1:
+        del competitors[random.randint(0,len(competitors) - 1)]
+        
+    while sizeMatingPool > 0:
+        #store population length for quick exces
+        sizeCompetitors = len(competitors)
+        #set parents to invalid values
+        p1_index = -1
+        p2_index = -1
+        #choose differnet parents untill they are not the same individuals
+        while p1_index == p2_index:
+            p1_index = random.randint(0,sizeCompetitors - 1)
+            p2_index = random.randint(0,sizeCompetitors - 1)
+
+        p1_fit = competitors[p1_index].fitness
+        p2_fit = competitors[p2_index].fitness
+        #p1 is fitter than p2
+        if p1_fit > p2_fit:
+            #append the matingpool with the fitter parent
+            matingpool.append(competitors[p1_index])
+            #delete the winnging parent, because he is no longer a competitor
+            competitors.pop(p1_index)
+            #shrink the size of the matingpool, because we have found a parent
+            sizeMatingPool -= 1
+        #p2 is fitter than p1
+        if p1_fit < p2_fit:
+            #append the matingpool with the fitter parent
+            matingpool.append(competitors[p2_index])
+            #delete the winnging parent, because he is no longer a competitor
+            competitors.pop(p2_index)
+            #shrink the size of the matingpool, because we have found a parent
+            sizeMatingPool -= 1
+        # if nothing holds we have a sting, booth are equaly fit, so we do nothing 
+        if p1_fit == p2_fit:
+            matingpool.append(competitors[p2_index])
+            matingpool.append(competitors[p1_index])
+            competitors.pop(p2_index)
+            competitors.pop(p1_index)
+            sizeMatingPool -= 2
+            
+    return matingpool
 #---------------------------------------------------------------M U T A T I O N   F U N C T I O N S -------------------------------------
         
 
@@ -273,6 +332,10 @@ def recombine(matingpool):
     return children
 
 
+#--------------------------------------------------------------- R E P L A C E R -------------------------------------------------------------------------------
+
+def delete_all(population):
+    
 
 #---------------------------------------------------------------I M P L E M E N T A T I O N   O F   U S E R   I N P U T   A N D   E X E C U T I O N -----------------------------------------
 def user_input():
@@ -288,9 +351,11 @@ def initalize():
     mutation2 = False
     numberofmachines = 20
     joblist = gen_rand_standard(200) + gen_rand_one(100)
+    
     usercommands = user_input()
     print("Initializing population with",usercommands,"individuals.")
-    generate_initial_population(usercommands)
+    pop = generate_initial_population(usercommands)
+    
     
         
     
