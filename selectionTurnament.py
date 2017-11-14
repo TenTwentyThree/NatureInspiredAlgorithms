@@ -19,7 +19,7 @@ def selectionTurnament(population):
         p1_index = -1
         p2_index = -1
         #choose differnet parents untill they are not the same individuals
-        while parent1 == parent2:
+        while p1_index == p2_index:
             p1_index = random.randint(0,sizePopulation-1)
             p2_index = random.randint(0,sizePopulation-1)
 
