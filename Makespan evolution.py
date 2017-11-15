@@ -257,7 +257,7 @@ def onepoint(p1,p2):
     c1: List of Child one, offspring of p1,p2
     c2: List of Child two, offspring of p1,p2
     '''
-    
+
     parentlength = (len(p1)-1)
     #create children 1 and 2
     c1 = []
@@ -303,8 +303,7 @@ def uniformCrossover(p1,p2):
         else:
             c1.append(p2[i])
             c2.append(p1[i])
-    list(c1)
-    list(c2)
+
     #return the new children
     return c1,c2
 
@@ -334,6 +333,9 @@ def recombine(matingpool):
         #save the two parents
         parent1 = matingpool[choice1]
         parent2 = matingpool[choice2]
+
+        print(type(parent1))
+        print(type(parent2))
 
         #execute the recombination method of your choice and save the new children in c1 and c2
         if recomMethod == 1:
@@ -389,7 +391,16 @@ def evolve(population):
 
     OUTPUT: next generation
     """
+
+
+
+
     matingpool = selectionTournament(population)
+    print(population)
+    matingpoolList = []
+    for index in range(0,individuals-1):
+        matingpoolList.append(population[index].genome)
+
     children = recombine(matingpool)
     children = mutation(children)
     new_population = steady_state(population,children)
@@ -445,7 +456,7 @@ def user_input():
     individuals = int(input("Please enter the number of individuals per generation: "))
     #global so we dont need to return value
     recomMethod = int(input("Please enter the recombination method OnePoint[1]  UniformBased[2]: "))
-    return individuals, recomMethod
+    return individuals, recomMethod, individuals
 
 def initalize():
     global mutation1
@@ -455,6 +466,7 @@ def initalize():
     global jobtime
     global recomMethod
     global fitnessoveriterations
+    global individuals
 
     mutation1 = True
     mutation2 = False
@@ -465,7 +477,7 @@ def initalize():
     print("Jobtime: ",jobtime)
 
 
-    usercommands, recomMethod = user_input()
+    usercommands, recomMethod, individuals = user_input()
     print("Initializing population with",usercommands,"individuals.")
 
     population = generate_initial_population(usercommands)
