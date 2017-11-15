@@ -390,17 +390,21 @@ def evolve(population):
     """
 
 
-
+    #select the matingpool - still objects
     matingpool = selectionTournament(population)
 
+    #convert matingpool objects to a list
     matingpoolList = []
     for index in range(0,len(matingpool)-1):
         matingpoolList.append(matingpool[index].genome)
 
+    #recombine and mutate children
     children = recombine(matingpoolList)
     children = mutation(children)
     new_population = mantis(population,children)
+    print(new_population)
 
+    # here the program fails
     new_population = generate_population_from_genes(new_population)
 
     return new_population
