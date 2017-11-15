@@ -18,6 +18,7 @@ class individual:
         """the fitness of an individual is updated with simply calling individual.update_fitness()"""
 
     def update_fitness(self):
+        '''
         totaldistance = 0
         iterator = 0
         machine =  [0]*numberofmachines
@@ -28,6 +29,8 @@ class individual:
             for compare in machine:
                 totaldistance += abs(totaltime - compare)
         self.fitness = jobtime - totaldistance
+        '''
+        self.fitness = random.randint(0,10000)
 
 
 
@@ -82,7 +85,7 @@ def generate_population_from_genes(listofgenomes):
     while indexofgenomes != -1:
         genome = listofgenomes[indexofgenomes]
         newindividual = individual(genome, 0)
-        #newindividual.update_fitness()
+        newindividual.update_fitness()
         population.append(newindividual)
         indexofgenomes -= 1
 
@@ -123,7 +126,6 @@ def generate_initial_population(numberofindividuals):
 
 def selectionTournament(population):
     competitors = population
-    #fitnessValues = []
     matingpool = []
 
     '''
@@ -149,8 +151,8 @@ def selectionTournament(population):
         p2_index = -1
         #choose differnet parents untill they are not the same individuals
         while p1_index == p2_index:
-            p1_index = random.randint(0,sizeCompetitors - 1)
-            p2_index = random.randint(0,sizeCompetitors - 1)
+            p1_index = random.randint(0,sizeCompetitors - 2)
+            p2_index = random.randint(0,sizeCompetitors - 2)
 
         p1_fit = competitors[p1_index].fitness
         p2_fit = competitors[p2_index].fitness
@@ -171,12 +173,14 @@ def selectionTournament(population):
             #shrink the size of the matingpool, because we have found a parent
             sizeMatingPool -= 1
         # if nothing holds we have a sting, booth are equaly fit, so we do nothing
+
         if p1_fit == p2_fit:
             matingpool.append(competitors[p2_index])
             matingpool.append(competitors[p1_index])
             competitors.pop(p2_index)
             competitors.pop(p1_index)
             sizeMatingPool -= 2
+
     print("Tournament finished")
     return matingpool
 
@@ -323,10 +327,6 @@ def recombine(matingpool):
 
     #recombine 2 parents from the matingpool untill the mating pool ist empty
     while len(matingpool) > 1:
-        print("matingpool: ")
-        print(len(matingpool))
-        print("Children: ")
-        print(len(children))
 
         #in every iteration compute the matingpool size again, because its shrinking
         sizeMatingPool = (len(matingpool)-1)
@@ -363,9 +363,9 @@ def recombine(matingpool):
 #--------------------------------------------------------------- R E P L A C E R -------------------------------------------------------------------------------
 
 def mantis(population, children):
-    population = population + children
+    new_population = population + children
     print("Replaced")
-    return population
+    return new_population
 
 
 def steady_state(population, children):
@@ -375,11 +375,11 @@ def steady_state(population, children):
 
     while number_of_selected > 0:
 
-        selectreplaceparent = random.randint(0,len(population) - 1)
-        selectreplacechild = random.randint(0,len(children) - 1)
+        selectreplaceparent = random.randint(0,len(population)-1)
+        selectreplacechild = random.randint(0,len(children)-1)
 
         while selectreplaceparent in picklistparent:
-            selectreplaceparent = random.randint(0,len(population) - 1)
+            selectreplaceparent = random.randint(0,len(population)-1)
 
 
         population[selectreplaceparent] = children[selectreplacechild]
@@ -408,10 +408,14 @@ def evolve(population):
     for index in range(0,len(matingpool)-1):
         matingpoolList.append(matingpool[index].genome)
 
+    populationList = []
+    for index in range(0,len(population)-1):
+        populationList.append(population[index].genome)
+
     #recombine and mutate children
     children = recombine(matingpoolList)
     children = mutation(children)
-    new_population = mantis(population,children)
+    new_population = mantis(populationList,children)
 
     # here the program fails
     new_population = generate_population_from_genes(new_population)
@@ -432,7 +436,7 @@ def evolution(initialpopulation):
 
 
     while terminalcount != 50:
-        print("evaluating generation: ",countgenerations)
+        print("#-----------------+Evaluating generation: ",countgenerations," +-------------------------#")
         countgenerations += 1
 
         population = evolve(population)
@@ -459,7 +463,6 @@ def evolution(initialpopulation):
 
         #save fittest indivivudal per iteration
         fitestovergenerations.append(bestindiv)
-        print("One Time Through")
 
 
     return(bestindiv, countgenerations)
@@ -499,9 +502,11 @@ def initalize():
     bestindiv, generationcount = evolution(population)
 
     print("Found best indivivudal :")
-    print(bestindiv)
+    print(bestindiv.genome)
     print("In generation :")
     print(generationcount)
+    print("With Fitnes :")
+    print(bestindiv.fitness)
 
 
 
