@@ -308,7 +308,7 @@ def uniformCrossover(p1,p2):
     #return the new children
     return c1,c2
 
-def recombine(matingpool, recomMethod):
+def recombine(matingpool):
     '''
     Generates new offsprings from the matingpool
     INPUT:
@@ -383,6 +383,55 @@ def steady_state(population, children):
     
 
 #--------------------------------------------------------------- I M P L E M E N T A T I O N   O F   U S E R   I N P U T   A N D   E X E C U T I O N -----------------------------------------
+def evolution(inipop):
+    """
+    in: initial population: list of individuals out: best individual 
+    """
+    population = inipop
+    countgenerations = 0
+    terminalcount = 0
+    bestindiv = inipop[0]
+    print("initializing with fitness: ",bestindiv.fitness)
+    
+    
+    while terminalcount != 25:
+        
+        print("evaluating generation: ",countgenerations)
+        countgenerations += 1
+        
+        
+        #Genetic Algorithm stuff
+        matingpool = selectionTournament(poulation)
+        children = recombine(matingpool)
+        children = mutation(children)
+        population = steady_state(population,children)
+        
+        #EVALUATE FITTEST INDIVIDUAL - TODO?
+        onlyfitness = []
+        #save fitnessvalues in a list
+        for index in (len(population)-1):
+            currentfitness = index.fitness
+            onlyfitness.append(currentfitness)   
+        #save the best 
+        generationbest = population[onlyfitness.index(max(onlyfitness))]
+        #clear onlyfittness for next generation
+        onlyfitness.clear()
+        
+        
+        if generationsbest.fitness > bestindiv.fitness:
+            
+            bestindiv = generationsbest
+            print("Better individual found in generation",countgenerations,"! Top fitness now: ",bestindiv.fitness)
+            terminalcount = 0
+        else:
+            terminalcount += 1
+
+        
+        
+        population = evolution(population)
+        
+        
+    return(bestindiv, countgenerations)
 
 def user_input():
     individuals = int(input("Please enter the number of individuals per generation: "))
@@ -394,10 +443,12 @@ def initalize():
     global joblist
     global numberofmachines
     global jobtime
+    global recomMethod
     jobtime = get_total_time()
     print("Jobtime: ",jobtime)
     mutation1 = True
     mutation2 = False
+    recomMethod = 1
     numberofmachines = 20
     joblist = gen_rand_standard(200) + gen_rand_one(100)
 
