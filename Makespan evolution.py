@@ -5,6 +5,7 @@ Created on Sat Nov 11 08:39:05 2017
 """
 
 import random
+import sys
 
 #--------------------------------------------------------------- P R E D E F I N I T I O N   O F   E X P E R I M E N T   A N D   O B J E C T S --------------------
 class individual:
@@ -232,8 +233,7 @@ def mutateReverse(chromosome):
         #create points randomly
         m1 = random.randint(0,chromosomesize-1)
         m2 = random.randint(0,chromosomesize-1)
-    print(m1)
-    print(m2)
+
     #flip the sublist
     sublist = chromosome[m2:m1:-1]
 
@@ -334,9 +334,6 @@ def recombine(matingpool):
         parent1 = matingpool[choice1]
         parent2 = matingpool[choice2]
 
-        print(type(parent1))
-        print(type(parent2))
-
         #execute the recombination method of your choice and save the new children in c1 and c2
         if recomMethod == 1:
             c1,c2 = onepoint(parent1,parent2)
@@ -357,7 +354,7 @@ def recombine(matingpool):
 #--------------------------------------------------------------- R E P L A C E R -------------------------------------------------------------------------------
 
 def mantis(population, children):
-    population = children
+    population = population + children
     return population
 
 
@@ -394,16 +391,17 @@ def evolve(population):
 
 
 
-
     matingpool = selectionTournament(population)
-    print(population)
-    matingpoolList = []
-    for index in range(0,individuals-1):
-        matingpoolList.append(population[index].genome)
 
-    children = recombine(matingpool)
+    matingpoolList = []
+    for index in range(0,len(matingpool)-1):
+        matingpoolList.append(matingpool[index].genome)
+
+    children = recombine(matingpoolList)
     children = mutation(children)
-    new_population = steady_state(population,children)
+    new_population = mantis(population,children)
+
+    new_population = generate_population_from_genes(new_population)
 
     return new_population
 
@@ -418,6 +416,7 @@ def evolution(initialpopulation):
     bestindiv = population[0]
     terminalcount = 0
 
+
     while terminalcount != 50:
         print("evaluating generation: ",countgenerations)
         countgenerations += 1
@@ -426,7 +425,7 @@ def evolution(initialpopulation):
 
         onlyfitness = []
         #save fitnessvalues in a list
-        for index in (len(population)-1):
+        for index in range(0,len(population)-1):
             currentfitness = index.fitness
             onlyfitness.append(currentfitness)
         #save the best
