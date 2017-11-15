@@ -16,8 +16,8 @@ class individual:
         self.genome = genome
         self.fitness = fitness
         """the fitness of an individual is updated with simply calling individual.update_fitness()"""
-        
-    
+
+
     def update_fitness(self):
         #'''
         totaldistance = 0
@@ -74,14 +74,14 @@ def get_total_time():
 def get_distribution_of_time(individual):
     iterator = 0
     distlist = [0]*numberofmachines
-    
+
     genome = individual.genome
     for item in genome:
         distlist[item - 1] += joblist[iterator]
         iterator += 1
     return distlist
-        
-    
+
+
 
 #---------------------------------------------------------------I M P L E M E N T A T I O N   O F   P O P U L A T I O N   G E N E R A T I O N -------------------------------------
 
@@ -468,10 +468,12 @@ def evolution(initialpopulation):
         if generationsbest.fitness > bestindiv.fitness:
             bestindiv = generationsbest
             #save fittest indivivudal per iteration
+            print("")
             print("Better individual found in generation",countgenerations,"!")
             terminalcount = 0
         else:
             terminalcount += 1
+            print(".", sep=' ', end='', flush=True)
 
         #save fittest indivivudal per iteration
         fitestovergenerations.append(bestindiv)
@@ -519,7 +521,7 @@ def initalize():
     bestindiv, generationcount = evolution(population)
     distribution = get_distribution_of_time(bestindiv)
     print("Found best indivivudal :")
-    print(distribution) 
+    print(distribution)
     total = 0
     for item in distribution:
         total += abs(item - jobtime//numberofmachines)
@@ -527,11 +529,24 @@ def initalize():
     print("Average deviation per item from optimal solution: ",total)
     percenttotal = (total / (jobtime // numberofmachines)) * 100
     print("Average deviation in percentage: ",percenttotal, "%")
-    
+
 
     print("In generation :")
     print(generationcount)
 
+
+
+initalize()
+
+'''
+machineTime = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+
+for index in range(0,len(joblist)):
+    machine = int(bestindiv.genome[index])
+    machineTime[machine-1] +=  joblist[index]
+
+print(machineTime)
+'''
 
 
 
