@@ -18,7 +18,7 @@ class individual:
         """the fitness of an individual is updated with simply calling individual.update_fitness()"""
 
     def update_fitness(self):
-        '''
+        #'''
         totaldistance = 0
         iterator = 0
         machine =  [0]*numberofmachines
@@ -29,8 +29,8 @@ class individual:
             for compare in machine:
                 totaldistance += abs(totaltime - compare)
         self.fitness = jobtime - totaldistance
-        '''
-        self.fitness = random.randint(0,10000)
+        #'''
+        #self.fitness = random.randint(0,10000)
 
 
 
@@ -137,13 +137,12 @@ def selectionTournament(population):
 
     #defines how many individuals are in the matingpool needs to be an even number
 
-    if len(competitors) % 2 == 1:
-        del competitors[random.randint(0,len(competitors) - 1)]
     sizeMatingPool = ((len(population) // 3) * 2)
+    print(sizeMatingPool)
 
 
 
-    while sizeMatingPool > 1:
+    while sizeMatingPool != 0:
         #store population length for quick exces
         sizeCompetitors = len(competitors)
         #set parents to invalid values
@@ -162,25 +161,28 @@ def selectionTournament(population):
             matingpool.append(competitors[p1_index])
             #delete the winnging parent, because he is no longer a competitor
             competitors.pop(p1_index)
+
             #shrink the size of the matingpool, because we have found a parent
             sizeMatingPool -= 1
         #p2 is fitter than p1
-        if p1_fit < p2_fit:
+        elif p1_fit < p2_fit:
             #append the matingpool with the fitter parent
             matingpool.append(competitors[p2_index])
             #delete the winnging parent, because he is no longer a competitor
             competitors.pop(p2_index)
+
             #shrink the size of the matingpool, because we have found a parent
             sizeMatingPool -= 1
         # if nothing holds we have a sting, booth are equaly fit, so we do nothing
 
-        if p1_fit == p2_fit:
+        elif p1_fit == p2_fit:
             matingpool.append(competitors[p2_index])
             matingpool.append(competitors[p1_index])
             competitors.pop(p2_index)
             competitors.pop(p1_index)
             sizeMatingPool -= 2
-
+    print("Size of Competitors: ",len(competitors))
+    print("Size of Matingpool: ",len(matingpool))
     print("Tournament finished")
     return matingpool
 
@@ -210,6 +212,7 @@ def mutation(population):
                 mutateRandomResetting(population[i])
             elif mutation2:
                 mutateReverse(population[i])
+    print("Size of Population: ",len(population))
     print("Mutation finished")
     return population
 
@@ -313,6 +316,7 @@ def uniformCrossover(p1,p2):
             c2.append(p1[i])
 
     #return the new children
+
     return c1,c2
 
 def recombine(matingpool):
@@ -324,9 +328,8 @@ def recombine(matingpool):
     children: List of generated offsprings from the matingpool
     '''
     children = []
-
     #recombine 2 parents from the matingpool untill the mating pool ist empty
-    while len(matingpool) > 1:
+    while len(matingpool) > 0:
 
         #in every iteration compute the matingpool size again, because its shrinking
         sizeMatingPool = (len(matingpool)-1)
@@ -355,7 +358,8 @@ def recombine(matingpool):
         #remove the parents from the matingpool
         matingpool.remove(parent1)
         matingpool.remove(parent2)
-
+    print("Size of children: ",len( children))
+    print("Size of Matingpool: ",len(matingpool))
     print("Recombination finished")
     return children
 
@@ -435,11 +439,12 @@ def evolution(initialpopulation):
     fitestovergenerations = []
 
 
-    while terminalcount != 50:
+    while terminalcount != 500:
         print("#-----------------+Evaluating generation: ",countgenerations," +-------------------------#")
         countgenerations += 1
 
         population = evolve(population)
+        print("Length of Population: ",len(population))
 
         onlyfitness = []
         #save fitnessvalues in a list
@@ -471,6 +476,10 @@ def evolution(initialpopulation):
 
 def user_input():
     individuals = int(input("Please enter the number of individuals per generation: "))
+    #make shure we got a even population
+    if individuals % 2 == 1:
+        print("upps, one to much")
+        individuals -= 1
     #global so we dont need to return value
     recomMethod = int(input("Please enter the recombination method OnePoint[1]  UniformBased[2]: "))
     return individuals, recomMethod, individuals
