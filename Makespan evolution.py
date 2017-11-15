@@ -26,7 +26,7 @@ class individual:
         for totaltime in machine:
             for compare in machine:
                 totaldistance += abs(totaltime - compare)
-        self.fitness = 0 - totaldistance
+        self.fitness = jobtime - totaldistance
             
             
 
@@ -58,6 +58,13 @@ def gen_rand_two(nmbofitems):
         newjob = random.randint(400,700)
         nmbofitems -= 1
         twolist.append(newjob)
+        
+def get_total_time():
+    totalvalue = 0
+    for item in joblist:
+        totalvalue += item
+        
+    return totalvalue
     
 
 #---------------------------------------------------------------I M P L E M E N T A T I O N   O F   P O P U L A T I O N   G E N E R A T I O N -------------------------------------
@@ -174,7 +181,11 @@ def selectionTournament(population):
 
 def FPselection(population):
     selectionlist = []
+    totalfit = 0
     sortedpop = sorted(population, key=lambda individual: individual.fitness)
+    for ind in sortedpop:
+        totalfit += ind.fitness
+    
     
     
     
@@ -292,6 +303,8 @@ def uniformCrossover(p1,p2):
         else:
             c1.append(p2[i])
             c2.append(p1[i])
+    list(c1)
+    list(c2)
     #return the new children
     return c1,c2
 
@@ -380,16 +393,21 @@ def initalize():
     global mutation2
     global joblist
     global numberofmachines
+    global jobtime
+    jobtime = get_total_time()
+    print("Jobtime: ",jobtime)
     mutation1 = True
     mutation2 = False
     numberofmachines = 20
     joblist = gen_rand_standard(200) + gen_rand_one(100)
+
     
     usercommands = user_input()
     print("Initializing population with",usercommands,"individuals.")
     
     population = generate_initial_population(usercommands)
-    sec = selectionTournament(population)
+    for item in population:
+        print(item.fitness)
     
     
     
