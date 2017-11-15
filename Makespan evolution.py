@@ -38,7 +38,7 @@ class individual:
 
 
 def gen_rand_standard(nmbofitems):
-    """This generator generates jobs for experiment 1&2"""
+    """This function generates jobs for experiment 1&2"""
     standardlist = []
     while nmbofitems != 0:
         newjob = random.randint(10,1000)
@@ -48,7 +48,7 @@ def gen_rand_standard(nmbofitems):
 
 
 def gen_rand_one(nmbofitems):
-    """This generator generates jobs for the FIRST experiment involing runtimes between 100 and 300"""
+    """This function generates jobs for the FIRST experiment involing runtimes between 100 and 300"""
     onelist = []
     while nmbofitems != 0:
         newjob = random.randint(100,300)
@@ -57,14 +57,25 @@ def gen_rand_one(nmbofitems):
     return onelist
 
 def gen_rand_two(nmbofitems):
-    """This generator generates jobs for the SECOND experiment involing runtimes between 400 and 700"""
+    """This function generates jobs for the SECOND experiment involing runtimes between 400 and 700"""
     twolist = []
     while nmbofitems != 0:
         newjob = random.randint(400,700)
         nmbofitems -= 1
         twolist.append(newjob)
+        
+def gen_rand_three():
+    counter = 51
+    threelist = []
+    threelist = [50]*3
+    while counter < 100:
+        threelist.append(counter)
+        threelist.append(counter)
+        counter += 1
+    return threelist
 
 def get_total_time():
+    """this function checks the total amount of time to distribute"""
     totalvalue = 0
     for item in joblist:
         totalvalue += item
@@ -72,6 +83,7 @@ def get_total_time():
     return totalvalue
 
 def get_distribution_of_time(individual):
+    """This function returns the time distributed to every indivdual"""
     iterator = 0
     distlist = [0]*numberofmachines
 
@@ -195,16 +207,6 @@ def selectionTournament(population):
             sizeMatingPool -= 2
 
     return matingpool
-
-
-def FPselection(population):
-    selectionlist = []
-    totalfit = 0
-    sortedpop = sorted(population, key=lambda individual: individual.fitness)
-    for ind in sortedpop:
-        totalfit += ind.fitness
-
-
 
 
 #--------------------------------------------------------------- M U T A T I O N   F U N C T I O N S -------------------------------------
@@ -493,7 +495,8 @@ def user_input():
     recomMethod = int(input("Please enter the recombination method OnePoint[1]  UniformBased[2]: "))
     mutMethod = int(input("Please enter the mutation method Random Resetting[1]  Reverse[2]: "))
     gendepth = int(input("Please enter the number of generations for which is searched for after finding a better individual: "))
-    return individuals, recomMethod, individuals, gendepth, mutMethod
+    bench = int(input("Please enter the type of Benchmark you want to use: [1],[2],[3]: "))
+    return bench, individuals, recomMethod, individuals, gendepth, mutMethod
 
 def initalize():
     global mutation1
@@ -508,15 +511,25 @@ def initalize():
 
     mutation1 = False
     mutation2 = False
-    numberofmachines = 20
-
-    joblist = gen_rand_standard(200) + gen_rand_one(100)
+    
+    
+    benchmark, usercommands, recomMethod, individuals, maxgeneration, mutationchoice = user_input()
+    if benchmark == 1:
+        joblist = gen_rand_standard(200) + gen_rand_one(100)
+        numberofmachines = 20
+    if benchmark == 2:
+        joblist = gen_rand_standard(150) + gen_rand_two(150)
+        numberofmachines = 20
+    if benchmark == 3:
+        joblist = gen_rand_three()
+        numberofmachines = 50
+        
     jobtime = get_total_time()
     print("Jobtime: ",jobtime)
-    print("Theoretical optimal distribution of time: ",jobtime//numberofmachines)
+    print("Theoretical optimal distribution of time: ",jobtime/numberofmachines)
 
 
-    usercommands, recomMethod, individuals, maxgeneration, mutationchoice = user_input()
+    
     if mutationchoice == 1:
         mutation1 = True
     if mutationchoice == 2:
@@ -547,15 +560,7 @@ def initalize():
 
 initalize()
 
-'''
-machineTime = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 
-for index in range(0,len(joblist)):
-    machine = int(bestindiv.genome[index])
-    machineTime[machine-1] +=  joblist[index]
-
-print(machineTime)
-'''
 
 
 
