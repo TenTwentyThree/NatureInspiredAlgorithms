@@ -447,7 +447,7 @@ def evolution(initialpopulation):
     print("Initalizing with best individual fitness : ",bestindiv.fitness)
 
 
-    while terminalcount != 500:
+    while terminalcount != maxgeneration:
         countgenerations += 1
 
         population = evolve(population)
@@ -489,7 +489,9 @@ def user_input():
         individuals -= 1
     #global so we dont need to return value
     recomMethod = int(input("Please enter the recombination method OnePoint[1]  UniformBased[2]: "))
-    return individuals, recomMethod, individuals
+    mutMethod = int(input("Please enter the mutation method Random Resetting[1]  Reverse[2]: "))
+    gendepth = int(input("Please enter the number of generations for which is searched for after finding a better individual: "))
+    return individuals, recomMethod, individuals, gendepth, mutMethod
 
 def initalize():
     global mutation1
@@ -500,8 +502,9 @@ def initalize():
     global recomMethod
     global fitnessoveriterations
     global individuals
+    global maxgeneration
 
-    mutation1 = True
+    mutation1 = False
     mutation2 = False
     numberofmachines = 20
 
@@ -511,8 +514,14 @@ def initalize():
     print("Theoretical optimal distribution of time: ",jobtime//numberofmachines)
 
 
-    usercommands, recomMethod, individuals = user_input()
+    usercommands, recomMethod, individuals, maxgeneration, mutationchoice = user_input()
+    if mutationchoice == 1:
+        mutation1 = True
+    if mutationchoice == 2:
+        mutation2 = True
     print("Initializing population with",usercommands,"individuals.")
+    
+    
 
     population = generate_initial_population(usercommands)
 
