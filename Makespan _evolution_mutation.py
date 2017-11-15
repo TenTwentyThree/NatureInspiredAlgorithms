@@ -6,6 +6,7 @@ Created on Sat Nov 11 08:39:05 2017
 
 import random
 import sys
+import math
 
 #--------------------------------------------------------------- P R E D E F I N I T I O N   O F   E X P E R I M E N T   A N D   O B J E C T S --------------------
 class individual:
@@ -218,49 +219,100 @@ def mutation(population):
     for i in range(populationsize):
         mutation = random.uniform(0,1)
         if mutation <= probability:
-            if mutation1:
-                mutateRandomResetting(population[i])
-            elif mutation2:
-                mutateReverse(population[i])
+            # Choose random mutation method or the best one
+            randorchoice = random.uniform(0,1)
+            '''
+            if randorchoice is bigger equal to 0.5 choose the best
+            mutation method, else choose one by chance
+            '''
+            if randorchoice >= 0.1 :
+                choice = mutationChoice.index(max(mutationChoice))
+            else:
+                choice = random.randint(0,2)
+
+            #hold fitness of choromosom to compare later
+            chromosome = generate_population_from_genes([population[i]])
+            fit = chromosome[0].fitness
+
+            #mutate with the choosen method
+            if choice == 0:
+                #mutate
+                population[i] = mutateRandomResetting(population[i])
+            elif choice == 1:
+                #mutate
+                population[i] = mutateReverse(population[i])
+            elif choice == 2:
+                #mutate
+                population[i] = mutateScramble(population[i])
+
+
+            '''
+            evaluate new fittnes, if the fittness is better,
+            the method gets a better rank and is choosen more often.
+            If the fittness is worse, it also gets a worse rank
+            '''
+            chromosome = generate_population_from_genes([population[i]])
+            newfit = chromosome[0].fitness
+            fitdif = newfit-fit
+            if fitdif > 0:
+                mutationChoice[choice] += (-1* math.log(fitdif))
+            #else:
+            #    mutationChoice[choice] -= math.log(fit)
+
+            for i in range(0,3):
+                mutationChoice[i] = mutationChoice[i]/20
 
     return population
 
-#mutates a specific machine to an other at a random place
-#mutates a random allel in a chromosome
+
 def mutateRandomResetting(chromosome):
-    mutateMachine = random.randint(0,numberofmachines)
+    '''
+    mutates a specific machine to an other at a random place
+    mutates a random allel in a chromosome
+    '''
+    mutateMachine = random.randint(0,20)
     mutatePlace = random.randint(0,len(chromosome)-1)
 
 #making sure that w do not mutate the one machine to the same machine
     while chromosome[mutatePlace] == mutateMachine:
-        mutateMachine = random.randint(0,numberofmachines)
+        mutateMachine = random.randint(0,20)
 
     chromosome[mutatePlace] = mutateMachine
     return chromosome
 
+
 def mutateReverse(chromosome):
-    '''
-    choose two random points and flip array in between
-    '''
-    #save length for quick access
     chromosomesize = len(chromosome)
 
     m1 = -1
     m2 = -1
-    #as long as m2 is smaller than m1 and make sure that they are at least 2 numbers appart
     while m2-m1 <= 2 :
-        #create points randomly
         m1 = random.randint(0,chromosomesize-1)
         m2 = random.randint(0,chromosomesize-1)
-
-    #flip the sublist
     sublist = chromosome[m2:m1:-1]
 
-    #put sublist in chromosome at the respective position
     for i in range(m1+1,m2):
         chromosome[i] = sublist[i-m1]
 
     return  chromosome
+
+def mutateScramble(chromosome):
+    chromosomesize = len(chromosome)
+
+    m1 = -1
+    m2 = -1
+    while m2-m1 <= 2 :
+        m1 = random.randint(0,chromosomesize-1)
+        m2 = random.randint(0,chromosomesize-1)
+    sublist = chromosome[m1:m2]
+
+    for i in range(m1,m2):
+        sublistLength = len(sublist)-1
+        gene = random.randint(0,sublistLength)
+        chromosome[i] = sublist[gene]
+        sublist.remove(sublist[gene])
+
+    return chromosome
 
 #--------------------------------------------------------------- R E C O M B I N A T I O N   O P E R A T I O N S------------------------
 
@@ -447,7 +499,7 @@ def evolution(initialpopulation):
     print("Initalizing with best individual fitness : ",bestindiv.fitness)
 
 
-    while terminalcount != maxgeneration:
+    while terminalcount != 500:
         countgenerations += 1
 
         population = evolve(population)
@@ -470,6 +522,8 @@ def evolution(initialpopulation):
             #save fittest indivivudal per iteration
             print("")
             print("Better individual found in generation",countgenerations,"!")
+            print("Mutation Method: ",mutationChoice.index(max(mutationChoice)))
+            print(mutationChoice)
             terminalcount = 0
         else:
             terminalcount += 1
@@ -491,9 +545,7 @@ def user_input():
         individuals -= 1
     #global so we dont need to return value
     recomMethod = int(input("Please enter the recombination method OnePoint[1]  UniformBased[2]: "))
-    mutMethod = int(input("Please enter the mutation method Random Resetting[1]  Reverse[2]: "))
-    gendepth = int(input("Please enter the number of generations for which is searched for after finding a better individual: "))
-    return individuals, recomMethod, individuals, gendepth, mutMethod
+    return individuals, recomMethod, individuals
 
 def initalize():
     global mutation1
@@ -504,9 +556,12 @@ def initalize():
     global recomMethod
     global fitnessoveriterations
     global individuals
-    global maxgeneration
+    global mutationChoice
+    global countgenerations
 
-    mutation1 = False
+    mutationChoice = [0,0,0]
+
+    mutation1 = True
     mutation2 = False
     numberofmachines = 20
 
@@ -516,14 +571,8 @@ def initalize():
     print("Theoretical optimal distribution of time: ",jobtime//numberofmachines)
 
 
-    usercommands, recomMethod, individuals, maxgeneration, mutationchoice = user_input()
-    if mutationchoice == 1:
-        mutation1 = True
-    if mutationchoice == 2:
-        mutation2 = True
+    usercommands, recomMethod, individuals = user_input()
     print("Initializing population with",usercommands,"individuals.")
-    
-    
 
     population = generate_initial_population(usercommands)
 
