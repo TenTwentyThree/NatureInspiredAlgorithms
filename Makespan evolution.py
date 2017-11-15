@@ -16,7 +16,8 @@ class individual:
         self.genome = genome
         self.fitness = fitness
         """the fitness of an individual is updated with simply calling individual.update_fitness()"""
-
+        
+    
     def update_fitness(self):
         #'''
         totaldistance = 0
@@ -70,6 +71,17 @@ def get_total_time():
 
     return totalvalue
 
+def get_distribution_of_time(individual):
+    iterator = 0
+    distlist = [0]*numberofmachines
+    
+    genome = individual.genome
+    for item in genome:
+        distlist[item - 1] += joblist[iterator]
+        iterator += 1
+    return distlist
+        
+    
 
 #---------------------------------------------------------------I M P L E M E N T A T I O N   O F   P O P U L A T I O N   G E N E R A T I O N -------------------------------------
 
@@ -138,7 +150,6 @@ def selectionTournament(population):
     #defines how many individuals are in the matingpool needs to be an even number
 
     sizeMatingPool = ((len(population) // 3) * 2)
-    print(sizeMatingPool)
 
 
 
@@ -182,9 +193,7 @@ def selectionTournament(population):
             competitors.pop(p2_index)
             competitors.pop(p1_index)
             sizeMatingPool -= 2
-    print("Size of Competitors: ",len(competitors))
-    print("Size of Matingpool: ",len(matingpool))
-    print("Tournament finished")
+
     return matingpool
 
 
@@ -213,8 +222,7 @@ def mutation(population):
                 mutateRandomResetting(population[i])
             elif mutation2:
                 mutateReverse(population[i])
-    print("Size of Population: ",len(population))
-    print("Mutation finished")
+
     return population
 
 #mutates a specific machine to an other at a random place
@@ -328,7 +336,7 @@ def recombine(matingpool):
     OUTPUT:
     children: List of generated offsprings from the matingpool
     '''
-    print("Size of Matingpool: ",len(matingpool))
+
     children = []
     #recombine 2 parents from the matingpool untill the mating pool ist empty
     while len(matingpool) > 0:
@@ -360,9 +368,7 @@ def recombine(matingpool):
         #remove the parents from the matingpool
         matingpool.remove(parent1)
         matingpool.remove(parent2)
-    print("Size of children: ",len( children))
-    print("Size of Matingpool: ",len(matingpool))
-    print("Recombination finished")
+
     return children
 
 
@@ -370,14 +376,13 @@ def recombine(matingpool):
 
 def mantis(population, children):
     new_population = population + children
-    print("Replaced")
     return new_population
 
 
 def steady_state(population, children):
     picklistparent = []
     number_of_selected = random.randint(1,len(population))
-    print(number_of_selected)
+
 
     while number_of_selected > 0:
 
@@ -439,14 +444,14 @@ def evolution(initialpopulation):
     bestindiv = population[0]
     terminalcount = 0
     fitestovergenerations = []
+    print("Initalizing with best individual fitness : ",bestindiv.fitness)
 
 
     while terminalcount != 500:
-        print("#-----------------+Evaluating generation: ",countgenerations," +-------------------------#")
         countgenerations += 1
 
         population = evolve(population)
-        print("Length of Population: ",len(population))
+        #print("Length of Population: ",len(population))
 
         onlyfitness = []
         #save fitnessvalues in a list
@@ -463,7 +468,7 @@ def evolution(initialpopulation):
         if generationsbest.fitness > bestindiv.fitness:
             bestindiv = generationsbest
             #save fittest indivivudal per iteration
-            print("Better individual found in generation",countgenerations,"! Top fitness now: ",bestindiv.fitness)
+            print("Better individual found in generation",countgenerations,"!")
             terminalcount = 0
         else:
             terminalcount += 1
@@ -503,6 +508,7 @@ def initalize():
     joblist = gen_rand_standard(200) + gen_rand_one(100)
     jobtime = get_total_time()
     print("Jobtime: ",jobtime)
+    print("Theoretical optimal distribution of time: ",jobtime//numberofmachines)
 
 
     usercommands, recomMethod, individuals = user_input()
@@ -511,13 +517,21 @@ def initalize():
     population = generate_initial_population(usercommands)
 
     bestindiv, generationcount = evolution(population)
-
+    distribution = get_distribution_of_time(bestindiv)
     print("Found best indivivudal :")
-    print(bestindiv.genome)
+    print(distribution) 
+    total = 0
+    for item in distribution:
+        total += abs(item - jobtime//numberofmachines)
+    total = total // numberofmachines
+    print("Average deviation per item from optimal solution: ",total)
+    percenttotal = (total / (jobtime // numberofmachines)) * 100
+    print("Average deviation in percentage: ",percenttotal, "%")
+    
+
     print("In generation :")
     print(generationcount)
-    print("With Fitnes :")
-    print(bestindiv.fitness)
+
 
 
 
