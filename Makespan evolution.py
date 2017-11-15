@@ -28,7 +28,7 @@ class individual:
         for totaltime in machine:
             for compare in machine:
                 totaldistance += abs(totaltime - compare)
-        self.fitness = jobtime - totaldistance
+        self.fitness = 0 - totaldistance
         #'''
         #self.fitness = random.randint(0,10000)
 
@@ -142,9 +142,10 @@ def selectionTournament(population):
 
 
 
-    while sizeMatingPool != 0:
+    while sizeMatingPool > 0:
         #store population length for quick exces
         sizeCompetitors = len(competitors)
+
         #set parents to invalid values
         p1_index = -1
         p2_index = -1
@@ -327,6 +328,7 @@ def recombine(matingpool):
     OUTPUT:
     children: List of generated offsprings from the matingpool
     '''
+    print("Size of Matingpool: ",len(matingpool))
     children = []
     #recombine 2 parents from the matingpool untill the mating pool ist empty
     while len(matingpool) > 0:
@@ -409,11 +411,11 @@ def evolve(population):
 
     #convert matingpool objects to a list
     matingpoolList = []
-    for index in range(0,len(matingpool)-1):
+    for index in range(0,len(matingpool)):
         matingpoolList.append(matingpool[index].genome)
 
     populationList = []
-    for index in range(0,len(population)-1):
+    for index in range(0,len(population)):
         populationList.append(population[index].genome)
 
     #recombine and mutate children
