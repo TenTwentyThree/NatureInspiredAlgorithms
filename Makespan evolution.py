@@ -82,7 +82,7 @@ def generate_population_from_genes(listofgenomes):
     while indexofgenomes != -1:
         genome = listofgenomes[indexofgenomes]
         newindividual = individual(genome, 0)
-        newindividual.update_fitness()
+        #newindividual.update_fitness()
         population.append(newindividual)
         indexofgenomes -= 1
 
@@ -139,6 +139,8 @@ def selectionTournament(population):
         del competitors[random.randint(0,len(competitors) - 1)]
     sizeMatingPool = ((len(population) // 3) * 2)
 
+
+
     while sizeMatingPool > 1:
         #store population length for quick exces
         sizeCompetitors = len(competitors)
@@ -175,7 +177,7 @@ def selectionTournament(population):
             competitors.pop(p2_index)
             competitors.pop(p1_index)
             sizeMatingPool -= 2
-
+    print("Tournament finished")
     return matingpool
 
 
@@ -204,6 +206,7 @@ def mutation(population):
                 mutateRandomResetting(population[i])
             elif mutation2:
                 mutateReverse(population[i])
+    print("Mutation finished")
     return population
 
 #mutates a specific machine to an other at a random place
@@ -266,6 +269,7 @@ def onepoint(p1,p2):
     cutpoint = random.randint(1,parentlength)
     #Copy Sublist into respective parents
     c1, c2 = (p1[:cutpoint] + p2[cutpoint:], p2[:cutpoint] + p1[cutpoint:])
+    "One Point finished"
     return c1,c2
 
 def uniformCrossover(p1,p2):
@@ -316,17 +320,22 @@ def recombine(matingpool):
     children: List of generated offsprings from the matingpool
     '''
     children = []
-    #which reombination method we want to use, untill now just 1
 
     #recombine 2 parents from the matingpool untill the mating pool ist empty
-    while len(matingpool) > 0:
+    while len(matingpool) > 1:
+        print("matingpool: ")
+        print(len(matingpool))
+        print("Children: ")
+        print(len(children))
+
         #in every iteration compute the matingpool size again, because its shrinking
-        sizeMatingPool = len(matingpool)-1
+        sizeMatingPool = (len(matingpool)-1)
         choice1 = -1
         choice2 = -1
 
         #select two random differnet parents from the mating pool
         while choice1 == choice2:
+
             choice1 = random.randint(0,sizeMatingPool)
             choice2 = random.randint(0,sizeMatingPool)
 
@@ -347,7 +356,7 @@ def recombine(matingpool):
         matingpool.remove(parent1)
         matingpool.remove(parent2)
 
-
+    print("Recombination finished")
     return children
 
 
@@ -355,6 +364,7 @@ def recombine(matingpool):
 
 def mantis(population, children):
     population = population + children
+    print("Replaced")
     return population
 
 
@@ -402,7 +412,6 @@ def evolve(population):
     children = recombine(matingpoolList)
     children = mutation(children)
     new_population = mantis(population,children)
-    print(new_population)
 
     # here the program fails
     new_population = generate_population_from_genes(new_population)
@@ -419,6 +428,7 @@ def evolution(initialpopulation):
     population = initialpopulation
     bestindiv = population[0]
     terminalcount = 0
+    fitestovergenerations = []
 
 
     while terminalcount != 50:
@@ -430,10 +440,10 @@ def evolution(initialpopulation):
         onlyfitness = []
         #save fitnessvalues in a list
         for index in range(0,len(population)-1):
-            currentfitness = index.fitness
+            currentfitness = population[index].fitness
             onlyfitness.append(currentfitness)
         #save the best
-        generationbest = population[onlyfitness.index(max(onlyfitness))]
+        generationsbest = population[onlyfitness.index(max(onlyfitness))]
         #clear onlyfittness for next generation
         onlyfitness.clear()
 
@@ -449,6 +459,7 @@ def evolution(initialpopulation):
 
         #save fittest indivivudal per iteration
         fitestovergenerations.append(bestindiv)
+        print("One Time Through")
 
 
     return(bestindiv, countgenerations)
