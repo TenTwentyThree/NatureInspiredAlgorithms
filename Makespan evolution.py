@@ -15,7 +15,7 @@ class individual:
         self.genome = genome
         self.fitness = fitness
         """the fitness of an individual is updated with simply calling individual.update_fitness()"""
-        
+
     def update_fitness(self):
         totaldistance = 0
         iterator = 0
@@ -27,11 +27,11 @@ class individual:
             for compare in machine:
                 totaldistance += abs(totaltime - compare)
         self.fitness = jobtime - totaldistance
-            
-            
 
 
-        
+
+
+
 def gen_rand_standard(nmbofitems):
     """This generator generates jobs for experiment 1&2"""
     standardlist = []
@@ -40,8 +40,8 @@ def gen_rand_standard(nmbofitems):
         standardlist.append(newjob)
         nmbofitems -= 1
     return standardlist
-        
-        
+
+
 def gen_rand_one(nmbofitems):
     """This generator generates jobs for the FIRST experiment involing runtimes between 100 and 300"""
     onelist = []
@@ -50,7 +50,7 @@ def gen_rand_one(nmbofitems):
         onelist.append(newjob)
         nmbofitems -= 1
     return onelist
-        
+
 def gen_rand_two(nmbofitems):
     """This generator generates jobs for the SECOND experiment involing runtimes between 400 and 700"""
     twolist = []
@@ -58,23 +58,23 @@ def gen_rand_two(nmbofitems):
         newjob = random.randint(400,700)
         nmbofitems -= 1
         twolist.append(newjob)
-        
+
 def get_total_time():
     totalvalue = 0
     for item in joblist:
         totalvalue += item
-        
+
     return totalvalue
-    
+
 
 #---------------------------------------------------------------I M P L E M E N T A T I O N   O F   P O P U L A T I O N   G E N E R A T I O N -------------------------------------
-        
+
 def generate_population_from_genes(listofgenomes):
     """This function generates individuals from the list of genomes that is passed into it. it returns a list of individuals which is the new population.
     This function can be used universally across all experiments
-    
+
     INPUT: A list of chromosoms
-    
+
     OUTPUT: A list of individuals (population)"""
     population = []
     indexofgenomes = len(listofgenomes) - 1
@@ -84,29 +84,29 @@ def generate_population_from_genes(listofgenomes):
         newindividual.update_fitness()
         population.append(newindividual)
         indexofgenomes -= 1
-        
+
     return population
 
-      
-    
 
-    
-    
+
+
+
+
 def generate_initial_population(numberofindividuals):
     """This function generates a random list of chromosoms that is equivalent to the number of individuals.
     in the list, there are chromosoms, (or in other words the individual's genes) with a random number in the range between 1 and the number of machines
     this function is only called once per experiment, as one only needs one initial population. the initial population is then manipulated by other functions such
     as the recombination function, the selection function or the mutation function
-    
-    INPUT: 
+
+    INPUT:
     Number of individuals per population (user defined in another function)
     Number of genes. This is equivalent to the total number of jobs to distribute
     Number of machines. This is important to distribute the integer range of single genes. In our case, this is always 20
-    
+
     OUTPUT: A list of random individuals (first population)"""
     initialgenes = []
     genecount = len(joblist)
-    
+
     for individual in range(numberofindividuals):
         genome = []
         genes = genecount
@@ -115,7 +115,7 @@ def generate_initial_population(numberofindividuals):
             genes -= 1
         initialgenes.append(genome)
     initialpop = generate_population_from_genes(initialgenes)
-    
+
     return initialpop
 
 #--------------------------------------------------------------- S E L E C T I O N   D E F I N I T I O N -------------------------------------
@@ -132,14 +132,13 @@ def selectionTournament(population):
         fitnessValues.append(currentfitness)
     '''
 
-    #defines how many individuals are in the matingpool needs to be an even number 
-    
+    #defines how many individuals are in the matingpool needs to be an even number
+
     if len(competitors) % 2 == 1:
         del competitors[random.randint(0,len(competitors) - 1)]
     sizeMatingPool = ((len(population) // 3) * 2)
-        
+
     while sizeMatingPool > 1:
-        print(sizeMatingPool)
         #store population length for quick exces
         sizeCompetitors = len(competitors)
         #set parents to invalid values
@@ -168,14 +167,14 @@ def selectionTournament(population):
             competitors.pop(p2_index)
             #shrink the size of the matingpool, because we have found a parent
             sizeMatingPool -= 1
-        # if nothing holds we have a sting, booth are equaly fit, so we do nothing 
+        # if nothing holds we have a sting, booth are equaly fit, so we do nothing
         if p1_fit == p2_fit:
             matingpool.append(competitors[p2_index])
             matingpool.append(competitors[p1_index])
             competitors.pop(p2_index)
             competitors.pop(p1_index)
             sizeMatingPool -= 2
-            
+
     return matingpool
 
 
@@ -185,12 +184,12 @@ def FPselection(population):
     sortedpop = sorted(population, key=lambda individual: individual.fitness)
     for ind in sortedpop:
         totalfit += ind.fitness
-    
-    
-    
-    
+
+
+
+
 #--------------------------------------------------------------- M U T A T I O N   F U N C T I O N S -------------------------------------
-        
+
 
 def mutation(population):
     probability = 0.06
@@ -221,39 +220,39 @@ def mutateRandomResetting(chromosome):
 
 def mutateReverse(chromosome):
     '''
-    choose two random points and flip array in between 
+    choose two random points and flip array in between
     '''
     #save length for quick access
     chromosomesize = len(chromosome)
 
     m1 = -1
     m2 = -1
-    #as long as m2 is smaller than m1 and make sure that they are at least 2 numbers appart 
+    #as long as m2 is smaller than m1 and make sure that they are at least 2 numbers appart
     while m2-m1 <= 2 :
         #create points randomly
         m1 = random.randint(0,chromosomesize-1)
         m2 = random.randint(0,chromosomesize-1)
     print(m1)
     print(m2)
-    #flip the sublist 
+    #flip the sublist
     sublist = chromosome[m2:m1:-1]
-    
-    #put sublist in chromosome at the respective position 
+
+    #put sublist in chromosome at the respective position
     for i in range(m1+1,m2):
         chromosome[i] = sublist[i-m1]
 
     return  chromosome
 
 #--------------------------------------------------------------- R E C O M B I N A T I O N   O P E R A T I O N S------------------------
-        
+
 
 def onepoint(p1,p2):
     '''
     Generate a crossover point and then copy sublist 1 of p1 in c1 and of p2 in c2 and then copy sublist 2 of p1 in c2 and of p2 in c1
     INPUT:
     p1: List of Parent one for crossover operation
-    p2: List of Parent two for crossover operation 
-    
+    p2: List of Parent two for crossover operation
+
     OUTPUT:
     c1: List of Child one, offspring of p1,p2
     c2: List of Child two, offspring of p1,p2
@@ -274,8 +273,8 @@ def uniformCrossover(p1,p2):
     copy gene from p1 in c1 else p2 (and respectively for c2)
     INPUT:
     p1: List of Parent one for crossover operation
-    p2: List of Parent two for crossover operation 
-    
+    p2: List of Parent two for crossover operation
+
     OUTPUT:
     c1: List of Child one, offspring of p1,p2
     c2: List of Child two, offspring of p1,p2
@@ -357,86 +356,96 @@ def recombine(matingpool):
 def mantis(population, children):
     population = children
     return population
-    
-    
+
+
 def steady_state(population, children):
     picklistparent = []
     number_of_selected = random.randint(1,len(population))
     print(number_of_selected)
 
     while number_of_selected > 0:
-        
+
         selectreplaceparent = random.randint(0,len(population) - 1)
         selectreplacechild = random.randint(0,len(children) - 1)
-        
+
         while selectreplaceparent in picklistparent:
             selectreplaceparent = random.randint(0,len(population) - 1)
 
-            
+
         population[selectreplaceparent] = children[selectreplacechild]
         picklistparent.append(selectreplaceparent)
-        
+
         del children[selectreplacechild]
         number_of_selected -= 1
 
     return population
-    
+
 
 #--------------------------------------------------------------- I M P L E M E N T A T I O N   O F   U S E R   I N P U T   A N D   E X E C U T I O N -----------------------------------------
-def evolution(inipop):
+def evolve(population):
     """
-    in: initial population: list of individuals out: best individual 
+    INPUT: population
+
+    OUTPUT: next generation
     """
-    population = inipop
+    matingpool = selectionTournament(population)
+    children = recombine(matingpool)
+    children = mutation(children)
+    new_population = steady_state(population,children)
+
+    return new_population
+
+def evolution(initialpopulation):
+    """
+    INPUT: initial population
+
+    OUTPUT: best individuum after x generations
+    """
     countgenerations = 0
+    population = initialpopulation
+    bestindiv = population[0]
     terminalcount = 0
-    bestindiv = inipop[0]
-    print("initializing with fitness: ",bestindiv.fitness)
-    
-    
-    while terminalcount != 25:
-        
+
+    while terminalcount != 50:
         print("evaluating generation: ",countgenerations)
         countgenerations += 1
-        
-        
-        #Genetic Algorithm stuff
-        matingpool = selectionTournament(poulation)
-        children = recombine(matingpool)
-        children = mutation(children)
-        population = steady_state(population,children)
-        
-        #EVALUATE FITTEST INDIVIDUAL - TODO?
+
+        population = evolve(population)
+
         onlyfitness = []
         #save fitnessvalues in a list
         for index in (len(population)-1):
             currentfitness = index.fitness
-            onlyfitness.append(currentfitness)   
-        #save the best 
+            onlyfitness.append(currentfitness)
+        #save the best
         generationbest = population[onlyfitness.index(max(onlyfitness))]
         #clear onlyfittness for next generation
         onlyfitness.clear()
-        
-        
+
+
+        #if we found a new maximum
         if generationsbest.fitness > bestindiv.fitness:
-            
             bestindiv = generationsbest
+            #save fittest indivivudal per iteration
             print("Better individual found in generation",countgenerations,"! Top fitness now: ",bestindiv.fitness)
             terminalcount = 0
         else:
             terminalcount += 1
 
-        
-        
-        population = evolution(population)
-        
-        
+        #save fittest indivivudal per iteration
+        fitestovergenerations.append(bestindiv)
+
+
     return(bestindiv, countgenerations)
+
+
 
 def user_input():
     individuals = int(input("Please enter the number of individuals per generation: "))
-    return individuals
-    
+    #global so we dont need to return value
+    recomMethod = int(input("Please enter the recombination method OnePoint[1]  UniformBased[2]: "))
+    return individuals, recomMethod
+
 def initalize():
     global mutation1
     global mutation2
@@ -444,26 +453,36 @@ def initalize():
     global numberofmachines
     global jobtime
     global recomMethod
-    jobtime = get_total_time()
-    print("Jobtime: ",jobtime)
+    global fitnessoveriterations
+
     mutation1 = True
     mutation2 = False
-    recomMethod = 1
     numberofmachines = 20
-    joblist = gen_rand_standard(200) + gen_rand_one(100)
 
-    
-    usercommands = user_input()
+    joblist = gen_rand_standard(200) + gen_rand_one(100)
+    jobtime = get_total_time()
+    print("Jobtime: ",jobtime)
+
+
+    usercommands, recomMethod = user_input()
     print("Initializing population with",usercommands,"individuals.")
-    
+
     population = generate_initial_population(usercommands)
-    for item in population:
-        print(item.fitness)
-    
-    
-    
-        
-    
-    
-    
+
+    bestindiv, generationcount = evolution(population)
+
+    print("Found best indivivudal :")
+    print(bestindiv)
+    print("In generation :")
+    print(generationcount)
+
+
+
+
+
+
+
+
+
+
 initalize()
