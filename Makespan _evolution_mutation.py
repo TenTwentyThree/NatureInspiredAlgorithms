@@ -253,8 +253,7 @@ def mutation(population):
             '''
             chromosome = generate_population_from_genes([population[i]])
             newfit = chromosome[0].fitness
-            fitdif = newfit-fit
-            if fitdif > 0:
+            if newfit > fit:
                 mutationChoice[choice] += (-1* math.log(fitdif))
             #else:
             #    mutationChoice[choice] -= math.log(fit)
