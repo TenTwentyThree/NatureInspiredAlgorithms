@@ -54,6 +54,10 @@ class ant:
         """
     
     def findSolution(self):
+        while self.possible_locations:
+            next_city = self.walk()
+            self.update_path()
+        
         
     
     def get_pathCost(self):
