@@ -40,9 +40,8 @@ class ant:
         """
         selects the next City to go to and updates the chosen path
         """
-        self.citiesToVisit = []
     
-        while self.citiesToVisit:
+        while self.possible_locations:
             nextCity = choseCity()
             update_path(nextCity)
             
