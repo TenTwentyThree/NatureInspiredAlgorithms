@@ -49,7 +49,7 @@ class ant:
         #Total sum of te denumerator, still has to be computed
         total_sum = 0
         # Compute the numerator for every possible node and save in the numeratorList
-        for i in len(self.possible_locations-1):
+        for i in range(len(self.possible_locations)):
             #get the pheromone_amount for the possible nect location and the distance between those cities
             pheromone_amount = float(pheromone_map[self.get_location()][self.possible_locations[i]])
             distance = float(1/tspmat[current_location][self.possible_locations[i]])
