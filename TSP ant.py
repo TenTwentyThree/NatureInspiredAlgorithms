@@ -25,7 +25,7 @@ class ant:
         This function updates the length of the path the ant has traveled 
         """
         for i in range(len(self.path)):
-            self.pathCost += pathMat[self.path[i][0]][self.path[i][1]]
+            self.pathCost += tspmat[self.path[i][0]][self.path[i][1]]
             
             
 def BestWay(ants):    
