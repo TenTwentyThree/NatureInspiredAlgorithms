@@ -12,7 +12,7 @@ class ant:
         """
         initialize an ant, to traverse the map
         possible_locations -> a list of possible locations the ant can travel to
-        path -> a list of tupeles where each tupel represents an edge between two cities 
+        path -> a list of integers, where each integer represents a city, and the path[i] to the path[i+1] entrence is an edge the ant has traveled 
         pathCost -> cost, in this case the sum of the edgecosts the ant has traveled
         """
         
@@ -24,8 +24,8 @@ class ant:
         """
         This function updates the length of the path the ant has traveled 
         """
-        for i in range(len(self.path)):
-            self.pathCost += tspmat[self.path[i][0]][self.path[i][1]]
+        for i in range(len(self.path)-1):
+            self.pathCost += pathMat[self.path[i]][self.path[i+1]]
             
     
     def update_path(self, edge):
@@ -35,6 +35,11 @@ class ant:
         """
         self.path.append(edge)
         self.possible_locations.remove(edge)
+    
+    
+    
+    def get_pathCost(self):
+        if 
             
 def BestWay(ants):    
     """
