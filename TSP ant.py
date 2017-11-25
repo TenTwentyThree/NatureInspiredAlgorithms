@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 Created on Fri Nov 24 12:33:10 2017
-@author: JoJo
+@author: JoJo, yj, tn
 """
 
 import numpy as np
@@ -11,62 +11,100 @@ class ant:
         """
         initialize an ant, to traverse the map
         possible_locations -> a list of possible locations the ant can travel to
-        path -> a list of integers, where each integer represents a city, and the path[i] to the path[i+1] entrence is an edge the ant has traveled 
+        path -> a list of integers, where each integer represents a city, and the path[i] to the path[i+1] entrence is an edge the ant has traveled
         pathCost -> cost, in this case the sum of the edgecosts the ant has traveled
         """
-        
+
         self.possible_locations = [range(0,149)]
         self.path = []
         self.pathCost = 0
 
-        
-    def path_length(self):
+
+
+
+    def findSolution(self):
         """
-        This function updates the length of the path the ant has traveled 
+        As long as the List of possibl enext location self.possible_locations is not empty
+        we chosse the next City and update the path
         """
-        for i in range(len(self.path)-1):
-            self.pathCost += pathMat[self.path[i]][self.path[i+1]]
-            
-    
-    def update_path(self, edge):
-        """
-        Adds a new node to self.path and
-        removes the pass from self.possible_locations so we can't visit nods twice 
-        """
-        self.path.append(edge)
-        self.possible_locations.remove(edge)
-        
-    def walk(self):
-        """
-        selects the next City to go to and updates the chosen path
-        """
-    
         while self.possible_locations:
-            nextCity = choseCity()
-            update_path(nextCity)
-            
-    def choseCity(self,citiesToVisit):
+            # first chose the next city
+            next_city = self.choseCity()
+            # update the path with the new city
+            self.update_path(next_city)
+            # updte the path cost of the ant
+            self.update_pathCost()
+
+
+    def choseCity(self):
          """choses the next city based on the pheromone level
             calculate the attractiveness of each possible transition from the current location
             then randomly choose a next path, based on its attractiveness
-        
-        to be done
         """
-    
-    def findSolution(self):
+        current_location = self.get_location
+        # probabilitys to visit the node, mapped over the possible_locations list
+        pathProbabilities = []
+        #List with all numerator values for each possible next_location
+        numeratorList= []
+        #Total sum of te denumerator, still has to be computed
+        total_sum = 0
+        # Compute the numerator for every possible node and save in the numeratorList
+        for i in len(self.possible_locations-1):
+            #get the pheromone_amount for the possible nect location and the distance between those cities
+            pheromone_amount = float(pheromone_map[self.get_location()][self.possible_locations[i]])
+            distance = float(1/tspmat[current_location][self.possible_locations[i]])
+
+            #fill the numerator list
+            numeratorList.append(pow(pheromone_amount, alpha)*pow(1/distance, beta))
+        #compute the denominator
+        denominator = sum(numeratorList)
+
+        #compute the path probabilities by deviding the numerator with the deonominator
+        for i in len(self.possible_locations-1):
+            pathProbabilities.append(numeratorList[i]/denominator)
+
+        return max(pathProbabilities)
+
+
+    def update_pathCcost(self):
         """
-        As long as the 
+        This function updates the Cost (length) of the path the ant has traveled
         """
-        while self.possible_locations:
-            next_city = self.walk()
-            self.update_path()
-        
-        
-    
+        for i in range(len(self.path)-1):
+            self.pathCost += tspmat[self.path[i]][self.path[i+1]]
+
+
+    def update_path(self, city):
+        """
+        Adds a new node to self.path and
+        removes the pass from self.possible_locations so we can't visit nods twice
+        """
+        self.path.append(city)
+        self.possible_locations.remove(city)
+
     def get_pathCost(self):
-        if 
-            
-def BestWay(ants):    
+        """
+        get the past cost
+        """
+        if len(self.possible_locations) = 0:
+            return self.pathCost
+        return None
+
+    def get_path(self):
+        """
+        get the path, if it's created completely
+        """
+        if len(self.possible_locations) = 0:
+            return self.path
+        return None
+
+    def get_location(self):
+        """
+        return the current location of the ant
+        """
+        return self.path[-1]
+
+def BestWay(ants):
     """
     Evaluates the best way in this iteration, concidering all path_lengths of all ants
     input: list of all ants
@@ -76,7 +114,7 @@ def BestWay(ants):
     for ant in ants:
         if ants[ant].path_length() < bestWay:
             bestWay = ants[ant].path_length()
-                
+
     return bestWay
 
 
@@ -87,20 +125,20 @@ def read_file(filename):
     """
     if filename == 1:
         tspmat = np.loadtxt("1.tsp")
-    
+
     if filename == 2:
         tspmat = np.loadtxt("2.tsp")
-        
+
     if filename == 3:
         tspmat = np.loadtxt("3.tsp")
-        
+
     valuematrix = tspmat.astype(int)
     return valuematrix
 
 def mainloop():
     """
     ACO scheme:
- 
+
     repeat
         for ant k ∈ {1,...,m}
              construct a solution
@@ -114,11 +152,11 @@ def mainloop():
         endfor
     until stopping criterion is met
     """
-    
+
     for ant in AntColony:
         ant.findSolution()
-     
-            
+
+
 
 
 
@@ -126,7 +164,7 @@ def initalize(benchmark, antnmbr):
     global tspmat
     tspmat = read_file(benchmark)
     createAnts(antnmbr)
-    
+
 
 def createAntColony(antnmbr):
     """
@@ -135,13 +173,13 @@ def createAntColony(antnmbr):
     AntColony = []
     for i in range(0,antnmbr):
         AntColony.append(ant)
-        
-    
+
+
 def user_input():
     benchmark = int(input("Please specify TSP benchmark to use [1],[2],[3]: "))
     antnmbr = int(input("Please specify number of ants to be used: "))
-    
+
     initalize(benchmark, antnmbr)
-    
-    
+
+
 user_input()
