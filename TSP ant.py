@@ -53,7 +53,8 @@ class ant:
         to be done
         """
     
-    
+    def findSolution(self):
+        
     
     def get_pathCost(self):
         if 
@@ -108,7 +109,7 @@ def mainloop():
     """
     
     for ant in AntColony:
-        findSolution(ant)
+        ant.findSolution()
      
             
 
