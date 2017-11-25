@@ -54,6 +54,9 @@ class ant:
         """
     
     def findSolution(self):
+        """
+        As long as the 
+        """
         while self.possible_locations:
             next_city = self.walk()
             self.update_path()
