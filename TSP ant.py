@@ -11,7 +11,7 @@ class ant:
         """
         initialize an ant, to traverse the map
         possible_locations -> a list of possible locations the ant can travel to
-        path -> a list of integers, where each integer represents a city, and the path[i] to the path[i+1] entrence is an edge the ant has traveled
+        path -> [1,2,5,3,4,6,1] a list of integers, where each integer represents a city, and the path[i] to the path[i+1] entrence is an edge the ant has traveled
         pathCost -> cost, in this case the sum of the edgecosts the ant has traveled
         """
 
