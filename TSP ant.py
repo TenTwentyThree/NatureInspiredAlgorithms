@@ -15,7 +15,7 @@ class ant:
         pathCost -> cost, in this case the sum of the edgecosts the ant has traveled
         """
 
-        self.possible_locations = [range(0,149)]
+        self.possible_locations = list(range(150))
         self.path = []
         self.pathCost = 0
 
