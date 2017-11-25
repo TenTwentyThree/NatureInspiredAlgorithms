@@ -106,9 +106,11 @@ def mainloop():
         endfor
     until stopping criterion is met
     """
-    def FindSolution(ant):
-        for i in range(1,150):
-            ant.walk()
+    
+    for ant in AntColony:
+        findSolution(ant)
+     
+            
 
 
 
