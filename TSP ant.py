@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """
 Created on Fri Nov 24 12:33:10 2017
-
 @author: JoJo
 """
 
@@ -35,6 +34,24 @@ class ant:
         """
         self.path.append(edge)
         self.possible_locations.remove(edge)
+        
+    def walk(self):
+        """
+        selects the next City to go to and updates the chosen path
+        """
+        self.citiesToVisit = []
+    
+        while self.citiesToVisit:
+            nextCity = choseCity()
+            update_path(nextCity)
+            
+    def choseCity(self,citiesToVisit):
+         """choses the next city based on the pheromone level
+            calculate the attractiveness of each possible transition from the current location
+            then randomly choose a next path, based on its attractiveness
+        
+        to be done
+        """
     
     
     
@@ -89,6 +106,9 @@ def mainloop():
         endfor
     until stopping criterion is met
     """
+    def FindSolution(ant):
+        for i in range(1,150):
+            ant.walk()
 
 
 
