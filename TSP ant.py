@@ -15,9 +15,10 @@ class ant:
         pathCost -> cost, in this case the sum of the edgecosts the ant has traveled
         """
         
-        self.possible_locations = possible_locations 
+        self.possible_locations = [range(0,149)]
         self.path = []
         self.pathCost = 0
+
         
     def path_length(self):
         """
@@ -135,7 +136,6 @@ def createAntColony(antnmbr):
     AntColony = []
     for i in range(0,antnmbr):
         AntColony.append(ant)
-        ant.possible_locations= [range(0,149)]
         
     
 def user_input():
