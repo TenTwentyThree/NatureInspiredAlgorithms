@@ -559,16 +559,3 @@ def initalize():
 
 
 initalize()
-
-
-
-
-
-
-
-
-
-
-
-
-initalize()
