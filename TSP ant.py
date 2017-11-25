@@ -60,10 +60,19 @@ class ant:
         denominator = sum(numeratorList)
 
         #compute the path probabilities by deviding the numerator with the deonominator
-        for i in len(self.possible_locations-1):
+        for i in range(len(self.possible_locations)):
             pathProbabilities.append(numeratorList[i]/denominator)
 
-        return max(pathProbabilities)
+        #randomly choose the next path
+        #Not quit shure about this 
+		toss = random.random()
+					
+		cummulative = 0
+		for possible_next_location in pathProbabilities:
+			weight = possible_next_location
+			if toss <= weight + cummulative:
+				return self.possible_locations[pathProbabilities.index(possible_next_location)]
+			cummulative += weight
 
 
     def update_pathCcost(self):
