@@ -27,6 +27,14 @@ class ant:
         for i in range(len(self.path)):
             self.pathCost += tspmat[self.path[i][0]][self.path[i][1]]
             
+    
+    def update_path(self, edge):
+        """
+        Adds a new node to self.path and
+        removes the pass from self.possible_locations so we can't visit nods twice 
+        """
+        self.path.append(edge)
+        self.possible_locations.remove(edge)
             
 def BestWay(ants):    
     """
