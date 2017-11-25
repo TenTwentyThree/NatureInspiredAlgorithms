@@ -8,9 +8,19 @@ Created on Fri Nov 24 12:33:10 2017
 import numpy as np
 
 class ant:
-    def __init__(self, path, totalcost):
+    def __init__(self, path, pathCost):
         self.path = []
-        self.totalcost = 0
+        self.pathCost = 0
+        
+    def path_length(self):
+        """
+        This function updates the length of the path the ant has traveled 
+        """
+        for i in range(len(self.path)):
+            self.pathCost += pathMat[self.path[i][0]][self.path[i][1]]
+            
+            
+            
 
 def read_file(filename):
     """This function reads in the tsp files and converts them into int matrices. The matrix can be accessed globably with the variable name tspmat
