@@ -128,13 +128,15 @@ def initalize(benchmark, antnmbr):
     createAnts(antnmbr)
     
 
-def createAnts(antnmbr):
+def createAntColony(antnmbr):
     """
-    creates an array 'ants' with as many ant-objects in it as user input wanted
+    creates an array 'ant' with as many ant-objects in it as user input wanted
     """
-    ants = []
+    AntColony = []
     for i in range(0,antnmbr):
-        ants.append(ant)
+        AntColony.append(ant)
+        ant.possible_locations= [range(0,149)]
+        
     
 def user_input():
     benchmark = int(input("Please specify TSP benchmark to use [1],[2],[3]: "))
