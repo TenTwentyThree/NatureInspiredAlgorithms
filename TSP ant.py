@@ -141,7 +141,7 @@ def mainloop():
 
     repeat
         for ant k ∈ {1,...,m}
-             construct a solution
+             construct a solution {solution finding}
         endfor
         forall pheromone values do
             decrease the value by a certain percentage {evaporation}
@@ -152,9 +152,35 @@ def mainloop():
         endfor
     until stopping criterion is met
     """
+    while "Terminationcondition":
+        #create pathes for every ant in the ANt AntColony
+        for ant in AntColony:
+            ant.findSolution()
 
-    for ant in AntColony:
-        ant.findSolution()
+
+        #since the matrix is symatrical acording to the diagonal we only need to comute the upper right triangal, and copy it to the lower left triangal
+        for i in range(len(pheromone_map)):
+            for j in range(i,len(pheromone_map)):
+
+                if i != j :
+                pheromone = #updated pheromone map after evaporation
+                else:
+                     pheromone = 0
+                #update the respective entry in the pheromone map
+                pheromone_map[i][j] = pheromone
+                pheromone_map[j][i] = pheromone
+
+        #since the matrix is symatrical acording to the diagonal we only need to comute the upper right triangal, and copy it to the lower left triangal
+        for i in range(len(pheromone_map)):
+            for j in range(i,len(pheromone_map)):
+
+                if i != j :
+                pheromone = #updated pheromone map after internsification
+                else:
+                     pheromone = 0
+                #update the respective entry in the pheromone map
+                pheromone_map[i][j] = pheromone
+                pheromone_map[j][i] = pheromone
 
 
 
