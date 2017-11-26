@@ -199,18 +199,18 @@ class PheromonesUpdate(Ant):
         :param ants: list of antIDs
         :param fittest_ant: int (index of the fittest ant in the population)
         :param fitness_ants: list of fitness of each ant
-        :param paths : tuple of path of fittest ant
+        :param paths : tuple of paths of  ants
         :return: array updated_pheromones
         """
 
         updated_pheromones = np.zeros((num_cities, num_cities))
         for ant in range(len(ants)):
-            for path in paths[tour]:
-                i,j = path
-                evaporation_factor = np.multiply((1 - self.rho), pheromones[i][j])
-                intensification_factor = np.multiply(self.rho, (fitness_ants[ant] / np.sum(fitness_ants, axis=0)))
-                updated_pheromones[i][j] = evaporation_factor + intensification_factor
-                # np.fill_diagonal(tau, 0)  # Hardcoded, just to make sure intensification is not performed between same city
+            for path in paths[ant]:
+                    i,j = path
+                    evaporation_factor = np.multiply((1 - self.rho), pheromones[i][j])
+                    intensification_factor = np.multiply(self.rho, (fitness_ants[ant] / np.sum(fitness_ants, axis=0)))
+                    updated_pheromones[i][j] = evaporation_factor + intensification_factor
+                    # np.fill_diagonal(tau, 0)  # Hardcoded, just to make sure intensification is not performed between same city
 
                 return updated_pheromones
 
