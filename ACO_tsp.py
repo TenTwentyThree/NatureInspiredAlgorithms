@@ -125,8 +125,7 @@ class PheromonesUpdate(Ant):
     3. Get the path of the best ant
     4. Evaporation
     5. Intensification
-    6. Update pheromones as given in the ACO Schema
-    4. Further work: Update pheromones applies to all pheromones with respect to the quality of solutions produced by the ants
+    6. Further work: Update pheromones applies to all pheromones with respect to the quality of solutions produced by the ants
     """
 
     def __init__(self, rho):
