@@ -35,7 +35,6 @@ class ant:
             # updte the path cost of the ant
             self.update_pathCost()
 
-
     def choseCity(self):
          """choses the next city based on the pheromone level
             calculate the attractiveness of each possible transition from the current location
@@ -135,6 +134,20 @@ def read_file(filename):
     valuematrix = tspmat.astype(int)
     return valuematrix
 
+def init_pheromone(num_cities, _random = False):
+
+    if _random:
+        pheromones = np.random.random((num_cities,num_cities))
+    else:
+        pheromones = np.zeros((num_cities,num_cities))
+
+    return pheromones
+
+def update_pheromone(rho, ):
+    pass
+
+
+
 def mainloop():
     """
     ACO scheme:
@@ -183,3 +196,4 @@ def user_input():
 
 
 user_input()
+
