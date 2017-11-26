@@ -204,11 +204,11 @@ class PheromonesUpdate(Ant):
         """
 
         updated_pheromones = np.zeros((num_cities, num_cities))
-        for tour in range(len(ants)):
+        for ant in range(len(ants)):
             for path in paths[tour]:
                 i,j = path
                 evaporation_factor = np.multiply((1 - self.rho), pheromones[i][j])
-                intensification_factor = np.multiply(self.rho, (fitness_ants[fittest_ant] / np.sum(fitness_ants, axis=0)))
+                intensification_factor = np.multiply(self.rho, (fitness_ants[ant] / np.sum(fitness_ants, axis=0)))
                 updated_pheromones[i][j] = evaporation_factor + intensification_factor
                 # np.fill_diagonal(tau, 0)  # Hardcoded, just to make sure intensification is not performed between same city
 
