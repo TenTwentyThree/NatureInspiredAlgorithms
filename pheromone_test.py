@@ -1,7 +1,7 @@
 import numpy as np
 
 
-#Dummy class
+# Dummy class
 class Ant:
 
     def __init__(self, num_cities, ants, path):
@@ -12,7 +12,6 @@ class Ant:
     def get_path(self, path):
 
         return path
-
 
 
     def path_cost(self):
@@ -84,6 +83,26 @@ class PheromonesUpdate(Ant):
 
                 return updated_tau
 
+    def intensification(self, pheromones, fitness_ants, fittest_ant, paths):
+
+        """
+
+        :param pheromones: Array of pheromones
+        :param fitness_ants: Fitnesses of all ants in the iteration
+        :param fittest_ant: Fittest ant index (AntID)
+        :param paths: Tuple of paths of all ants
+        :return: intensified_pheromones : Of the best ant's path
+        """
+        path = paths[fittest_ant]
+        print("Pheromones to be intensified", pheromones)
+        intensified_pheromones = pheromones.copy()
+        for cities in path:
+            i, j = cities
+            intensification_factor = np.multiply(self.rho,
+                                                         (fitness_ants[fittest_ant] / np.sum(fitness_ants, axis=0)))
+            intensified_pheromones[i][j] = pheromones[i][j] + intensification_factor
+
+        return intensified_pheromones
 
 # Test variables
 ants = [0, 1, 2, 3, 4]  # Ant IDs
@@ -98,12 +117,16 @@ pathcost = ant.path_cost()
 pheromones_update = PheromonesUpdate(rho)
 pheromones = pheromones_update.init_pheromones(num_cities=5, _random=True)
 _fittest_ant, _fitness_ants = pheromones_update.fitness_measure(ants, pathcost)
-updated_tau = pheromones_update.update_pheromones(tau=pheromones, ants=ants, paths=paths, fittest_ant=_fittest_ant,fitness_ants=_fitness_ants )
+# updated_tau = pheromones_update.update_pheromones(tau=pheromones, ants=ants, paths=paths, fittest_ant=_fittest_ant,fitness_ants=_fitness_ants )
 
-
+"""
 print("Path Cost",pathcost)
 print("Fitness of ants", fitness_ants)
 print("Fittest Ant", np.argmin(fitness_ants))
 print("Pheromones Initialized \n ", pheromones)
 print("Fitnesses of ants are %s and the fittest ant is %s  "%(_fitness_ants, _fittest_ant))
 print("Updated pheromone", updated_tau)
+"""
+
+intensified_pheromones = pheromones_update.intensification(pheromones, fitness_ants= _fitness_ants, fittest_ant=_fittest_ant, paths=paths)
+print("Intensified pheromones", intensified_pheromones)
