@@ -19,7 +19,7 @@ class ant:
         self.path = []
         self.pathCost = 0
 
-
+#----------------------------------Solution Construction-------------------------------
 
 
     def findSolution(self):
@@ -74,6 +74,9 @@ class ant:
 				return self.possible_locations[pathProbabilities.index(possible_next_location)]
 			cummulative += weight
 
+#----------------------------------Solution Construction Ends-------------------------------
+			
+			
 
     def update_pathCcost(self):
         """
@@ -247,6 +250,8 @@ def read_file(filename):
     valuematrix = tspmat.astype(int)
     return valuematrix
 
+#----------------------------------Main loop-------------------------------
+
 def mainloop():
     """
     ACO scheme:
@@ -285,7 +290,7 @@ def mainloop():
         
 
 
-
+#----------------------------------Main loop Ends-------------------------------
 
 
 def initalize(benchmark, antnmbr):
