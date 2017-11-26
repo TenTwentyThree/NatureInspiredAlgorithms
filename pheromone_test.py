@@ -72,19 +72,17 @@ class PheromonesUpdate(Ant):
         :return: array updated_pheromones
 
         """
-        updated_tau = np.zeros((num_cities,num_cities))
+        updated_tau = np.zeros((num_cities, num_cities))
         for tour in range(len(ants)):
             print("Tour", tour)
             for path in paths[tour]:
                 i,j = path
-                print(tau[i][j])
-                print(i,j)
                 evaporation_factor = np.multiply((1 - self.rho), tau[i][j])
                 intensification_factor = np.multiply(self.rho, (fitness_ants[fittest_ant] / np.sum(fitness_ants, axis=0)))
                 updated_tau[i][j] = evaporation_factor + intensification_factor
                 # np.fill_diagonal(tau, 0)  # Hardcoded, just to make sure intensification is not performed bet
-                print(updated_tau)
-        return updated_tau
+
+                return updated_tau
 
 
 # Test variables
