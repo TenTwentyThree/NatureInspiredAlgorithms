@@ -179,17 +179,7 @@ def mainloop():
                 pheromone_map[i][j] = pheromone
                 pheromone_map[j][i] = pheromone
 
-        #since the matrix is symatrical acording to the diagonal we only need to comute the upper right triangal, and copy it to the lower left triangal
-        for i in range(len(pheromone_map)):
-            for j in range(i,len(pheromone_map)):
-
-                if i != j :
-                pheromone = #updated pheromone map after internsification
-                else:
-                     pheromone = 0
-                #update the respective entry in the pheromone map
-                pheromone_map[i][j] = pheromone
-                pheromone_map[j][i] = pheromone
+        
 
 
 
