@@ -4,9 +4,15 @@ import numpy as np
 #Dummy class
 class Ant:
 
-    def __init__(self, num_cities, ants):
+    def __init__(self, num_cities, ants, path):
         self.num_cities = num_cities
         self.ants = ants
+        self.path = path
+
+    def get_path(self, path):
+
+        return path
+
 
 
     def path_cost(self):
@@ -18,7 +24,7 @@ class Ant:
 class PheromonesUpdate(Ant):
 
     def __init__(self, rho):
-        super().__init__(ants, num_cities)
+        super().__init__(ants, num_cities, paths )
         self.rho = rho
 
     def init_pheromones(self, num_cities, _random=False):
@@ -50,23 +56,34 @@ class PheromonesUpdate(Ant):
         fitness_ants = np.subtract(max(pathcost), pathcost)
         fittest_ant = ants[np.argmax(fitness_ants)]
 
-        return fittest_ant,fitness_ants
+        return fittest_ant, fitness_ants
 
+    def get_path_fittest_ant(self):
 
-    def update_pheromones(self, tau, fittest_ant, fitness_ants):
+        pass
+
+    def update_pheromones(self, tau, ants, fitness_ants, fittest_ant, paths ):
         """
         :param tau:  pheromones
         :param rho: evaporation constant
         :param fittest_ant: int (index of the fittest ant in the population)
         :param fitness_ants: list of fitness of each ant
-        :return: updated_pheromones
+        :param path : tuple of path of fittest ant
+        :return: array updated_pheromones
 
         """
-
-        evaporation_factor = np.multiply((1 - self.rho), tau)
-        intensification_factor = np.multiply(self.rho, (fitness_ants[fittest_ant] / np.sum(fitness_ants, axis=0)))
-        updated_tau = evaporation_factor + intensification_factor
-        np.fill_diagonal(updated_tau, 0)  # Hardcoded, just to make sure intensification is not performed bet
+        updated_tau = np.zeros((num_cities,num_cities))
+        for tour in range(len(ants)):
+            print("Tour", tour)
+            for path in paths[tour]:
+                i,j = path
+                print(tau[i][j])
+                print(i,j)
+                evaporation_factor = np.multiply((1 - self.rho), tau[i][j])
+                intensification_factor = np.multiply(self.rho, (fitness_ants[fittest_ant] / np.sum(fitness_ants, axis=0)))
+                updated_tau[i][j] = evaporation_factor + intensification_factor
+                # np.fill_diagonal(tau, 0)  # Hardcoded, just to make sure intensification is not performed bet
+                print(updated_tau)
         return updated_tau
 
 
@@ -75,13 +92,15 @@ ants = [0, 1, 2, 3, 4]  # Ant IDs
 num_cities = 5
 fitness_ants = np.random.rand(1, 5)
 rho = 0.5
+paths = [[(0,1),(1,3),(3,4),(4,1),(4,0)],[(1,0),(0,3),(3,2),(2,4),(4,1)],[(0,1),(1,2),(2,4),(4,1),(4,0)],[(2,1),(1,3),(3,4),(4,1),(1,2)],
+        [(4, 1), (1, 3), (3, 2), (2, 1), (1, 4)]]
 
-ant = Ant(ants, num_cities)
+ant = Ant(ants, num_cities, paths)
 pathcost = ant.path_cost()
 pheromones_update = PheromonesUpdate(rho)
 pheromones = pheromones_update.init_pheromones(num_cities=5, _random=True)
 _fittest_ant, _fitness_ants = pheromones_update.fitness_measure(ants, pathcost)
-updated_tau = pheromones_update.update_pheromones(tau=pheromones, fittest_ant=_fittest_ant, fitness_ants=_fitness_ants )
+updated_tau = pheromones_update.update_pheromones(tau=pheromones, ants=ants, paths=paths, fittest_ant=_fittest_ant,fitness_ants=_fitness_ants )
 
 
 print("Path Cost",pathcost)
