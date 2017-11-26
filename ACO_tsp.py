@@ -113,6 +113,110 @@ class ant:
         """
         return self.path[-1]
 
+
+#----------------------------------Pheromone_update-------------------------------
+
+class PheromonesUpdate(Ant):
+
+    """
+    Properties:
+    1. Initialize pheromones (Zeros/Random)
+    2. Measure the fitness of ants, given pathCost from Parent Class(Ant)
+    3. Get the path of the best ant
+    4. Evaporation
+    5. Intensification
+    6. Update pheromones as given in the ACO Schema
+    4. Further work: Update pheromones applies to all pheromones with respect to the quality of solutions produced by the ants
+    """
+
+    def __init__(self, rho):
+        super().__init__(ants, num_cities, paths )
+        self.rho = rho
+
+    def init_pheromones(self, num_cities, _random=False):
+
+        """
+        :param num_cities:
+        :param _random: Type of initialization. Zeros or Random
+        :return: array of pheromones
+        """
+
+        if _random:
+            pheromones = np.random.random((num_cities, num_cities))
+            np.fill_diagonal(pheromones, 0)
+        else:
+            pheromones = np.zeros((num_cities, num_cities))
+
+        return pheromones
+
+    def fitness_measure(self, ants, pathcost):
+        """
+        :param ants: list of antIDs
+        :param pathcost: Path cost of each ant
+        :return: fittest_ant, list of their fitness
+        """
+
+        fitness_ants = np.subtract(max(pathcost), pathcost)
+        fittest_ant = ants[np.argmax(fitness_ants)]
+
+        return fittest_ant, fitness_ants
+
+    def get_path_fittest_ant(self, fittest_ant):
+
+        fittest_ant_path = paths[fittest_ant]
+
+        return fittest_ant_path
+
+    def evaporation(self, pheromones):
+        """
+        :param pheromones: Array of pheromones
+        :return: Array vaporized pheromones
+        """
+
+        return np.multiply((1-self.rho), pheromones)
+
+    def intensification(self,pheromones, fitness_ants,fittest_ant):
+
+        """
+
+        :param pheromones: Array of pheromones
+        :param fitness_ants: Fitnesses of all ants in the iteration
+        :param fittest_ant: Fittest ant index (AntID)
+        :return: intensified_pheromones : Of the best ant's path
+        """
+        path = self.get_path_fittest_ant(fittest_ant)
+        intensified_pheromones = pheromones.copy()
+        for cities in path:
+            i,j = cities
+            intensification_factor = np.multiply(self.rho, (fitness_ants[fittest_ant] / np.sum(fitness_ants, axis=0)))
+            intensified_pheromones[i][j] = pheromones[i][j] + intensification_factor
+
+        return intensified_pheromones
+
+    def update_pheromones(self, pheromones, ants, fitness_ants, fittest_ant, paths ):
+
+        """
+        :param pheromones:  Array of pheromones
+        :param ants: list of antIDs
+        :param fittest_ant: int (index of the fittest ant in the population)
+        :param fitness_ants: list of fitness of each ant
+        :param paths : tuple of path of fittest ant
+        :return: array updated_pheromones
+        """
+
+        updated_pheromones = np.zeros((num_cities, num_cities))
+        for tour in range(len(ants)):
+            for path in paths[tour]:
+                i,j = path
+                evaporation_factor = np.multiply((1 - self.rho), pheromones[i][j])
+                intensification_factor = np.multiply(self.rho, (fitness_ants[fittest_ant] / np.sum(fitness_ants, axis=0)))
+                updated_pheromones[i][j] = evaporation_factor + intensification_factor
+                # np.fill_diagonal(tau, 0)  # Hardcoded, just to make sure intensification is not performed between same city
+
+                return updated_pheromones
+
+# ------------------------PheromoneUpdate Class Ends---------------------------
+
 def BestWay(ants):
     """
     Evaluates the best way in this iteration, concidering all path_lengths of all ants
