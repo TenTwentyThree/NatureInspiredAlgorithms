@@ -73,16 +73,7 @@ class ant:
         draw = choice(possible_locations, 1, p=pathProbabilities)
         next_node = draw[0]
         return next_node
-        #randomly choose the next path
-        #Not quit shure about this
-        toss = random.random()
 
-        cummulative = 0
-        for possible_next_location in pathProbabilities:
-            weight = possible_next_location
-            if toss <= weight + cummulative:
-                return self.possible_locations[pathProbabilities.index(possible_next_location)]
-            cummulative += weight
 
 #----------------------------------Solution Construction Ends-------------------------------
 
@@ -137,7 +128,10 @@ def evaporation():
     pheromone_factor = 1 - pheromone_evap_constant
     for i in range(len(p_map)):
         for j in range(len(p_map)):
-            p_map[i][j] = p_map[i][j] * pheromone_factor
+            if i != j:
+                p_map[i][j] = p_map[i][j] * pheromone_factor
+            else:
+                p_map[i][j] = 0
     return p_map
 
 def intensification(antColony):
@@ -145,10 +139,9 @@ def intensification(antColony):
 
     for ant in antColony:
         path = ant.path
-        for node in range(len(path)-2):
-            pheromone_map[path[node]][path[node+1]] = pheromone_map[path[node]][path[node+1]] + pheromoneConstant/ant.pathCost
-            pheromone_map[path[node]][path[node+1]] = pheromone_map[path[node]][path[node+1]] + pheromoneConstant/ant.pathCost
-
+        for i in range(len(path)-2):
+            pheromone_map[path[i]][path[i+1]] = pheromone_map[path[i]][path[i+1]] + pheromoneConstant/ant.pathCost
+            pheromone_map[path[i+1]][path[i]] = pheromone_map[path[i+1]][path[i]] + pheromoneConstant/ant.pathCost
 
     return p_map
 
@@ -229,7 +222,6 @@ def mainloop():
 
         #update pheromone mappe
         pheromone_map = update_pheromone_map(antColony)
-
         bestAntLength = bestAnt(antColony)
         print("Best Length: ", bestAntLength)
 
@@ -285,8 +277,8 @@ def createAntColony(antnmbr):
 def user_input():
     benchmark = 1# int(input("Please specify TSP benchmark to use [1],[2],[3]: "))
     antnmbr = 20# int(input("Please specify number of ants to be used: "))
-    evapConst = 0.5#float(input("Please specify Evaporation Constant: "))
-    p_Constant =8# float(input("Please specify Intensification Constant: "))
+    evapConst = 0.2#float(input("Please specify Evaporation Constant: "))
+    p_Constant =1# float(input("Please specify Intensification Constant: "))
 
     initalize(benchmark, antnmbr, p_Constant, evapConst)
 
