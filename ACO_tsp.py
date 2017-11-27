@@ -173,7 +173,7 @@ def update_pheromone_map(antColony):
 # ------------------------PheromoneUpdate Class 2.0 Ends-----------------------
 def bestAnt(antColony):
     """
-    Evaluates the best way in this iteration, concidering all path_lengths of all ants
+    Evaluates the best way in this iteration, considering all path_lengths of all ants
     input: list of all ants
     output: bestWay: Integer value for the shortest way found
     """
