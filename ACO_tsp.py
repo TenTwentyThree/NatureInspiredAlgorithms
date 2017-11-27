@@ -37,7 +37,7 @@ class ant:
 
 
     def choseCity(self):
-         """choses the next city based on the pheromone level
+        """choses the next city based on the pheromone level
             calculate the attractiveness of each possible transition from the current location
             then randomly choose a next path, based on its attractiveness
         """
