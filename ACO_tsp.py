@@ -221,7 +221,7 @@ class PheromonesUpdate(Ant):
 
 def BestWay(ants):
     """
-    Evaluates the best way in this iteration, concidering all path_lengths of all ants
+    Evaluates the best way in this iteration, considering all path_lengths of all ants
     input: list of all ants
     output: bestWay: Integer value for the shortest way found
     """
@@ -275,7 +275,7 @@ def mainloop():
             ant.findSolution()
 
 
-        #since the matrix is symatrical acording to the diagonal we only need to comute the upper right triangal, and copy it to the lower left triangal
+        #since the matrix is symmetrical acording to the diagonal we only need to comute the upper right triangal, and copy it to the lower left triangal
         for i in range(len(pheromone_map)):
             for j in range(i,len(pheromone_map)):
 
