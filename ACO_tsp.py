@@ -226,7 +226,8 @@ def mainloop():
 
     best_path = []
 
-    while "Terminationcondition":
+    termcount = 0           #see below
+    while termination() = false:  #see below
 
         antColony = createAntColony(antnmbr)
 
@@ -245,6 +246,15 @@ def mainloop():
 
 #----------------------------------Main loop Ends-------------------------------
 
+""" Termination Condition
+def termination():
+    if bestWay <= previousbestWay:
+        return false
+    else:
+        termcount += 1
+    if termcount = termcriterion:
+        return true
+"""
 
 def initalize(benchmark, antNumber,p_Constant, evapConst):
     global tspmat
@@ -295,6 +305,7 @@ def user_input():
     antnmbr = 20# int(input("Please specify number of ants to be used: "))
     evapConst = 0.2#float(input("Please specify Evaporation Constant: "))
     p_Constant =8# float(input("Please specify Intensification Constant: "))
+    #termcriterion = 5 (amount of iterations with no improvement in solution until termination)
 
     initalize(benchmark, antnmbr, p_Constant, evapConst)
 
