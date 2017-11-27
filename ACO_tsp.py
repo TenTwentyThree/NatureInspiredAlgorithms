@@ -269,7 +269,7 @@ def mainloop():
         endfor
     until stopping criterion is met
     """
-    for i in range(int(stoppingcriterion)-1):
+    for i in range(1, int(stoppingcriterion)):
         #create pathes for every ant in the ANt AntColony
         for ant in AntColony:
             ant.findSolution()
@@ -313,7 +313,7 @@ def user_input():
     antnmbr = int(input("Please specify number of ants to be used: "))
     stoppingcriterion = int(input("Please specify after how many iterations without an improved solution you want to stop: "))
 
-    initalize(benchmark, antnmbr, stoppingcriterion)
+    initalize(benchmark, antnmbr)
 
 
 user_input()
