@@ -124,10 +124,16 @@ class ant:
 
 # ------------------------PheromoneUpdate Class 2.0----------------------------
 def evaporation():
+    """
+    Evaporate pheromone from the pheromone map
+    """
+    #save the pheromone map
     p_map = pheromone_map
+    #compute the pheromone factor : (1 - pheromone_evap_constant) * p_map(i,j)
     pheromone_factor = 1 - pheromone_evap_constant
     for i in range(len(p_map)):
         for j in range(len(p_map)):
+            #make sure the diagonal values are 0
             if i != j:
                 p_map[i][j] = p_map[i][j] * pheromone_factor
             else:
@@ -137,13 +143,19 @@ def evaporation():
 def intensification(antColony):
     p_map = pheromone_map
 
+    #for every ant in the antColony
     for ant in antColony:
+        #safe the path(solution that it found)
         path = ant.path
+        #than depose the pheromone amount which is computed by
+        # computing the pheromone amount between city i and i+1 + a pheromone constant divided by the length of the path of the ant
+        #the larger the pathcost is, the smaler the amount of added pharomne gets, since if the denomnator gets bigger, the output shrinks
         for i in range(len(path)-2):
-            pheromone_map[path[i]][path[i+1]] = pheromone_map[path[i]][path[i+1]] + pheromoneConstant/ant.pathCost
-            pheromone_map[path[i+1]][path[i]] = pheromone_map[path[i+1]][path[i]] + pheromoneConstant/ant.pathCost
+            p_map[path[i]][path[i+1]] = p_map[path[i]][path[i+1]] + pheromoneConstant/ant.pathCost
+            p_map[path[i+1]][path[i]] = p_map[path[i+1]][path[i]] + pheromoneConstant/ant.pathCost
 
     return p_map
+
 
 
 
@@ -165,8 +177,10 @@ def bestAnt(antColony):
     input: list of all ants
     output: bestWay: Integer value for the shortest way found
     """
+    #set best ant to first ant in antColony
     bestAnt = antColony[0].pathCost
     for ant in antColony:
+        #if path cost of ant x is smaler than the one of the best ant, x is new best ant
         if ant.pathCost < bestAnt:
             bestWay = ant.pathCost
 
@@ -216,12 +230,14 @@ def mainloop():
 
         antColony = createAntColony(antnmbr)
 
-        #create pathes for every ant in the ANt AntColony
+        #create pathes for every ant in the AntColony
         for ant in antColony:
             ant.findSolution()
 
         #update pheromone mappe
         pheromone_map = update_pheromone_map(antColony)
+
+        #compute the best ant of the generation
         bestAntLength = bestAnt(antColony)
         print("Best Length: ", bestAntLength)
 
@@ -278,7 +294,7 @@ def user_input():
     benchmark = 1# int(input("Please specify TSP benchmark to use [1],[2],[3]: "))
     antnmbr = 20# int(input("Please specify number of ants to be used: "))
     evapConst = 0.2#float(input("Please specify Evaporation Constant: "))
-    p_Constant =1# float(input("Please specify Intensification Constant: "))
+    p_Constant =8# float(input("Please specify Intensification Constant: "))
 
     initalize(benchmark, antnmbr, p_Constant, evapConst)
 
