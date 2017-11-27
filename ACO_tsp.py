@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 Created on Fri Nov 24 12:33:10 2017
-@author: JoJo, yj, tn
+@author: JoJo, yj, tn, mp
 """
 
 import numpy as np
@@ -269,7 +269,7 @@ def mainloop():
         endfor
     until stopping criterion is met
     """
-    while "Terminationcondition":
+    for i in range(1, int(stoppingcriterion)):
         #create pathes for every ant in the ANt AntColony
         for ant in AntColony:
             ant.findSolution()
@@ -311,6 +311,7 @@ def createAntColony(antnmbr):
 def user_input():
     benchmark = int(input("Please specify TSP benchmark to use [1],[2],[3]: "))
     antnmbr = int(input("Please specify number of ants to be used: "))
+    stoppingcriterion = int(input("Please specify after how many iterations without an improved solution you want to stop: "))
 
     initalize(benchmark, antnmbr)
 
