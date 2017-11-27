@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 """
 Created on Fri Nov 24 12:33:10 2017
-@author: JoJo, yj, tn
+@author: JoJo, yj, tn, sr, mr
 """
 
 import numpy as np
+import random
 
 class ant:
-    def __init__(self,possible_locations, path, pathCost):
+    def __init__(self):
         """
         initialize an ant, to traverse the map
         possible_locations -> a list of possible locations the ant can travel to
@@ -15,8 +16,8 @@ class ant:
         pathCost -> cost, in this case the sum of the edgecosts the ant has traveled
         """
 
-        self.possible_locations = list(range(150))
-        self.path = []
+        self.possible_locations = list(range(len(tspmat)))
+        self.path = [0]
         self.pathCost = 0
 
 #----------------------------------Solution Construction-------------------------------
@@ -41,7 +42,9 @@ class ant:
             calculate the attractiveness of each possible transition from the current location
             then randomly choose a next path, based on its attractiveness
         """
-        current_location = self.get_location
+        current_location = self.get_location()
+        possible_locations = self.possible_locations
+
         # probabilitys to visit the node, mapped over the possible_locations list
         pathProbabilities = []
         #List with all numerator values for each possible next_location
@@ -51,8 +54,8 @@ class ant:
         # Compute the numerator for every possible node and save in the numeratorList
         for i in range(len(self.possible_locations)):
             #get the pheromone_amount for the possible nect location and the distance between those cities
-            pheromone_amount = float(pheromone_map[self.get_location()][self.possible_locations[i]])
-            distance = float(1/tspmat[current_location][self.possible_locations[i]])
+            pheromone_amount = pheromone_map[current_location][possible_locations[i]]
+            distance = float(1/tspmat[current_location][possible_locations[i]])
 
             #fill the numerator list
             numeratorList.append(pow(pheromone_amount, alpha)*pow(1/distance, beta))
@@ -64,21 +67,21 @@ class ant:
             pathProbabilities.append(numeratorList[i]/denominator)
 
         #randomly choose the next path
-        #Not quit shure about this 
-		toss = random.random()
-					
-		cummulative = 0
-		for possible_next_location in pathProbabilities:
-			weight = possible_next_location
-			if toss <= weight + cummulative:
-				return self.possible_locations[pathProbabilities.index(possible_next_location)]
-			cummulative += weight
+        #Not quit shure about this
+        toss = random.random()
+
+        cummulative = 0
+        for possible_next_location in pathProbabilities:
+            weight = possible_next_location
+            if toss <= weight + cummulative:
+                return self.possible_locations[pathProbabilities.index(possible_next_location)]
+            cummulative += weight
 
 #----------------------------------Solution Construction Ends-------------------------------
-			
-			
 
-    def update_pathCcost(self):
+
+
+    def update_pathCost(self):
         """
         This function updates the Cost (length) of the path the ant has traveled
         """
@@ -98,7 +101,7 @@ class ant:
         """
         get the past cost
         """
-        if len(self.possible_locations) = 0:
+        if len(self.possible_locations) != 0:
             return self.pathCost
         return None
 
@@ -106,131 +109,67 @@ class ant:
         """
         get the path, if it's created completely
         """
-        if len(self.possible_locations) = 0:
-            return self.path
-        return None
+        #if len(self.possible_locations) != 0:
+        path = self.path
+        return path
+        #return None
 
     def get_location(self):
         """
         return the current location of the ant
         """
-        return self.path[-1]
+        path = self.path
+        return path[-1]
 
 
-#----------------------------------Pheromone_update-------------------------------
 
-class PheromonesUpdate(Ant):
+# ------------------------PheromoneUpdate Class 2.0----------------------------
+def evaporation():
+    p_map = pheromone_map
+    pheromone_factor = 1 - pheromone_evap_constant
+    for i in range(len(p_map)):
+        for j in range(len(p_map)):
+            p_map[i][j] = p_map[i][j] * pheromone_factor
+    return p_map
 
+def intensification(antColony):
+    p_map = pheromone_map
+
+    for ant in antColony:
+        path = ant.path
+        for node in range(len(path)-2):
+            pheromone_map[path[node]][path[node+1]] = pheromone_map[path[node]][path[node+1]] + pheromoneConstant/ant.pathCost
+            pheromone_map[path[node]][path[node+1]] = pheromone_map[path[node]][path[node+1]] + pheromoneConstant/ant.pathCost
+
+
+    return p_map
+
+
+
+def update_pheromone_map(antColony):
+
+    #evaporate and intensify the phromone map
+    pheromone_map = evaporation()
+    pheromone_map = intensification(antColony)
+
+    #return the updated pheromone map
+    return pheromone_map
+
+
+
+# ------------------------PheromoneUpdate Class 2.0 Ends-----------------------
+def bestAnt(antColony):
     """
-    Properties:
-    1. Initialize pheromones (Zeros/Random)
-    2. Measure the fitness of ants, given pathCost from Parent Class(Ant)
-    3. Get the path of the best ant
-    4. Evaporation
-    5. Intensification
-    6. Further work: Update pheromones applies to all pheromones with respect to the quality of solutions produced by the ants
-    """
-
-    def __init__(self, rho):
-        super().__init__(ants, num_cities, paths )
-        self.rho = rho
-
-    def init_pheromones(self, num_cities, _random=False):
-
-        """
-        :param num_cities:
-        :param _random: Type of initialization. Zeros or Random
-        :return: array of pheromones
-        """
-
-        if _random:
-            pheromones = np.random.random((num_cities, num_cities))
-            np.fill_diagonal(pheromones, 0)
-        else:
-            pheromones = np.zeros((num_cities, num_cities))
-
-        return pheromones
-
-    def fitness_measure(self, ants, pathcost):
-        """
-        :param ants: list of antIDs
-        :param pathcost: Path cost of each ant
-        :return: fittest_ant, list of their fitness
-        """
-
-        fitness_ants = np.subtract(max(pathcost), pathcost)
-        fittest_ant = ants[np.argmax(fitness_ants)]
-
-        return fittest_ant, fitness_ants
-
-    def get_path_fittest_ant(self, fittest_ant):
-
-        fittest_ant_path = paths[fittest_ant]
-
-        return fittest_ant_path
-
-    def evaporation(self, pheromones):
-        """
-        :param pheromones: Array of pheromones
-        :return: Array vaporized pheromones
-        """
-
-        return np.multiply((1-self.rho), pheromones)
-
-    def intensification(self,pheromones, fitness_ants,fittest_ant):
-
-        """
-
-        :param pheromones: Array of pheromones
-        :param fitness_ants: Fitnesses of all ants in the iteration
-        :param fittest_ant: Fittest ant index (AntID)
-        :return: intensified_pheromones : Of the best ant's path
-        """
-        path = self.get_path_fittest_ant(fittest_ant)
-        intensified_pheromones = pheromones.copy()
-        for cities in path:
-            i,j = cities
-            intensification_factor = np.multiply(self.rho, (fitness_ants[fittest_ant] / np.sum(fitness_ants, axis=0)))
-            intensified_pheromones[i][j] = pheromones[i][j] + intensification_factor
-
-        return intensified_pheromones
-
-    def update_pheromones(self, pheromones, ants, fitness_ants, fittest_ant, paths ):
-
-        """
-        :param pheromones:  Array of pheromones
-        :param ants: list of antIDs
-        :param fittest_ant: int (index of the fittest ant in the population)
-        :param fitness_ants: list of fitness of each ant
-        :param paths : tuple of paths of  ants
-        :return: array updated_pheromones
-        """
-
-        updated_pheromones = np.zeros((num_cities, num_cities))
-        for ant in range(len(ants)):
-            for path in paths[ant]:
-                    i,j = path
-                    evaporation_factor = np.multiply((1 - self.rho), pheromones[i][j])
-                    intensification_factor = np.multiply(self.rho, (fitness_ants[ant] / np.sum(fitness_ants, axis=0)))
-                    updated_pheromones[i][j] = evaporation_factor + intensification_factor
-                    # np.fill_diagonal(tau, 0)  # Hardcoded, just to make sure intensification is not performed between same city
-
-                return updated_pheromones
-
-# ------------------------PheromoneUpdate Class Ends---------------------------
-
-def BestWay(ants):
-    """
-    Evaluates the best way in this iteration, considering all path_lengths of all ants
+    Evaluates the best way in this iteration, concidering all path_lengths of all ants
     input: list of all ants
     output: bestWay: Integer value for the shortest way found
     """
-    bestWay = ants[0].path_length()
-    for ant in ants:
-        if ants[ant].path_length() < bestWay:
-            bestWay = ants[ant].path_length()
+    bestAnt = antColony[0].pathCost
+    for ant in antColony:
+        if ant.pathCost > bestAnt:
+            bestWay = ant.pathCost
 
-    return bestWay
+    return bestAnt
 
 
 
@@ -269,34 +208,59 @@ def mainloop():
         endfor
     until stopping criterion is met
     """
+
+    best_path = []
+
     while "Terminationcondition":
+
+        antColony = createAntColony(antnmbr)
+
         #create pathes for every ant in the ANt AntColony
-        for ant in AntColony:
+        for ant in antColony:
             ant.findSolution()
 
+        #update pheromone mappe
+        pheromone_map = update_pheromone_map(antColony)
 
-        #since the matrix is symmetrical acording to the diagonal we only need to comute the upper right triangal, and copy it to the lower left triangal
-        for i in range(len(pheromone_map)):
-            for j in range(i,len(pheromone_map)):
+        bestAntLength = bestAnt(antColony)
+        print("Best Length: ", bestAntLength)
 
-                if i != j :
-                pheromone = #updated pheromone map after evaporation
-                else:
-                     pheromone = 0
-                #update the respective entry in the pheromone map
-                pheromone_map[i][j] = pheromone
-                pheromone_map[j][i] = pheromone
-
-        
-
+    return best_path
 
 #----------------------------------Main loop Ends-------------------------------
 
 
-def initalize(benchmark, antnmbr):
+def initalize(benchmark, antNumber,p_Constant, evapConst):
     global tspmat
+    global pheromone_map
+    global pheromone_evap_constant
+    global pheromoneConstant
+    global antnmbr
+    global alpha
+    global beta
     tspmat = read_file(benchmark)
-    createAnts(antnmbr)
+    antnmbr = antNumber
+    pheromone_map = create_pheromone_map()
+    pheromone_evap_constant = evapConst
+    pheromoneConstant = p_Constant
+    alpha = 1
+    beta = 1
+
+
+    #create a pheromone map similar to the size of the tsp_mat
+
+
+    best_path = mainloop()
+
+
+
+def create_pheromone_map():
+    pheromone_map = [[] for _ in range(len(tspmat))]
+    for sublist in pheromone_map:
+        for i in range(len(tspmat)):
+            sublist.append(1)
+    return pheromone_map
+
 
 
 def createAntColony(antnmbr):
@@ -305,14 +269,18 @@ def createAntColony(antnmbr):
     """
     AntColony = []
     for i in range(0,antnmbr):
-        AntColony.append(ant)
+        AntColony.append(ant())
+
+    return AntColony
 
 
 def user_input():
-    benchmark = int(input("Please specify TSP benchmark to use [1],[2],[3]: "))
-    antnmbr = int(input("Please specify number of ants to be used: "))
+    benchmark = 1# int(input("Please specify TSP benchmark to use [1],[2],[3]: "))
+    antnmbr = 10# int(input("Please specify number of ants to be used: "))
+    evapConst = 0.2#float(input("Please specify Evaporation Constant: "))
+    p_Constant =2# float(input("Please specify Intensification Constant: "))
 
-    initalize(benchmark, antnmbr)
+    initalize(benchmark, antnmbr, p_Constant, evapConst)
 
 
 user_input()
