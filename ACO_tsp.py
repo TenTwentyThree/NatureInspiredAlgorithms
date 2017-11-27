@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 """
 Created on Fri Nov 24 12:33:10 2017
-@author: JoJo, yj, tn, sr, mr
+@author: JoJo, yj, tn
 """
 
 import numpy as np
 import random
+from numpy.random import choice
+
 
 class ant:
     def __init__(self):
@@ -66,6 +68,11 @@ class ant:
         for i in range(len(self.possible_locations)):
             pathProbabilities.append(numeratorList[i]/denominator)
 
+
+
+        draw = choice(possible_locations, 1, p=pathProbabilities)
+        next_node = draw[0]
+        return next_node
         #randomly choose the next path
         #Not quit shure about this
         toss = random.random()
@@ -85,6 +92,7 @@ class ant:
         """
         This function updates the Cost (length) of the path the ant has traveled
         """
+        self.pathCost = 0
         for i in range(len(self.path)-1):
             self.pathCost += tspmat[self.path[i]][self.path[i+1]]
 
@@ -166,7 +174,7 @@ def bestAnt(antColony):
     """
     bestAnt = antColony[0].pathCost
     for ant in antColony:
-        if ant.pathCost > bestAnt:
+        if ant.pathCost < bestAnt:
             bestWay = ant.pathCost
 
     return bestAnt
@@ -244,7 +252,7 @@ def initalize(benchmark, antNumber,p_Constant, evapConst):
     pheromone_evap_constant = evapConst
     pheromoneConstant = p_Constant
     alpha = 1
-    beta = 1
+    beta = 0
 
 
     #create a pheromone map similar to the size of the tsp_mat
@@ -276,9 +284,9 @@ def createAntColony(antnmbr):
 
 def user_input():
     benchmark = 1# int(input("Please specify TSP benchmark to use [1],[2],[3]: "))
-    antnmbr = 10# int(input("Please specify number of ants to be used: "))
-    evapConst = 0.2#float(input("Please specify Evaporation Constant: "))
-    p_Constant =2# float(input("Please specify Intensification Constant: "))
+    antnmbr = 20# int(input("Please specify number of ants to be used: "))
+    evapConst = 0.5#float(input("Please specify Evaporation Constant: "))
+    p_Constant =8# float(input("Please specify Intensification Constant: "))
 
     initalize(benchmark, antnmbr, p_Constant, evapConst)
 
