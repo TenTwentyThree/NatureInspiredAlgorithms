@@ -39,8 +39,8 @@ class ant:
             self.update_pathCost()
 
 
-    def choseCity(self):
-        """choses the next city based on the pheromone level
+    def chooseCity(self):
+        """chooses the next city based on the pheromone level
             calculate the attractiveness of each possible transition from the current location
             then randomly choose a next path, based on its attractiveness
         """
@@ -180,7 +180,7 @@ def bestAnt(antColony):
     #set best ant to first ant in antColony
     bestAnt = antColony[0].pathCost
     for ant in antColony:
-        #if path cost of ant x is smaler than the one of the best ant, x is new best ant
+        #if path cost of ant x is smaller than the one of the best ant, x is new best ant
         if ant.pathCost < bestAnt:
             bestWay = ant.pathCost
 
