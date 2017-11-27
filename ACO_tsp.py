@@ -311,8 +311,9 @@ def createAntColony(antnmbr):
 def user_input():
     benchmark = int(input("Please specify TSP benchmark to use [1],[2],[3]: "))
     antnmbr = int(input("Please specify number of ants to be used: "))
+    stoppingcriterion = int(input("Please specify after how many iterations without an improved solution you want to stop: "))
 
-    initalize(benchmark, antnmbr)
+    initalize(benchmark, antnmbr, stoppingcriterion)
 
 
 user_input()
