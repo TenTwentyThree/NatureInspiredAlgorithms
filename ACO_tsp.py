@@ -32,7 +32,7 @@ class ant:
         """
         while self.possible_locations:
             # first chose the next city
-            next_city = self.choseCity()
+            next_city = self.chooseCity()
             # update the path with the new city
             self.update_path(next_city)
             # updte the path cost of the ant
