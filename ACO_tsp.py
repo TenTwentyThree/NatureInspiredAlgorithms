@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 Created on Fri Nov 24 12:33:10 2017
-@author: JoJo, yj, tn
+@author: JoJo, yj, tn, mp
 """
 
 import numpy as np
@@ -269,7 +269,7 @@ def mainloop():
         endfor
     until stopping criterion is met
     """
-    while "Terminationcondition":
+    for i in range(int(stoppingcriterion)-1):
         #create pathes for every ant in the ANt AntColony
         for ant in AntColony:
             ant.findSolution()
