@@ -11,7 +11,7 @@ class ant:
         """
         initialize an ant, to traverse the map
         possible_locations -> a list of possible locations the ant can travel to
-        path -> [1,2,5,3,4,6,1] a list of integers, where each integer represents a city, and the path[i] to the path[i+1] entrence is an edge the ant has traveled
+        path -> [1,2,5,3,4,6,1] a list of integers, where each integer represents a city, and the path[i] to the path[i+1] entrance is an edge the ant has traveled
         pathCost -> cost, in this case the sum of the edgecosts the ant has traveled
         """
 
@@ -24,7 +24,7 @@ class ant:
 
     def findSolution(self):
         """
-        As long as the List of possibl enext location self.possible_locations is not empty
+        As long as the List of possible next location self.possible_locations is not empty
         we chosse the next City and update the path
         """
         while self.possible_locations:
