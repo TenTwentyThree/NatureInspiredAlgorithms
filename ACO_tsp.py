@@ -7,7 +7,7 @@ Created on Fri Nov 24 12:33:10 2017
 import numpy as np
 import random
 from numpy.random import choice
-
+import heapq
 
 class ant:
     def __init__(self):
@@ -32,15 +32,19 @@ class ant:
         """
         while self.possible_locations:
             # first chose the next city
-            next_city = self.chooseCity()
+            #print("From :",self.possible_locations)
+            next_city = self.choseCity()
             # update the path with the new city
             self.update_path(next_city)
+            #print("we choose: ", self.path[-1])
+            #print("")
             # updte the path cost of the ant
             self.update_pathCost()
+        self.update_pathCost()
 
 
-    def chooseCity(self):
-        """chooses the next city based on the pheromone level
+    def choseCity(self):
+        """choses the next city based on the pheromone level
             calculate the attractiveness of each possible transition from the current location
             then randomly choose a next path, based on its attractiveness
         """
@@ -52,28 +56,36 @@ class ant:
         #List with all numerator values for each possible next_location
         numeratorList= []
         #Total sum of te denumerator, still has to be computed
-        total_sum = 0
+        denominator = 0
         # Compute the numerator for every possible node and save in the numeratorList
-        for i in range(len(self.possible_locations)):
+        #for i in range(0,len(self.possible_locations)):
+        for city in self.possible_locations:
             #get the pheromone_amount for the possible nect location and the distance between those cities
-            pheromone_amount = pheromone_map[current_location][possible_locations[i]]
-            distance = float(1/tspmat[current_location][possible_locations[i]])
+            pheromone_amount = pheromone_map[current_location][city]
+            distance = float(1/tspmat[current_location][city])
 
             #fill the numerator list
-            numeratorList.append(pow(pheromone_amount, alpha)*pow(1/distance, beta))
-        #compute the denominator
-        denominator = sum(numeratorList)
+            numeratorList.append(pow(pheromone_amount, alpha)*pow(distance, beta))
 
+        #compute the denominator
+        denominator = float(sum(numeratorList))
         #compute the path probabilities by deviding the numerator with the deonominator
         for i in range(len(self.possible_locations)):
-            pathProbabilities.append(numeratorList[i]/denominator)
+            if denominator != 0:
+                pathProbabilities.append(numeratorList[i]/denominator)
+            elif denominator == 0:
+                pathProbabilities.append(0)
 
 
-
-        draw = choice(possible_locations, 1, p=pathProbabilities)
+        draw = choice(possible_locations, 1, pathProbabilities)
         next_node = draw[0]
+
+        index = possible_locations.index(next_node)
+        #print("with Probability: ",pathProbabilities[index], " best prob would be: ", max(pathProbabilities))
+
         return next_node
 
+        return possible_locations[pathProbabilities.index(max(pathProbabilities))]
 
 #----------------------------------Solution Construction Ends-------------------------------
 
@@ -84,6 +96,7 @@ class ant:
         This function updates the Cost (length) of the path the ant has traveled
         """
         self.pathCost = 0
+
         for i in range(len(self.path)-1):
             self.pathCost += tspmat[self.path[i]][self.path[i+1]]
 
@@ -143,8 +156,19 @@ def evaporation():
 def intensification(antColony):
     p_map = pheromone_map
 
-    #for every ant in the antColony
+    ants_path_cost = []
     for ant in antColony:
+        ants_path_cost.append(ant.pathCost)
+
+    fastest20 = heapq.nsmallest(10,ants_path_cost)
+
+    subAnts = []
+    #put the fastest ants in the sublost
+    for i in range(len(fastest20)):
+        subAnts.append(antColony[ants_path_cost.index(fastest20[i])])
+
+    #for the 20 fastest ants in the antColony
+    for ant in subAnts:
         #safe the path(solution that it found)
         path = ant.path
         #than depose the pheromone amount which is computed by
@@ -165,6 +189,7 @@ def update_pheromone_map(antColony):
     pheromone_map = evaporation()
     pheromone_map = intensification(antColony)
 
+    #print(pheromone_map[0])
     #return the updated pheromone map
     return pheromone_map
 
@@ -173,19 +198,17 @@ def update_pheromone_map(antColony):
 # ------------------------PheromoneUpdate Class 2.0 Ends-----------------------
 def bestAnt(antColony):
     """
-    Evaluates the best way in this iteration, considering all path_lengths of all ants
+    Evaluates the best way in this iteration, concidering all path_lengths of all ants
     input: list of all ants
     output: bestWay: Integer value for the shortest way found
     """
     #set best ant to first ant in antColony
-    bestAnt = antColony[0].pathCost
+    costs = []
     for ant in antColony:
-        #if path cost of ant x is smaller than the one of the best ant, x is new best ant
-        if ant.pathCost < bestAnt:
-            bestWay = ant.pathCost
+        #if path cost of ant x is smaler than the one of the best ant, x is new best ant
+        costs.append(ant.pathCost)
 
-    return bestAnt
-
+    return min(costs)
 
 
 def read_file(filename):
@@ -200,6 +223,9 @@ def read_file(filename):
 
     if filename == 3:
         tspmat = np.loadtxt("3.tsp")
+
+    if filename == 4:
+        tspmat = np.loadtxt("4.tsp")
 
     valuematrix = tspmat.astype(int)
     return valuematrix
@@ -224,17 +250,18 @@ def mainloop():
     until stopping criterion is met
     """
 
-    best_path = []
-
-    termcount = 0           #see below
-    while termination() = false:  #see below
+    best_path = 1000000000
+    iteration = 0
+    while iteration != 10000:
 
         antColony = createAntColony(antnmbr)
 
         #create pathes for every ant in the AntColony
         for ant in antColony:
             ant.findSolution()
-
+        #print(antColony[0].path)
+        #print(antColony[0].pathCost)
+        #print(antColony[0].possible_locations)
         #update pheromone mappe
         pheromone_map = update_pheromone_map(antColony)
 
@@ -242,10 +269,14 @@ def mainloop():
         bestAntLength = bestAnt(antColony)
         print("Best Length: ", bestAntLength)
 
+        if bestAntLength < best_path:
+            best_path = bestAntLength
+            print("###--------        Shorter Path found:  ",best_path,"         ----------#####")
+
+        iteration +=1
     return best_path
 
 #----------------------------------Main loop Ends-------------------------------
-
 """ Termination Condition
 def termination():
     if bestWay <= previousbestWay:
@@ -255,6 +286,7 @@ def termination():
     if termcount = termcriterion:
         return true
 """
+
 
 def initalize(benchmark, antNumber,p_Constant, evapConst):
     global tspmat
@@ -269,22 +301,22 @@ def initalize(benchmark, antNumber,p_Constant, evapConst):
     pheromone_map = create_pheromone_map()
     pheromone_evap_constant = evapConst
     pheromoneConstant = p_Constant
-    alpha = 1
-    beta = 0
+    alpha = 0
+    beta = 1
 
 
     #create a pheromone map similar to the size of the tsp_mat
 
 
     best_path = mainloop()
-
+    print("Shortest Path found: ",best_path )
 
 
 def create_pheromone_map():
     pheromone_map = [[] for _ in range(len(tspmat))]
     for sublist in pheromone_map:
         for i in range(len(tspmat)):
-            sublist.append(1)
+            sublist.append(0.0)
     return pheromone_map
 
 
@@ -302,10 +334,9 @@ def createAntColony(antnmbr):
 
 def user_input():
     benchmark = 1# int(input("Please specify TSP benchmark to use [1],[2],[3]: "))
-    antnmbr = 20# int(input("Please specify number of ants to be used: "))
-    evapConst = 0.2#float(input("Please specify Evaporation Constant: "))
-    p_Constant =8# float(input("Please specify Intensification Constant: "))
-    #termcriterion = 5 (amount of iterations with no improvement in solution until termination)
+    antnmbr = 100# int(input("Please specify number of ants to be used: "))
+    evapConst = 0.4#float(input("Please specify Evaporation Constant: "))
+    p_Constant =0.6# float(input("Please specify Intensification Constant: "))
 
     initalize(benchmark, antnmbr, p_Constant, evapConst)
 
