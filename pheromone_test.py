@@ -23,7 +23,7 @@ class Ant:
 class PheromonesUpdate(Ant):
 
     def __init__(self, rho):
-        super().__init__(ants, num_cities, paths )
+        super().__init__(ants, num_cities, paths)
         self.rho = rho
 
     def init_pheromones(self, num_cities, _random=False):
@@ -61,7 +61,7 @@ class PheromonesUpdate(Ant):
 
         pass
 
-    def update_pheromones(self, tau, ants, fitness_ants, fittest_ant, paths ):
+    def update_pheromones(self, tau, ants, fitness_ants, fittest_ant, paths):
         """
         :param tau:  pheromones
         :param rho: evaporation constant
@@ -104,6 +104,7 @@ class PheromonesUpdate(Ant):
 
         return intensified_pheromones
 
+
 # Test variables
 ants = [0, 1, 2, 3, 4]  # Ant IDs
 num_cities = 5
@@ -128,5 +129,5 @@ print("Fitnesses of ants are %s and the fittest ant is %s  "%(_fitness_ants, _fi
 print("Updated pheromone", updated_tau)
 """
 
-intensified_pheromones = pheromones_update.intensification(pheromones, fitness_ants= _fitness_ants, fittest_ant=_fittest_ant, paths=paths)
+intensified_pheromones = pheromones_update.intensification(pheromones, fitness_ants=_fitness_ants, fittest_ant=_fittest_ant, paths=paths)
 print("Intensified pheromones", intensified_pheromones)
