@@ -65,14 +65,14 @@ class ant:
 
         #randomly choose the next path
         #Not quit shure about this 
-		toss = random.random()
+        toss = random.random()
 					
-		cummulative = 0
-		for possible_next_location in pathProbabilities:
-			weight = possible_next_location
-			if toss <= weight + cummulative:
-				return self.possible_locations[pathProbabilities.index(possible_next_location)]
-			cummulative += weight
+        cummulative = 0
+        for possible_next_location in pathProbabilities:
+            weight = possible_next_location
+            if toss <= weight + cummulative:
+                return self.possible_locations[pathProbabilities.index(possible_next_location)]
+            cummulative += weight
 
 #----------------------------------Solution Construction Ends-------------------------------
 			
@@ -98,7 +98,7 @@ class ant:
         """
         get the past cost
         """
-        if len(self.possible_locations) = 0:
+        if len(self.possible_locations) == 0:
             return self.pathCost
         return None
 
@@ -106,7 +106,7 @@ class ant:
         """
         get the path, if it's created completely
         """
-        if len(self.possible_locations) = 0:
+        if len(self.possible_locations) == 0:
             return self.path
         return None
 
@@ -215,7 +215,7 @@ class PheromonesUpdate(Ant):
                     updated_pheromones[i][j] = evaporation_factor + intensification_factor
                     # np.fill_diagonal(tau, 0)  # Hardcoded, just to make sure intensification is not performed between same city
 
-                return updated_pheromones
+        return updated_pheromones
 
 # ------------------------PheromoneUpdate Class Ends---------------------------
 
