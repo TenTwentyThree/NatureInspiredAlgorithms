@@ -18,14 +18,14 @@ class ant:
         pathCost -> cost, in this case the sum of the edgecosts the ant has traveled
         """
 
-        self.possible_locations = list(range(len(tspmat)))
+        self.possible_locations = list(range(1,len(tspmat)))
         self.path = [0]
         self.pathCost = 0
 
 #----------------------------------Solution Construction-------------------------------
 
 
-    def findSolution(self):
+    def findSolution(self,pheromone_map):
         """
         As long as the List of possible next location self.possible_locations is not empty
         we chosse the next City and update the path
@@ -33,7 +33,7 @@ class ant:
         while self.possible_locations:
             # first chose the next city
             #print("From :",self.possible_locations)
-            next_city = self.choseCity()
+            next_city= self.choseCity(pheromone_map)
             # update the path with the new city
             self.update_path(next_city)
             #print("we choose: ", self.path[-1])
@@ -43,7 +43,7 @@ class ant:
         self.update_pathCost()
 
 
-    def choseCity(self):
+    def choseCity(self,pheromone_map):
         """choses the next city based on the pheromone level
             calculate the attractiveness of each possible transition from the current location
             then randomly choose a next path, based on its attractiveness
@@ -136,25 +136,23 @@ class ant:
 
 
 # ------------------------PheromoneUpdate Class 2.0----------------------------
-def evaporation():
+def evaporation(pheromone_map):
     """
     Evaporate pheromone from the pheromone map
     """
     #save the pheromone map
-    p_map = pheromone_map
+    pheromone_map
     #compute the pheromone factor : (1 - pheromone_evap_constant) * p_map(i,j)
     pheromone_factor = 1 - pheromone_evap_constant
-    for i in range(len(p_map)):
-        for j in range(len(p_map)):
+    for i in range(len(pheromone_map)):
+        for j in range(len(pheromone_map)):
             #make sure the diagonal values are 0
             if i != j:
-                p_map[i][j] = p_map[i][j] * pheromone_factor
+                pheromone_map[i][j] = pheromone_map[i][j] * pheromone_factor
             else:
-                p_map[i][j] = 0
-    return p_map
+                pheromone_map[i][j] = 0
 
-def intensification(antColony):
-    p_map = pheromone_map
+def intensification(antColony,pheromone_map):
 
     ants_path_cost = []
     for ant in antColony:
@@ -175,23 +173,22 @@ def intensification(antColony):
         # computing the pheromone amount between city i and i+1 + a pheromone constant divided by the length of the path of the ant
         #the larger the pathcost is, the smaler the amount of added pharomne gets, since if the denomnator gets bigger, the output shrinks
         for i in range(len(path)-2):
-            p_map[path[i]][path[i+1]] = p_map[path[i]][path[i+1]] + pheromoneConstant/ant.pathCost
-            p_map[path[i+1]][path[i]] = p_map[path[i+1]][path[i]] + pheromoneConstant/ant.pathCost
-
-    return p_map
+            pheromone_map[path[i]][path[i+1]] = pheromone_map[path[i]][path[i+1]] + pheromoneConstant/ant.pathCost
+            pheromone_map[path[i+1]][path[i]] = pheromone_map[path[i+1]][path[i]] + pheromoneConstant/ant.pathCost
 
 
 
 
-def update_pheromone_map(antColony):
+
+def update_pheromone_map(antColony,pheromone_map):
 
     #evaporate and intensify the phromone map
-    pheromone_map = evaporation()
-    pheromone_map = intensification(antColony)
+    evaporation(pheromone_map)
+    intensification(antColony,pheromone_map)
 
     #print(pheromone_map[0])
     #return the updated pheromone map
-    return pheromone_map
+
 
 
 
@@ -252,18 +249,20 @@ def mainloop():
 
     best_path = 1000000000
     iteration = 0
+    pheromone_map = create_pheromone_map()
     while iteration != 10000:
 
         antColony = createAntColony(antnmbr)
 
         #create pathes for every ant in the AntColony
         for ant in antColony:
-            ant.findSolution()
+            ant.findSolution(pheromone_map)
         #print(antColony[0].path)
         #print(antColony[0].pathCost)
         #print(antColony[0].possible_locations)
         #update pheromone mappe
-        pheromone_map = update_pheromone_map(antColony)
+        update_pheromone_map(antColony,pheromone_map)
+        print(pheromone_map[0][:20])
 
         #compute the best ant of the generation
         bestAntLength = bestAnt(antColony)
@@ -298,11 +297,10 @@ def initalize(benchmark, antNumber,p_Constant, evapConst):
     global beta
     tspmat = read_file(benchmark)
     antnmbr = antNumber
-    pheromone_map = create_pheromone_map()
     pheromone_evap_constant = evapConst
     pheromoneConstant = p_Constant
-    alpha = 0
-    beta = 1
+    alpha = 1
+    beta = 0
 
 
     #create a pheromone map similar to the size of the tsp_mat
