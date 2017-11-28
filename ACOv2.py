@@ -132,7 +132,7 @@ class antColony():
             """
             self.path_cost += tspmap[oldCity][newCity]
 
-    def __init__(self,start=None, ant_count= 20, alpha=1.0, beta=0.1,  pheromone_evaporation_coefficient=.40, pheromone_constant=.60, iterations=20):
+    def __init__(self, start, ant_count, alpha, beta,  pheromone_evaporation_coefficient, phero, nbofgen):
         """
         initialize an ant Colony
         start(int) = the starting position of the
@@ -143,7 +143,16 @@ class antColony():
         pheromone_constant(float) : Parameter to regulate the amount of pheromone that is added to the pheromone_map
         iterations(int) : numebr of iterations we run through
         """
-
+        self.start = start
+        self.ant_count = ant_count
+        self.alpha = alpha
+        self.beta = beta
+        self.pheromone_evaporation_coefficient = pheromone_evaporation_coefficient
+        self.pheromone_constant = phero
+        self.iterations = nbofgen
+        
+        
+        
         # Matrix of the pheromone amount over iterations
         self.pheromone_map = self.init_pheromone_map(len(tspmap))
         # Matrix of pheromone amount in iteration
@@ -372,7 +381,7 @@ def initalize(benchmark):
     global tspmap
     tspmap = read_file(benchmark)
 
-    Colony = antColony()
+    Colony = antColony(None, antnmbr, al, be,  p_evap_co, p_factor, iterations)
     shortest_distance, shortest_path = Colony.mainloop()
 
     print("The shortest path has cost: ",shortest_distance)
@@ -381,17 +390,19 @@ def initalize(benchmark):
 
 def user_input():
     global antnmbr
-    global p_evaporation_coefficient
+    global p_evap_co
     global p_factor
     global al
     global be
+    global iterations
 
     benchmark = int(input("Please specify TSP benchmark to use [1],[2],[3]: "))
     antnmbr = int(input("Please specify number of ants to be used: "))
-    p_evaporation_coefficient = float(input("Please specify Evaporation Constant: "))
+    p_evap_co = float(input("Please specify Evaporation Constant: "))
     p_factor = float(input("Please specify Intensification Constant: "))
     al = float(input("Please specify Alpha Value: "))
     be = float(input("Please specify Beta Value: "))
+    iterations = int(input("Please specify the number of iterations before termination: "))
 
     initalize(benchmark)
 
