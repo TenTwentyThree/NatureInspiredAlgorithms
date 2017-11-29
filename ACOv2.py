@@ -278,13 +278,13 @@ class antColony():
 
         #iterate through the path of the ant and update the pheromone_map_iteration at each respective edge the ant has traveled
         for i in range(len(path)-1):
-            current_pheromone_value = float(self.pheromone_map_iteration[path[i]][path[i+1]])
+            current_pheromone_value = float(self.pheromone_map_iteration[path[i]][path[i + 1]])
 
             new_pheromone_amount = self.pheromone_constant/ant.path_cost
 
             #because the map is symetrical to the diagonal we only need to copy them with respect to the indizes
-            self.pheromone_map_iteration[path[i]][path[i+1]] = current_pheromone_value + new_pheromone_amount
-            self.pheromone_map_iteration[path[i+1]][path[i]] = current_pheromone_value + new_pheromone_amount
+            self.pheromone_map_iteration[path[i]][path[i + 1]] = current_pheromone_value + new_pheromone_amount
+            self.pheromone_map_iteration[path[i + 1]][path[i]] = current_pheromone_value + new_pheromone_amount
 
 #---------------------------------- EVAPORATION and INTENSIFICATION ENDS--------------------------------#
     def mainloop(self):
@@ -416,7 +416,7 @@ def user_input():
 
 
     #Benchmark Input
-    while (benchmark != 0)and (benchmark != 1)and (benchmark != 2) and (benchmark != 3):
+    while (benchmark != 0) and (benchmark != 1) and (benchmark != 2) and (benchmark != 3):
         if benchmark == -1:
             benchmark = int(input("Please specify TSP benchmark to use [1],[2],[3]: "))
         else:
