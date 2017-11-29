@@ -415,71 +415,73 @@ def user_input():
             iterations = 20
             initalize(benchmark)
             return None
+        if default == 1:
 
 
-    #Benchmark Input
-    while (benchmark != 0) and (benchmark != 1) and (benchmark != 2) and (benchmark != 3):
-        if benchmark == -1:
-            benchmark = int(input("Please specify TSP benchmark to use [1],[2],[3]: "))
-        else:
-            benchmark = int(input("Benachmark must be [1],[2],[3]: "))
-        if benchmark == 0:
-            benchmark = 1
-    #AntNumber Input
-    while antnmbr < 0:
-        if antnmbr == -1:
-            antnmbr = int(input("Please specify number of ants to be used: "))
-        else:
-            antnmbr = int(input("Please specify number of ants (must be 0 for default or higher): "))
-        if antnmbr == 0:
-            antnmbr = 20
-    #Evaporation constant
-    while p_evap_co < 0:
-        if p_evap_co == -1:
-            p_evap_co = float(input("Please specify Evaporation Constant: "))
-        else:
-            p_evap_co = float(input("Please specify Evaporation Constant bigger than 0 or zero for default: "))
-        if p_evap_co == 0:
-            p_evap_co = 0.4
-    #Pheromone Factor
-    while p_factor < 0:
-        if p_factor == -1:
-            p_factor = float(input("Please specify Intensification Constant: "))
-        else:
-            p_factor = float(input("Please specify Intensification Constant:  bigger than 0 or zero for default: "))
-        if p_factor == 0:
-            p_factor = 0.4
-    #Alpha
-    while al < 0:
-        if al == -1:
-            al = float(input("Please specify Alpha Value(no default): "))
-        else:
-            al = float(input("Please specify Alpha Value bigger or equal to zero: "))
-    #beta
-    while be < 0:
-        if be == -1:
-            be = float(input("Please specify Beta Value: "))
-        else:
-            be = float(input("Please specify Beta Value bigger or equal to zero: "))
-    while iterations < 1:
-        if iterations == -1:
-            iterations = int(input("Please specify the number of iterations before termination: "))
-        else:
-            iterations = int(input("Please specify the number of iterations before termination that is bigger than 0 or 0 for default: "))
-        if iterations == 0:
-            iterations = 20
-    print("")
-    print("Initialize ACO with:")
-    print("")
-    print("Benchamrk: ",benchmark)
-    print("Number of ants: ",antnmbr)
-    print("Evaporation Coefficient: ",p_evap_co)
-    print("Pheromone Constant: ",p_factor)
-    print("Alpha Value: ",al)
-    print("Beta Value: ",be)
-    print("Terminate after  ",iterations," Iterations.")
-    print("")
-    initalize(benchmark)
+            #Benchmark Input
+            while (benchmark != 0) and (benchmark != 1) and (benchmark != 2) and (benchmark != 3):
+                if benchmark == -1:
+                    benchmark = int(input("Please specify TSP benchmark to use [1],[2],[3]: "))
+                else:
+                    benchmark = int(input("Benachmark must be [1],[2],[3]: "))
+                if benchmark == 0:
+                    benchmark = 1
+            #AntNumber Input
+            while antnmbr < 0:
+                if antnmbr == -1:
+                    antnmbr = int(input("Please specify number of ants to be used: "))
+                else:
+                    antnmbr = int(input("Please specify number of ants (must be 0 for default or higher): "))
+                if antnmbr == 0:
+                    antnmbr = 20
+            #Evaporation constant
+            while p_evap_co < 0:
+                if p_evap_co == -1:
+                    p_evap_co = float(input("Please specify Evaporation Constant: "))
+                else:
+                    p_evap_co = float(input("Please specify Evaporation Constant bigger than 0 or zero for default: "))
+                if p_evap_co == 0:
+                    p_evap_co = 0.4
+            #Pheromone Factor
+            while p_factor < 0:
+                if p_factor == -1:
+                    p_factor = float(input("Please specify Intensification Constant: "))
+                else:
+                    p_factor = float(input("Please specify Intensification Constant:  bigger than 0 or zero for default: "))
+                if p_factor == 0:
+                    p_factor = 0.4
+            #Alpha
+            while al < 0:
+                if al == -1:
+                    al = float(input("Please specify Alpha Value(no default): "))
+                else:
+                    al = float(input("Please specify Alpha Value bigger or equal to zero: "))
+            #beta
+            while be < 0:
+                if be == -1:
+                    be = float(input("Please specify Beta Value: "))
+                else:
+                    be = float(input("Please specify Beta Value bigger or equal to zero: "))
+            while iterations < 1:
+                if iterations == -1:
+                    iterations = int(input("Please specify the number of iterations before termination: "))
+                else:
+                    iterations = int(input("Please specify the number of iterations before termination that is bigger than 0 or 0 for default: "))
+                if iterations == 0:
+                    iterations = 20
+            print("")
+            print("Initialize ACO with:")
+            print("")
+            print("Benchamrk: ",benchmark)
+            print("Number of ants: ",antnmbr)
+            print("Evaporation Coefficient: ",p_evap_co)
+            print("Pheromone Constant: ",p_factor)
+            print("Alpha Value: ",al)
+            print("Beta Value: ",be)
+            print("Terminate after  ",iterations," Iterations.")
+            print("")
+            initalize(benchmark)
+            return None
 
 
 user_input()
