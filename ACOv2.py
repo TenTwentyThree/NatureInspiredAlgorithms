@@ -386,6 +386,7 @@ def user_input():
     global al
     global be
     global iterations
+    global default
 
     benchmark = -1
     antnmbr = -1
@@ -394,9 +395,25 @@ def user_input():
     al = -1
     be = -1
     iterations = -1
+    default = -1
 
 
     print("#----- USERINTERFACE - Input 0 for a default Value -----#")
+
+    #Default
+    while (default != 0) or (default != 1):
+        default = int(input("Do yo want to use default values? [0]Yes  [1]No: "))
+        if default == 0:
+            benchmark = 1
+            antnmbr = 50
+            p_evap_co = 0.4
+            p_factor = 0.4
+            al = 1
+            be = 1
+            iterations = 20
+            initalize(benchmark)
+            return None
+
 
     #Benchmark Input
     while (benchmark != 0)and (benchmark != 1)and (benchmark != 2) and (benchmark != 3):
