@@ -132,7 +132,7 @@ class antColony():
             """
             self.path_cost += tspmap[oldCity][newCity]
 
-    def __init__(self, start, ant_count, alpha, beta,  pheromone_evaporation_coefficient, phero, nbofgen):
+    def __init__(self, start, ant_count, alpha, beta,  pheromone_evaporation_coefficient, pheromone_constant, iterations):
         """
         initialize an ant Colony
         start(int) = the starting position of the
@@ -143,16 +143,7 @@ class antColony():
         pheromone_constant(float) : Parameter to regulate the amount of pheromone that is added to the pheromone_map
         iterations(int) : numebr of iterations we run through
         """
-        self.start = start
-        self.ant_count = ant_count
-        self.alpha = alpha
-        self.beta = beta
-        self.pheromone_evaporation_coefficient = pheromone_evaporation_coefficient
-        self.pheromone_constant = phero
-        self.iterations = nbofgen
-        
-        
-        
+
         # Matrix of the pheromone amount over iterations
         self.pheromone_map = self.init_pheromone_map(len(tspmap))
         # Matrix of pheromone amount in iteration
