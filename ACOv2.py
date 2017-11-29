@@ -7,7 +7,7 @@ import heapq
 class antColony():
     class ant():
 
-        def __init__(self,init_location,possible_locations,pheromone_map,alpha,beta,first_pass=False):
+        def __init__(self,init_location,possible_locations,pheromone_map,alpha,beta,first_pass):
             """
             Initialite an ant with,
 
@@ -27,7 +27,7 @@ class antColony():
             self.pheromone_map = pheromone_map
             self.alpha = alpha
             self.beta = beta
-            self.first_pass = first_pass
+            self.first_pass = True
 
             self.update_path(init_location)
 
@@ -47,7 +47,9 @@ class antColony():
             """
             #if we are in the first iteration, just take a random path
             if self.first_pass:
+                self.first_pass = False
                 return random.choice(self.possible_locations)
+                
 
             #else compute the path by the ACO edge selection Heuristic
             #(pheromoneamount^alpha * (1/distance)^beta)/sum(all alowed moves)
@@ -244,7 +246,7 @@ class antColony():
                     self.alpha, self.beta, first_pass=True) for _ in range(self.ant_count)]
 
         for ant in self.colony:
-            ant.__init__(start,self.possible_locations(),self.pheromone_map,self.alpha,self.beta)
+            ant.__init__(start,self.possible_locations(),self.pheromone_map,self.alpha,self.beta, self.first_pass)
 
 
 #---------------------------------- EVAPORATION and INTENSIFICATION--------------------------------#
@@ -404,7 +406,7 @@ def user_input():
     while (default != 0) or (default != 1):
         default = int(input("Do yo want to use default values? [0]Yes  [1]No: "))
         if default == 0:
-            benchmark = 1
+            benchmark = 2
             antnmbr = 50
             p_evap_co = 0.4
             p_factor = 0.4
