@@ -3,7 +3,7 @@
 import numpy as np
 import random
 from numpy.random import choice
-import heapq
+import time
 
 
 class antColony():
@@ -427,13 +427,13 @@ def user_input():
         if default == 0:
             benchmark = 1
             antnmbr = 50
-            p_evap_co = 0.4
-            p_factor = 0.4
+            p_evap_co = 0.3
+            p_factor = 0.3
             al = 1
             be = 1
-            iterations = 100
+            iterations = 1000
             print("")
-            print("Initialize ACO with:")
+            print("####---------Initialize ACO with: ---------###")
             print("")
             print("Benchamrk: ",benchmark)
             print("Number of ants: ",antnmbr)
@@ -442,7 +442,9 @@ def user_input():
             print("Alpha Value: ",al)
             print("Beta Value: ",be)
             print("Terminate after  ",iterations," Iterations without improvement.")
+            print("####-----------------------------------------###")
             print("")
+            time.sleep(3)
             initalize(benchmark)
             return None
         if default == 1:
@@ -494,7 +496,7 @@ def user_input():
                     be = float(input("Please specify Beta Value bigger or equal to zero: "))
             while iterations < 1:
                 if iterations == -1:
-                    iterations = int(input("Please specify the number of iterations before termination: "))
+                    iterations = int(input("Please specify the number of iterations without improvement before termination: "))
                 else:
                     iterations = int(input("Please specify the number of iterations before termination that is bigger than 0 or 0 for default: "))
                 if iterations == 0:
@@ -508,7 +510,7 @@ def user_input():
             print("Pheromone Constant: ",p_factor)
             print("Alpha Value: ",al)
             print("Beta Value: ",be)
-            print("Terminate after  ",iterations," Iterations.")
+            print("Terminate after  ",iterations," Iterations without improvement.")
             print("")
             initalize(benchmark)
             return None
