@@ -1,3 +1,5 @@
+
+
 import numpy as np
 import random
 from numpy.random import choice
@@ -49,7 +51,7 @@ class antColony():
             if self.first_pass:
                 self.first_pass = False
                 return random.choice(self.possible_locations)
-                
+
 
             #else compute the path by the ACO edge selection Heuristic
             #(pheromoneamount^alpha * (1/distance)^beta)/sum(all alowed moves)
@@ -64,8 +66,10 @@ class antColony():
                 pheromone_amount = float(self.pheromone_map[self.current_location][possbible_next_location])
                 distance = float(tspmap[self.current_location][possbible_next_location])
 
+                #if (self.alpha == 0) and (self.beta == 0):
+                attractiveness.append(pheromone_amount*(1/distance))
                 #append the numerator list 'attractiveness' with the numerator of the likelyhood
-                attractiveness.append(pow(pheromone_amount, self.alpha)*pow(1/distance, self.beta))
+                #attractiveness.append(pow(pheromone_amount, self.alpha)*pow(1/distance, self.beta))
             #Compute the denominator by adding up all possible attractivnesses
             denominator = float(sum(attractiveness))
 
@@ -102,13 +106,24 @@ class antColony():
                 elif denominator == 0.0:
                     pathProbabilities.append(0)
 
+            #Sample the next path from the probabilities
+            toss = random.random()
+            cummulative = 0
+
+            for i in range(len(pathProbabilities)):
+                if toss <= (pathProbabilities[i] + cummulative):
+                    next_city = self.possible_locations[i]
+                    return next_city
+                cummulative += pathProbabilities[i]
+
+
             #next city is the city with the highest probability
-            next_city = self.possible_locations[pathProbabilities.index(max(pathProbabilities))]
+            #next_city = self.possible_locations[pathProbabilities.index(max(pathProbabilities))]
 
             #Initially the Idea was to choose the city by the probability distribution, but somehow it doesn't work \_(o.o)_/
             #draw = choice(self.possible_locations, 1, pathProbabilities)
             #next_city = draw[0]
-            return next_city
+            #return next_city
 #---------------------------------------------SOLUTION CONSTRUCTION Ends--------------------------------------#
         def traverse(self,oldCity,newCity):
             """
@@ -303,8 +318,9 @@ class antColony():
             increase the value {intensification}
         endfor
         """
-
-        for _ in range(self.iterations):
+        terminate = 0
+        while terminate <= self.iterations:
+            terminate += 1
             #SOLUTION FINDING
             for ant in self.colony:
                 ant.create_path()
@@ -328,6 +344,9 @@ class antColony():
                     self.shortest_ant_in_iteration = ant.path_cost
                 #find overall best path
                 if ant.path_cost < self.shortest_distance:
+
+                    terminate = 0
+
                     self.shortest_distance = ant.path_cost
                     self.shortest_path_seen = ant.path
                     print("#-------------------# Shortest Path : ", self.shortest_distance,"   #------#")
@@ -406,13 +425,24 @@ def user_input():
     while (default != 0) or (default != 1):
         default = int(input("Do yo want to use default values? [0]Yes  [1]No: "))
         if default == 0:
-            benchmark = 2
+            benchmark = 1
             antnmbr = 50
             p_evap_co = 0.4
             p_factor = 0.4
             al = 1
             be = 1
-            iterations = 20
+            iterations = 100
+            print("")
+            print("Initialize ACO with:")
+            print("")
+            print("Benchamrk: ",benchmark)
+            print("Number of ants: ",antnmbr)
+            print("Evaporation Coefficient: ",p_evap_co)
+            print("Pheromone Constant: ",p_factor)
+            print("Alpha Value: ",al)
+            print("Beta Value: ",be)
+            print("Terminate after  ",iterations," Iterations without improvement.")
+            print("")
             initalize(benchmark)
             return None
         if default == 1:
