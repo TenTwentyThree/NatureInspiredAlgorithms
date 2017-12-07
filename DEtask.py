@@ -7,6 +7,7 @@ Created on Thu Dec  7 14:27:24 2017
 
 import numpy as np
 import random as rnd
+import math
 
 # - - - - - - - - - - - - - - - I N D I V I D U A L   D E F I N I T I O N - - - - - - - - - - - - - - - - - - 
 class individual():
@@ -134,7 +135,37 @@ def trial_generation(target_and_donors, scaling_factor):
             
             
             
-            
+# - - - - - - - - - - - - - - - PLANT COST MODEL - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+def cost(x, kwhPerPlant, costPerPlant, maxPlants):
+    """ 
+    calculates the cost we will have to build the amount of plants that is needed.
+    
+    INPUT
+    - x (desired amount of energy)
+    - kwhPerPlant (how much energy one plant provides)
+    - maxPlants (maximum amount of plants we can have)
+
+    """
+    
+    # if x non-positive, return 0
+    if(x <= 0):
+        return 0
+    
+    #if x larger than possible generation, return infinite
+    if(x > kwhPerPlants * maxPlants):
+        return float.("inf")
+    
+    #otherwise find amount of plants needed to generate x
+    plantsNeeded = math.ceil(x / kwhPerPlant)
+    
+    #return cost (amount of plants * cost per plant)
+    return plantsNeeded * costPerPlant
+
+
+
+    
+    
         
         
         
