@@ -99,6 +99,13 @@ def trial_generation(target_and_donors, scaling_factor):
     - A list containing tuples
     - tuples contain the original target as well as a list of donors
     """
+    
+    
+    
+    """
+    MISTAKE THAT NEEDS TO BE FIXED:
+        
+    At the moment, I select EVERY individual in the list of bases to be a base, one is ought to select only one randomly!!!!!!"""
     for target_donor_tuple in target_and_donors:
         #because the input for this function is a touple of an object and a list of object, we split the tuple for easy handling
         target = target_donor_tuple[0]
@@ -118,9 +125,9 @@ def trial_generation(target_and_donors, scaling_factor):
             donor_vector = np.substract(x1.genome,x2.genome) * scaling_factor
             
             final_donor = np.add(target.genome + donor_vector)
-            newindiviual = individual(final_donor,0)
+            newindividual = individual(final_donor,0)
             newindividual.update_revenue()
-            target_donors_associated_list.append(newindiviual)
+            target_donors_associated_list.append(newindividual)
             
             
             
