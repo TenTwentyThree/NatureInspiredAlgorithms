@@ -5,16 +5,54 @@ Created on Thu Dec  7 14:27:24 2017
 @author: Johannes
 """
 
+import numpy as np
+import random as rnd
+
 # - - - - - - - - - - - - - - - I N D I V I D U A L   D E F I N I T I O N - - - - - - - - - - - - - - - - - - 
 class individual():
-    def __init__(self,genome,revenue):
+    def __init__(self, genome, revenue):
         self.genome = genome
         self.revenue = revenue
     def update_revenue():
         return None
-
-
-#- - - - - - - - - - - - - - - M A I N - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+"""# - - - - - - - - - - - - - - - P R O B L E M  &  P A R A M E T E R   D E S C R I P T I O N - - - - - - - - - -
+class problem():
+    class powerplant():
+        def __init__(self, planttype):
+            if planttype == 1:
+                self.power = 50000
+                self.cost = 10000
+                self.amount = 100
+                
+            if planttype == 2:
+                self.power = 600000
+                self.cost = 80000
+                self.amount = 50
+                
+            if planttype == 3:
+                self.power = 4000000
+                self.cost = 400000
+                self.amount = 3
+        None
+    def market_model():
+        None
+    def plant_cost_model():
+        None
+    def 
+"""
+# - - - - - - - - - - - - - - - P O P U L A T I O N   I N I T I A L I Z A T I O N - - - - - - - - - - - - - - -
+def initalize_population(individualcount):
+    population = []
+    while individualcount != 0:
+        newgenome = "somethingsomething in numpy"
+        newindividual = individual(newgenome,0)
+        newindividual.update_revenue()
+        population.append(newindividual)
+        individualcount -= 1
+    return population
+        
+    
+# - - - - - - - - - - - - - - - M A I N - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 def __MAIN__():
     """
     1. Handle user input
@@ -27,7 +65,7 @@ def __MAIN__():
         f Update termination condition value
     3. return best after termination
     """
-#- - - - - - - - - - - - - - - D O N O R  - - - - - - - - - - - - - - - - - - - - - - - - 
+# - - - - - - - - - - - - - - - D O N O R   S E L E C T I O N - - - - - - - - - - - - - - - - - - - - - - - - 
 def donor_selection(population):
     """
     INPUT: Population, a list of objects containing vectors as a representation for genome projecting into the search-space
@@ -37,17 +75,64 @@ def donor_selection(population):
     target_and_donors_list = []
     #this is the output list, which contains tuples with the target at postion 1 and all donor individuals at 2
     while target_position != len(population):
-        target_donors = population
+        target_donors = list(population)
         target = population[target_position]
         del target_donors[target_position]
         target_and_donors = (target, target_donors)
+        print(target_and_donors)
         target_and_donors_list.append(target_and_donors)
         target_position += 1
     return target_and_donors_list
+
+# - - - - - - - - - - - - - - - D O N O R   S E L E C T I O N - - - - - - - - - - - - - - - - - - - - - - - -
+def trial_generation(target_and_donors, scaling_factor):
+    """
+    
+    for each target vector (all vectors in our population are defined as target vectors), we select a base
+    the base vector is then removed from the available population pool and two other individuals (except target and base)
+    are chosen. These then provide the donor vector for the trial vector / trial individual 
+    
+    INPUT: 
+    - A list of tuples which contain the target and a list of base vectors
+    - A constant scaling factor to be applied to the difference between base and target to generate trial objects
+    OUTPUT:
+    - A list containing tuples
+    - tuples contain the original target as well as a list of donors
+    """
+    for target_donor_tuple in target_and_donors:
+        #because the input for this function is a touple of an object and a list of object, we split the tuple for easy handling
+        target = target_donor_tuple[0]
+        all_donors = target_donor_tuple[1]
+        
+        target_donors_associated_list = []
+        for one_donor in all_donors:
+            aux_donors = list(all_donors)
+            
+            aux_donors.pop(one_donor)
+            #After we removed the individual we want to compare our target to from the list, we choose two other vectors from the remaining list
+            x1 = rnd.choice(aux_donors)
+            aux_donors.remove(x1)
+            x2 = rnd.choice(aux_donors)
+            
+            #donor vector is selected by computing the difference between the genome of the randomly chosen individuals and scaling it with the scaling factor
+            donor_vector = np.substract(x1.genome,x2.genome) * scaling_factor
+            
+            final_donor = np.add(target.genome + donor_vector)
+            newindiviual = individual(final_donor,0)
+            newindividual.update_revenue()
+            target_donors_associated_list.append(newindiviual)
+            
+            
+            
+            
+            
+            
+            
         
         
         
         
-#- - - - - - - - - - - - - - - U S E R   I N P U T - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        
+# - - - - - - - - - - - - - - - U S E R   I N P U T - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 def user_input():
     return None
