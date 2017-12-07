@@ -364,9 +364,6 @@ def read_file(filename):
     if filename == 3:
         tspmat = np.loadtxt("3.tsp")
 
-    if filename == 4:
-        tspmat = np.loadtxt("4.tsp")
-
     valuematrix = tspmat.astype(int)
     return valuematrix
 

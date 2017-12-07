@@ -21,24 +21,7 @@ class ant():
             totalcost = totalcost + item
         self.cost = totalcost
     
-    def choose_initial_path(self):
-        ycoordinates = list(range(1,150))
-        startingpoint = 0
-        endpoint = 0
-        #we start at city 0 and choose a random city
-        #we technically don't need the endpoint variable but I kept it here to make the code more readable
-        
-        newpath = []
-        
-        while len(ycoordinates) != 0:
-            chosencity = random.choice(ycoordinates)
-            newpath.append(city_matrix[startingpoint][chosencity])
-            pheromone_matrix[startingpoint][chosencity] += len(ycoordinates) / 100
-            startingpoint = chosencity
-            ycoordinates.remove(chosencity)
-        newpath.append(city_matrix[startingpoint][endpoint])
-        
-        self.path = newpath
+
         
 class colony():
     def __init__(self, numberofants, totalvalue, bestpath, evapconstant, pherofact):
@@ -53,7 +36,7 @@ class colony():
         newcolony = []
         while numberofants !=0:
             newant = ant(alpha, beta, [], 0)
-            newant.choose_initial_path()
+            choose_initial_path(newant)
             newcolony.append(newant)
             numberofants -= 1
         self.colony = newcolony
@@ -73,11 +56,30 @@ def create_pheromone_matrix():
     return p_matrix
         
 def update_pheromone_matrix(pheromone_matrix):
+    
     updated_matrix = pheromone_matrix
     for xcoordinates in updated_matrix:
-        for ycoordinates in updated_matrix:
+        for ycoordinates in xcoordinates
             ycoordinates = ycoordinates * p_factor
     return updated_matrix
+
+def choose_initial_path(someant):
+    
+    ycoordinates = list(range(1,150))
+    startingpoint = 0
+    endpoint = 0
+        #we start at city 0 and choose a random city
+        #we technically don't need the endpoint variable but I kept it here to make the code more readable
+        
+    newpath = []
+    while len(ycoordinates) != 0:
+        chosencity = random.choice(ycoordinates)
+        newpath.append(city_matrix[startingpoint][chosencity])
+        pheromone_matrix[startingpoint][chosencity] += len(ycoordinates) / 100
+        startingpoint = chosencity
+        ycoordinates.remove(chosencity)
+    newpath.append(city_matrix[startingpoint][endpoint])
+    someant.path = newpath
     
         
             
