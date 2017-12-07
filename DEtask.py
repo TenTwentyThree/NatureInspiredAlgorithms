@@ -128,7 +128,7 @@ def trial_generation(target_and_donors, scaling_factor):
             
             
             
-# - - - - - - - - - - - - - - - COST FUNCTIONS - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+# - - - - - - - - - - - - - - - PLANT COST MODEL - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
 def cost(x, kwhPerPlant, costPerPlant, maxPlants):
     """ 
