@@ -135,11 +135,22 @@ def trial_generation(target_and_donors, scaling_factor):
             
             
             
-# - - - - - - - - - - - - - - - PLANT COST MODEL - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+# - - - - - - - - - - - - - - - HIGH LEVEL PROFIT MODEL - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+"""
+    profit = revenue - totalCost
+    revenue = soldQuantitiy * sellingPrice
+    totalCost = productionCost + purchasingCost
+    puchasingCost = max(soldQuantity - generatedQuantity, 0) * costPrice
+
+"""
+
+
+# - - - - - - - - - - - - - - - PLANT COST MODEL - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
 
 def productionCost(x, kwhPerPlant, costPerPlant, maxPlants):
-    """ 
-    calculates the cost we will have to build the amount of plants that is needed.
+y    """ 
+    calculates the cost we will have to build n plants of type p
     
     INPUT
     - x (desired amount of energy)
@@ -163,9 +174,22 @@ def productionCost(x, kwhPerPlant, costPerPlant, maxPlants):
     return plantsNeeded * costPerPlant
 
 
-
+# - - - - - - - - - - - - - - - MARKET MODEL - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     
+def demand(sellingPrice, maxPrice, maxDemand):
     
+    #if the selling price is greater than what customers want to pay, return 0
+    if (sellingPrice > maxPrice):
+        return 0
+    
+    #if nothing is produced for market
+    if (sellingPrice <= 0):
+        return maxDemand
+    
+    #else determine the demand based on the selling price
+    demand = maxDemand - sellingPrice**2 * maxDemand / maxPrice**2
+    
+    return demand
         
         
         
@@ -173,11 +197,4 @@ def productionCost(x, kwhPerPlant, costPerPlant, maxPlants):
         
 # - - - - - - - - - - - - - - - U S E R   I N P U T - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 def user_input():
-    
-    #Our three Control Parameters
-    crossoverRate = -1
-    scalingFactor = -1
-    populationSize = -1
-    
-    
-    return 
+    return None
