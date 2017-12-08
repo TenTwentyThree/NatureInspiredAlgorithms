@@ -139,7 +139,7 @@ def trial_generation(target_and_donors, scaling_factor):
 """
     profit = revenue - totalCost
     revenue = soldQuantitiy * sellingPrice
-    totalCost = productionCost + purchasingCost
+    totalCost = plantTypeCost + purchasingCost
     puchasingCost = max(soldQuantity - generatedQuantity, 0) * costPrice
 
 """
@@ -148,7 +148,7 @@ def trial_generation(target_and_donors, scaling_factor):
 # - - - - - - - - - - - - - - - PLANT COST MODEL - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 
-def productionCost(x, kwhPerPlant, costPerPlant, maxPlants):
+def plantTypeCost(x, kwhPerPlant, costPerPlant, maxPlants):
 y    """ 
     calculates the cost we will have to build n plants of type p
     
