@@ -296,3 +296,45 @@ def user_input():
 
 
     return output
+
+
+def initialise(agentnmbr):
+    """
+    input: agentnmbr = number of agents defined by the user (for our problem 20 should be more than sufficient)
+    output: either none, or if needed the array of agents. I would suggest however to make the array global.
+    
+    creates as many agents as user defines. randomly assigns values to the number of powerplants.
+    randomly divides the overall energy created over all the markets
+    takes the price of the market (m1,m2,m3) as given as a global variable
+    """
+    m1 = 0.45
+    m2 = 0.25
+    m3 = 0.20
+    kwh1 = 5
+    kwh2 = 10
+    kwh3 = 20
+    population = []
+    for i in range(0,agentnmbr):
+        p1 = random.randint(0,100)
+        p2 = random.randint(0,50)
+        p3 = random.randint(0,3)
+        #randomly choosing how many powerplants we have for each agent
+        
+        sum = p1*kwh1 + p2*kwh2 + p3*kwh3
+        #print(sum)
+        s1 = random.randint(0,sum)
+        sum = sum - s1
+        #print(sum)
+        s2 = random.randint(0,sum)
+        sum = sum - s2
+        #print(sum)
+        s3 = sum
+        #assigning random values for each market, depending on the overall produced energy
+        new_agent = (p1,p2,p3,s1,s2,s3,m1,m2,m3)
+        #print(new_agent)
+        population.append(new_agent)
+    
+    print(population)           
+    return population
+
+
