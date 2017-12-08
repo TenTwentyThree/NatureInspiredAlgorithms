@@ -142,6 +142,10 @@ def trial_generation(target_and_donors, scaling_factor):
     totalCost = plantTypeCost + purchasingCost
     puchasingCost = max(soldQuantity - generatedQuantity, 0) * costPrice
 
+    sellingPrice = price at which we sell the energy to customers
+    plantTypeCost = cost we will have to build n plants of type p
+    purchasingCost = what we pay if we don't produce enough and have to buy energy from other suppliers
+    costPrice = what it costs us to produce the energy
 """
 
 
@@ -149,7 +153,7 @@ def trial_generation(target_and_donors, scaling_factor):
 
 
 def plantTypeCost(x, kwhPerPlant, costPerPlant, maxPlants):
-y    """ 
+    """ 
     calculates the cost we will have to build n plants of type p
     
     INPUT
@@ -177,6 +181,19 @@ y    """
 # - - - - - - - - - - - - - - - MARKET MODEL - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     
 def demand(sellingPrice, maxPrice, maxDemand):
+    
+    """
+    gives us the open demand of a market
+    
+    INPUT
+    - sellingPrice (the price at which we sell energy)
+    - maxPrice (maximum price customers are willing to pay)
+    - maxDemand (total demand of a market)
+    
+    OUTPUT
+    - 
+    
+    """
     
     #if the selling price is greater than what customers want to pay, return 0
     if (sellingPrice > maxPrice):
