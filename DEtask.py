@@ -230,7 +230,7 @@ def user_input():
 
     if default == 0:
             #crossoverRate
-            output.append(1)
+            output.append(0.5)
             #scalingFactor
             output.append(0.5)
             #populationSize
