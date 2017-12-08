@@ -154,7 +154,7 @@ def cost(x, kwhPerPlant, costPerPlant, maxPlants):
     
     #if x larger than possible generation, return infinite
     if(x > kwhPerPlants * maxPlants):
-        return float.("inf")
+        return float('Inf')
     
     #otherwise find amount of plants needed to generate x
     plantsNeeded = math.ceil(x / kwhPerPlant)
