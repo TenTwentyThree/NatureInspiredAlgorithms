@@ -137,7 +137,7 @@ def trial_generation(target_and_donors, scaling_factor):
             
 # - - - - - - - - - - - - - - - PLANT COST MODEL - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
-def cost(x, kwhPerPlant, costPerPlant, maxPlants):
+def productionCost(x, kwhPerPlant, costPerPlant, maxPlants):
     """ 
     calculates the cost we will have to build the amount of plants that is needed.
     
