@@ -42,71 +42,7 @@ class problem():
     def 
 """
 
-def generate_newgenome(self):
-
-    """
-    Create energy list
-    Create planned amount of energy sold
-    create price for market of type 1
-    """
-    newgenome = []
-    for _ in range(9)
-        #Energy produced with plants of type i
-        newgenome.append(np.random.randint(1,50000)) #e1
-        newgenome.append(np.random.randint(1,6000000)) #e2
-        newgenome.append(np.random.randint(1,4000000)) #e3
-
-        # Energy planned to be sold to market
-        newgenome.append(np.random.randint(1,50000))  #s1
-        newgenome.append(np.random.randint(1, 6000000)) #s2
-        newgenome.append(np.random.randint(1, 4000000)) #s3
-
-        # Price for market of type
-
-        newgenome.append(np.random.uniform(0,0.5)) #p1
-        newgenome.append(np.random.uniform(0,0.3))  #p2
-        newgenome.append(np.random.uniform(0,25)) #p3
-
-
 # - - - - - - - - - - - - - - - P O P U L A T I O N   I N I T I A L I Z A T I O N - - - - - - - - - - - - - - -
-
-
-def generate_newgenome():
-    """
-    Create energy list within max range
-    Planned amount of energy sold
-    Price for market of type 1
-    """
-    newgenome = []
-
-    # Energy produced with plants of type i
-    newgenome.append(np.random.randint(1, 50000))  # e1
-    newgenome.append(np.random.randint(1, 6000000))  # e2
-    newgenome.append(np.random.randint(1, 4000000))  # e3
-
-
-    # Energy planned to be sold to market
-    newgenome.append(np.random.randint(1, 50000))  # s1
-    newgenome.append(np.random.randint(1, 6000000))  # s2
-    newgenome.append(np.random.randint(1, 4000000))  # s3
-
-    # Price for market of type
-    newgenome.append(np.random.uniform(0, 0.5))  # p1
-    newgenome.append(np.random.uniform(0, 0.3))  # p2
-    newgenome.append(np.random.uniform(0, 25))  # p3
-
-    return newgenome
-
-# print(generate_newgenome())
-
-def generate_new_pop(num_pop):
-
-    pop = []
-    for _ in range(num_pop):
-        pop.append(generate_newgenome())
-
-    return pop
-
 
 # - - - - - - - - - - - - - - - M A I N - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 def __MAIN__():
@@ -123,8 +59,7 @@ def __MAIN__():
     """
 # - - - - - - - - - - - - - - - D O N O R   S E L E C T I O N - - - - - - - - - - - - - - - - - - - - - - - - 
 
-import numpy as np
-import random
+
 def generate_newgenome():
     """
     Create energy list within max range
