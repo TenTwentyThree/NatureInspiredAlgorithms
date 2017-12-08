@@ -41,18 +41,73 @@ class problem():
         None
     def 
 """
+
+def generate_newgenome(self):
+
+    """
+    Create energy list
+    Create planned amount of energy sold
+    create price for market of type 1
+    """
+    newgenome = []
+    for _ in range(9)
+        #Energy produced with plants of type i
+        newgenome.append(np.random.randint(1,50000)) #e1
+        newgenome.append(np.random.randint(1,6000000)) #e2
+        newgenome.append(np.random.randint(1,4000000)) #e3
+
+        # Energy planned to be sold to market
+        newgenome.append(np.random.randint(1,50000))  #s1
+        newgenome.append(np.random.randint(1, 6000000)) #s2
+        newgenome.append(np.random.randint(1, 4000000)) #s3
+
+        # Price for market of type
+
+        newgenome.append(np.random.uniform(0,0.5)) #p1
+        newgenome.append(np.random.uniform(0,0.3))  #p2
+        newgenome.append(np.random.uniform(0,25)) #p3
+
+
 # - - - - - - - - - - - - - - - P O P U L A T I O N   I N I T I A L I Z A T I O N - - - - - - - - - - - - - - -
-def initalize_population(individualcount):
-    population = []
-    while individualcount != 0:
-        newgenome = "somethingsomething in numpy"
-        newindividual = individual(newgenome,0)
-        newindividual.update_revenue()
-        population.append(newindividual)
-        individualcount -= 1
-    return population
-        
-    
+
+
+def generate_newgenome():
+    """
+    Create energy list within max range
+    Planned amount of energy sold
+    Price for market of type 1
+    """
+    newgenome = []
+
+    # Energy produced with plants of type i
+    newgenome.append(np.random.randint(1, 50000))  # e1
+    newgenome.append(np.random.randint(1, 6000000))  # e2
+    newgenome.append(np.random.randint(1, 4000000))  # e3
+
+
+    # Energy planned to be sold to market
+    newgenome.append(np.random.randint(1, 50000))  # s1
+    newgenome.append(np.random.randint(1, 6000000))  # s2
+    newgenome.append(np.random.randint(1, 4000000))  # s3
+
+    # Price for market of type
+    newgenome.append(np.random.uniform(0, 0.5))  # p1
+    newgenome.append(np.random.uniform(0, 0.3))  # p2
+    newgenome.append(np.random.uniform(0, 25))  # p3
+
+    return newgenome
+
+# print(generate_newgenome())
+
+def generate_new_pop(num_pop):
+
+    pop = []
+    for _ in range(num_pop):
+        pop.append(generate_newgenome())
+
+    return pop
+
+
 # - - - - - - - - - - - - - - - M A I N - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 def __MAIN__():
     """
@@ -67,73 +122,133 @@ def __MAIN__():
     3. return best after termination
     """
 # - - - - - - - - - - - - - - - D O N O R   S E L E C T I O N - - - - - - - - - - - - - - - - - - - - - - - - 
-def donor_selection(population):
+
+import numpy as np
+import random
+def generate_newgenome():
+    """
+    Create energy list within max range
+    Planned amount of energy sold
+    Price for market of type 1
+
+    newgenome = []
+
+    # Energy produced with plants of type i
+    newgenome.append(np.random.randint(1, 50000))  # e1
+    newgenome.append(np.random.randint(1, 6000000))  # e2
+    newgenome.append(np.random.randint(1, 4000000))  # e3
+
+
+    # Energy planned to be sold to market
+    newgenome.append(np.random.randint(1, 50000))  # s1
+    newgenome.append(np.random.randint(1, 6000000))  # s2
+    newgenome.append(np.random.randint(1, 4000000))  # s3
+
+    # Price for market of type
+    newgenome.append(np.random.uniform(0, 0.5))  # p1
+    newgenome.append(np.random.uniform(0, 0.3))  # p2
+    newgenome.append(np.random.uniform(0, 25))  # p3
+    """
+
+    newgenome = np.random.randint(0,5,5).tolist()
+    newgenome = [float(gene) for gene in newgenome]
+
+    return newgenome
+
+# print(generate_newgenome())
+
+def generate_new_pop(num_pop):
+
+    pop = []
+    for _ in range(num_pop):
+        pop.append(generate_newgenome())
+
+    return pop
+
+pop = generate_new_pop(8)
+
+print("POPULATION",pop)
+# -----------------------------
+# - - - - - - - - - - - - - - - M A I N - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+def __MAIN__():
+    """
+    1. Handle user input
+    2. Mainloop:
+        a initialize population
+        b donor selection
+            c trial generation
+            d Selection
+            e update Population
+        f Update termination condition value
+    3. return best after termination
+    """
+    pass
+# - - - - - - - - - - - - - - - D O N O R   S E L E C T I O N - - - - - - - - - - - - - - - - - - - - - - - -
+
+# GENERATE TARGET AND DONOR PAIRS FROM THE POPULATION AND
+def donor_selection(population, scaling_factor):
     """
     INPUT: Population, a list of objects containing vectors as a representation for genome projecting into the search-space
-    OUTPUT: A list of tuples. Each tuple contains the target at position 1 (0) and the list of donor objects at position 2 (1)
+    OUTPUT: A list of tuples. Each tuple contains the target at position 0  donor objects at position 1
     """
     target_position = 0
     target_and_donors_list = []
-    #this is the output list, which contains tuples with the target at postion 1 and all donor individuals at 2
+    #this is the output list, which contains tuples with the target at position 1 and all donor individuals at 2
     while target_position != len(population):
-        target_donors = list(population)
+        target_donors = population.copy()
         target = population[target_position]
         del target_donors[target_position]
-        target_and_donors = (target, target_donors)
-        print(target_and_donors)
+
+        # Randomly select the base for each target
+        base_idx = np.random.randint(0,len(target_donors))
+        base = target_donors[base_idx]
+        del target_donors[base_idx]
+
+        #Select two vectors randomly
+        x1_idx = np.random.randint(0,len(target_donors))
+        x1 = target_donors[x1_idx]
+        del target_donors[x1_idx]
+
+        x2_idx = np.random.randint(0,len(target_donors))
+        x2  = target_donors[x2_idx]
+        del target_donors[x2_idx]
+
+        # COMPUTE DIFFERENCE DONOR
+        # Subtract two vectors x1 and x2
+        sub_dummy = [x - y for x,y in zip(x1,x2)]
+        mul_dummy = np.dot(scaling_factor,sub_dummy)
+        donor = [b + x for b, x in (zip(base, mul_dummy))]
+
+        target_and_donors = (target, donor)
         target_and_donors_list.append(target_and_donors)
         target_position += 1
     return target_and_donors_list
 
-# - - - - - - - - - - - - - - - D O N O R   S E L E C T I O N - - - - - - - - - - - - - - - - - - - - - - - -
-def trial_generation(target_and_donors, scaling_factor):
-    """
-    
-    for each target vector (all vectors in our population are defined as target vectors), we select a base
-    the base vector is then removed from the available population pool and two other individuals (except target and base)
-    are chosen. These then provide the donor vector for the trial vector / trial individual 
-    
-    INPUT: 
-    - A list of tuples which contain the target and a list of base vectors
-    - A constant scaling factor to be applied to the difference between base and target to generate trial objects
-    OUTPUT:
-    - A list containing tuples
-    - tuples contain the original target as well as a list of donors
-    """
-    
-    
-    
-    """
-    MISTAKE THAT NEEDS TO BE FIXED:
-        
-    At the moment, I select EVERY individual in the list of bases to be a base, one is ought to select only one randomly!!!!!!"""
-    for target_donor_tuple in target_and_donors:
-        #because the input for this function is a touple of an object and a list of object, we split the tuple for easy handling
-        target = target_donor_tuple[0]
-        all_donors = target_donor_tuple[1]
-        
-        target_donors_associated_list = []
-        for one_donor in all_donors:
-            aux_donors = list(all_donors)
-            
-            aux_donors.pop(one_donor)
-            #After we removed the individual we want to compare our target to from the list, we choose two other vectors from the remaining list
-            x1 = rnd.choice(aux_donors)
-            aux_donors.remove(x1)
-            x2 = rnd.choice(aux_donors)
-            
-            #donor vector is selected by computing the difference between the genome of the randomly chosen individuals and scaling it with the scaling factor
-            donor_vector = np.substract(x1.genome,x2.genome) * scaling_factor
-            
-            final_donor = np.add(target.genome + donor_vector)
-            newindividual = individual(final_donor,0)
-            newindividual.update_revenue()
-            target_donors_associated_list.append(newindividual)
-            
-            
-            
-            
-            
+targets_and_donors = donor_selection(pop,0.5)
+print(targets_and_donors)
+
+
+# - - - - - - - - - - - - - - - TRIAL   S E L E C T I O N - - - - - - - - - - - - - - - - - - - - - - - -
+
+# TRIAL GENERATION FOR SINGLE TARGET,DONOR PAIR
+# LOOP OVER this function in targets_and_donors list to get the list of trials for entire population
+
+def trial_generation(target_and_donor,CR = 0.5):
+
+    target,donor = target_and_donor[0],target_and_donor[1]
+    z = []
+    for i in range(len(target)):
+        r = np.random.uniform(0,1)
+        if r<= CR:
+            z.append(donor[i])
+        else:
+            z.append(target[i])
+
+    return z
+
+
+z = trial_generation(targets_and_donors[0])
+print(z)
             
 # - - - - - - - - - - - - - - - PLANT COST MODEL - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
@@ -174,3 +289,4 @@ def cost(x, kwhPerPlant, costPerPlant, maxPlants):
 # - - - - - - - - - - - - - - - U S E R   I N P U T - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 def user_input():
     return None
+---
