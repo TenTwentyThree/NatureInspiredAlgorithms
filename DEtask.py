@@ -138,7 +138,7 @@ def trial_generation(target_and_donors, scaling_factor):
 # - - - - - - - - - - - - - - - HIGH LEVEL PROFIT MODEL - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 """
     profit = revenue - totalCost
-    revenue = soldQuantitiy * sellingPrice
+    revenue = soldQuantity * sellingPrice
     totalCost = plantTypeCost + purchasingCost
     puchasingCost = max(soldQuantity - generatedQuantity, 0) * costPrice
 
@@ -147,7 +147,14 @@ def trial_generation(target_and_donors, scaling_factor):
     purchasingCost = what we pay if we don't produce enough and have to buy energy from other suppliers
     costPrice = what it costs us to produce the energy
 """
+"""
+(ideas, to be finished)
+def profit():   
+    return revenue(soldQuantity, sellingPrice) - totalCost(plantTypeCost, purchasingCost)
 
+def revenue():
+    return soldQuantity
+"""
 
 # - - - - - - - - - - - - - - - PLANT COST MODEL - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
