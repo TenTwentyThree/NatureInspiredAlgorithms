@@ -173,4 +173,11 @@ def productionCost(x, kwhPerPlant, costPerPlant, maxPlants):
         
 # - - - - - - - - - - - - - - - U S E R   I N P U T - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 def user_input():
-    return None
+    
+    #Our three Control Parameters
+    crossoverRate = -1
+    scalingFactor = -1
+    populationSize = -1
+    
+    
+    return 
