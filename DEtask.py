@@ -66,6 +66,29 @@ def __MAIN__():
         f Update termination condition value
     3. return best after termination
     """
+    # 1. userinput of type List: [crossoverRate,scalingFactor,populationSize]
+    userinput = user_input()
+    
+    crossoverRate = userinput[0]
+    scalingFactor = userinput[1]
+    populationSize = userinput[2]
+    
+    # 2. Mainloop
+    search = True
+    while search:
+        # a initialize population
+        population = initalize_population(populationSize)
+        # b donor selection
+        target_and_donors_list = donor_selection(population):
+    
+    
+    # 3. Best
+    return best_model 
+            
+        
+        
+    
+    
 # - - - - - - - - - - - - - - - D O N O R   S E L E C T I O N - - - - - - - - - - - - - - - - - - - - - - - - 
 def donor_selection(population):
     """
@@ -85,7 +108,7 @@ def donor_selection(population):
         target_position += 1
     return target_and_donors_list
 
-# - - - - - - - - - - - - - - - D O N O R   S E L E C T I O N - - - - - - - - - - - - - - - - - - - - - - - -
+# - - - - - - - - - - - - - - - T R I A L   G E N E R A T I O N - - - - - - - - - - - - - - - - - - - - - - - -
 def trial_generation(target_and_donors, scaling_factor):
     """
     
