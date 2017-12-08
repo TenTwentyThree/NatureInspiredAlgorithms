@@ -214,4 +214,62 @@ def demand(sellingPrice, maxPrice, maxDemand):
         
 # - - - - - - - - - - - - - - - U S E R   I N P U T - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 def user_input():
-    return None
+    """
+    Output List with control Parameters: [crossoverRate,scalingFactor,populationSize]
+    """
+
+    #Our three Control Parameters
+    crossoverRate = -1
+    scalingFactor = -1
+    populationSize = -1
+    #output = [crossoverRate,scalingFactor,populationSize]
+    output = []
+
+
+    default = int(input("Do yo want to use default values? [0]Yes [else]No: "))
+
+    if default == 0:
+            #crossoverRate
+            output.append(1)
+            #scalingFactor
+            output.append(0.5)
+            #populationSize
+            output.append(20)
+    else:
+        print("")
+        #Crossover Rate Cr e [0,1]
+        while (crossoverRate < 0) or (crossoverRate > 1):
+            if crossoverRate == -1:
+                crossoverRate = float(input("Please specify Crossover Rate in [0,1]: "))
+            else:
+                crossoverRate = int(input("Crossover rate must be must be in [0,1]: "))
+        output.append(crossoverRate)
+        print("")
+        #Scaling factor F e (0,1)
+        while (scalingFactor <= 0) or (scalingFactor >= 1):
+            if scalingFactor == -1:
+                scalingFactor = float(input("Please specify Scaling Factor in (0,1): "))
+            else:
+                scalingFactor = float(input("Scaling Factor must be must be in (0,1): "))
+        output.append(scalingFactor)
+        print("")
+        #population size N > 4
+        while (populationSize < 5):
+            if populationSize == -1:
+                print("Recommended Population size: 5-10 times the dimension of the problem.")
+                populationSize = int(input("Please specify Population Size: "))
+            else:
+                populationSize = int(input("Population Size must be bigger than 4: "))
+        output.append(populationSize)
+    print("")
+    print("####---------Initialize Differential Evolution with: ---------###")
+    print("")
+    print("Crossover Rate: ",crossoverRate)
+    print("Scaling Factor: ",scalingFactor)
+    print("Population Size: ",populationSize)
+    print("")
+    print("####----------------------------------------------------------###")
+    print("")
+
+
+    return output
