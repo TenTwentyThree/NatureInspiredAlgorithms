@@ -40,15 +40,15 @@ def initialise(agentnmbr):
         p3 = rnd.randint(0,3)
         #randomly choosing how many powerplants we have for each agent
         
-        sum = p1*kwh1 + p2*kwh2 + p3*kwh3
+        ttlsum = p1*kwh1 + p2*kwh2 + p3*kwh3
         #print(sum)
-        s1 = rnd.randint(0,sum)
-        sum = sum - s1
+        s1 = rnd.randint(0,ttlsum)
+        ttlsum = ttlsum - s1
         #print(sum)
-        s2 = rnd.randint(0,sum)
-        sum = sum - s2
+        s2 = rnd.randint(0,ttlsum)
+        ttlsum = ttlsum - s2
         #print(sum)
-        s3 = sum
+        s3 = ttlsum
         #assigning random values for each market, depending on the overall produced energy
         new_agent = individual([p1,p2,p3,s1,s2,s3,m1,m2,m3],0)
         #print(new_agent)
@@ -197,7 +197,7 @@ def plantTypeCost(x, kwhPerPlant, costPerPlant, maxPlants):
         return 0
     
     #if x larger than possible generation, return infinite
-    if(x > kwhPerPlants * maxPlants):
+    if(x > kwhPerPlant * maxPlants):
         return float('Inf')
     
     #otherwise find amount of plants needed to generate x
