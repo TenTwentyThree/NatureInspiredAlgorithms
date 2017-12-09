@@ -97,6 +97,10 @@ def __MAIN__():
 # - - - - - - - - - - - - - - - D O N O R   S E L E C T I O N - - - - - - - - - - - - - - - - - - - - - - - - 
 def donor_selection(population):
     """
+    
+    This function basically generates a number of permutations of the population where one element is chosen as the target vector and the others as donors or bases
+    
+    
     INPUT: Population, a list of objects containing vectors as a representation for genome projecting into the search-space
     OUTPUT: A list of tuples. Each tuple contains the target at position 1 (0) and the list of donor objects at position 2 (1)
     """
