@@ -43,7 +43,8 @@ def evaluate(population):
         print("Distance between X1 and X2: ",distance)
         donor = np.add(population[d],distance)
     
-        compare(population[target],donor)
+        better = compare(population[target],donor)
+        population[target] = better
         
     return population
 
