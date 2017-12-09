@@ -1,9 +1,13 @@
-
+"""
+Created on Fri Nov 29 12:33:10 2017
+@author: Yannic Jänike
+"""
 
 import numpy as np
 import random
 from numpy.random import choice
 import time
+import matplotlib.pyplot as plt
 
 
 class antColony():
@@ -67,9 +71,9 @@ class antColony():
                 distance = float(tspmap[self.current_location][possbible_next_location])
 
                 #if (self.alpha == 0) and (self.beta == 0):
-                attractiveness.append(pheromone_amount*(1/distance))
+                #attractiveness.append(pheromone_amount*(1/distance))
                 #append the numerator list 'attractiveness' with the numerator of the likelyhood
-                #attractiveness.append(pow(pheromone_amount, self.alpha)*pow(1/distance, self.beta))
+                attractiveness.append(pow(pheromone_amount, self.alpha)*pow(1/distance, self.beta))
             #Compute the denominator by adding up all possible attractivnesses
             denominator = float(sum(attractiveness))
 
@@ -117,13 +121,10 @@ class antColony():
                 cummulative += pathProbabilities[i]
 
 
-            #next city is the city with the highest probability
+            #next city is the city with the highest probability - Old solution
             #next_city = self.possible_locations[pathProbabilities.index(max(pathProbabilities))]
 
-            #Initially the Idea was to choose the city by the probability distribution, but somehow it doesn't work \_(o.o)_/
-            #draw = choice(self.possible_locations, 1, pathProbabilities)
-            #next_city = draw[0]
-            #return next_city
+
 #---------------------------------------------SOLUTION CONSTRUCTION Ends--------------------------------------#
         def traverse(self,oldCity,newCity):
             """
@@ -256,10 +257,11 @@ class antColony():
         """
         Create ants, if it is first called, else we just 'reset' the ants with the initial values
         """
+        #If we are in the first iteration, initialize ants
         if self.first_pass:
             return [self.ant(start, self.possible_locations(), self.pheromone_map,
                     self.alpha, self.beta, first_pass=True) for _ in range(self.ant_count)]
-
+        #else reset every ant in the colony
         for ant in self.colony:
             ant.__init__(start,self.possible_locations(),self.pheromone_map,self.alpha,self.beta, self.first_pass)
 
@@ -319,7 +321,14 @@ class antColony():
         endfor
         """
         terminate = 0
-        while terminate <= self.iterations:
+
+        #Plotting Lists
+        iteration_results = []
+        iteration = []
+        shortest_in_iteration = []
+
+
+        while terminate < self.iterations:
             terminate += 1
             #SOLUTION FINDING
             for ant in self.colony:
@@ -332,7 +341,7 @@ class antColony():
                 #set best path to an initial value
                 if self.FirsAnt:
                     self.shortest_ant_in_iteration = ant.path_cost
-                    self.FirsIteraton = False
+                    self.FirsAnt = False
 
                 if not self.shortest_distance:
                     self.shortest_distance = ant.path_cost
@@ -344,14 +353,19 @@ class antColony():
                     self.shortest_ant_in_iteration = ant.path_cost
                 #find overall best path
                 if ant.path_cost < self.shortest_distance:
+                    #fill Iteartion List for Plot
+                    iteration_results.append(ant.path_cost)
+                    iteration.append(len(shortest_in_iteration))
 
                     terminate = 0
 
                     self.shortest_distance = ant.path_cost
                     self.shortest_path_seen = ant.path
-                    print("#-------------------# Shortest Path : ", self.shortest_distance,"   #------#")
+                    print("#-------------------# Shortest Path : ", ant.path_cost,"   #------#")
 
-            print("Shortest Path: ", self.shortest_ant_in_iteration)
+            print("Shortest Path: ", self.shortest_ant_in_iteration,"     Iterations left: ",self.iterations - terminate )
+            #save shortest ant in iteration for plot
+            shortest_in_iteration.append(self.shortest_ant_in_iteration)
             #restet FirstAnt for next iteration
             self.FirsAnt = True
             #EVAPORATION and INTENSIFCATION
@@ -360,14 +374,14 @@ class antColony():
             if self.first_pass:
                 self.first_pass = False
 
-            #Reset seth ants in the colony
+            #Reset the ants in the colony
             self.init_ants(self.start)
 
             #reset the pheromone_map_iteration matrix
             self.pheromone_map_iteration = self.init_pheromone_map()
 
-        #return the shortest distance and the path of the SHortest distance
-        return self.shortest_distance, self.shortest_path_seen
+        #return the shortest distance and the path of the Shortest distance
+        return self.shortest_distance, self.shortest_path_seen, iteration_results, iteration, shortest_in_iteration
 #---------------------------------------- CLASSES END --------------------------------------#
 
 def read_file(filename):
@@ -383,6 +397,9 @@ def read_file(filename):
     if filename == 3:
         tspmat = np.loadtxt("3.tsp")
 
+    if filename == 4:
+        tspmat = np.loadtxt("4.tsp")
+
     valuematrix = tspmat.astype(int)
     return valuematrix
 
@@ -391,10 +408,26 @@ def initalize(benchmark):
     tspmap = read_file(benchmark)
 
     Colony = antColony(None, antnmbr, al, be,  p_evap_co, p_factor, iterations)
-    shortest_distance, shortest_path = Colony.mainloop()
+    shortest_distance, shortest_path, iteration_results, iteration, shortest_in_iteration = Colony.mainloop()
 
     print("The shortest path has cost: ",shortest_distance)
-    print("The path is: ",shortest_path)
+    print("Found in Generation: ",len(iteration_results))
+
+    fig, graph = plt.subplots()
+    x = np.arange(len(shortest_in_iteration))
+    graph.plot(x, shortest_in_iteration, color = 'g' )
+    #graph.plot(iteration,iteration_results,':', color = 'r' )
+    graph.plot(iteration,iteration_results,'ro', color = 'b' )
+    graph.plot(iteration[len(iteration)-1],iteration_results[len(iteration_results)-1],'ro', color = 'r' )
+    title = 'AntColonyOptimization - Ants: ' + str(antnmbr) + ', Alpha/Beta: ' + str(al) + '/' + str(be)
+    plt.title(title)
+    plt.ylabel('Cost')
+    plt.xlabel('Iteration')
+
+    #plt.annotate('global min', xy=(iteration[len(iteration)-1]+0.2, iteration_results[len(iteration)-1]), xytext=(iteration[len(iteration)-1]+2, iteration_results[len(iteration)-1]),arrowprops=dict(facecolor='black', shrink=0.05))
+    plt.show()
+
+
 
 
 def user_input():
@@ -424,11 +457,11 @@ def user_input():
         if default == 0:
             benchmark = 1
             antnmbr = 50
-            p_evap_co = 0.3
-            p_factor = 0.3
+            p_evap_co = 0.4
+            p_factor = 0.4
             al = 1
             be = 1
-            iterations = 1000
+            iterations = 20
             print("")
             print("####---------Initialize ACO with: ---------###")
             print("")
@@ -441,7 +474,7 @@ def user_input():
             print("Terminate after  ",iterations," Iterations without improvement.")
             print("####-----------------------------------------###")
             print("")
-            time.sleep(3)
+            time.sleep(1.5)
             initalize(benchmark)
             return None
         if default == 1:
