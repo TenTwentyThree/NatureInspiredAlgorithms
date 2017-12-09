@@ -1,0 +1,58 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Fri Dec  8 16:46:05 2017
+
+@author: Till
+"""
+import random
+import numpy as np
+
+def evaluate(population):
+    """
+    Input: population of all agents
+    Output: population with compared and probably replced donors
+    
+    Randomly selects agents, that are compared to a donor. The donor is created 
+    by selecting two random agents (X1,X1), measuring their distance, multiply this distance with a value F,
+    and adding this distance to a third agent.
+    It holds: third agent != X1 != X2 != target
+    """
+    
+    F = 0.4
+    
+    for agent in population:
+        x1 = 0
+        x2 = 1
+        d = 0
+        target = random.randint(0,len(population)-1)
+    
+        while x1 == target:
+            x1 = random.randint(0,len(population)-1)
+        
+        while x2 == target or x2 == x1:
+            #It is not possible that X1 and X2 are the same agent
+            x2 = random.randint(0,len(population)-1)
+    
+        while d == target or d == x1 or d == x2:
+            #Select the donor Agent the way that it is unique
+            d = random.randint(0,len(population)-1)
+    
+    
+        distance = np.subtract(population[x1],population[x2])
+        distance = np.multiply(distance, F)
+        print("Distance between X1 and X2: ",distance)
+        donor = np.add(population[d],distance)
+    
+        compare(population[target],donor)
+        
+    return population
+
+def compare(target,donor):
+    """
+    TO BE DONE:
+    Input: target and donor
+    Output: The better one of them
+    
+    compares the value of the donor to the one of the target and selects the better one
+    """
+    
