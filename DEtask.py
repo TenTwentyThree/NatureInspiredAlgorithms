@@ -15,7 +15,7 @@ class individual():
         self.genome = np.array(genome)
         self.revenue = revenue
     def update_revenue():
-        return None
+        self.revenue = 0
 
 # - - - - - - - - - - - - - - - P O P U L A T I O N   I N I T I A L I Z A T I O N - - - - - - - - - - - - - - -
 def initialise(agentnmbr):
@@ -126,37 +126,34 @@ def trial_generation(target_and_donors, scaling_factor):
     - A constant scaling factor to be applied to the difference between base and target to generate trial objects
     OUTPUT:
     - A list containing tuples
-    - tuples contain the original target as well as a list of donors
+    - tuples contain the original target as well as a trial individual that then can be compared by the fitness function
     """
     
-    
-    
-    """
-    MISTAKE THAT NEEDS TO BE FIXED:
-        
-    At the moment, I select EVERY individual in the list of bases to be a base, one is ought to select only one randomly!!!!!!"""
+
+    target_trial_associated_list = []
     for target_donor_tuple in target_and_donors:
         #because the input for this function is a touple of an object and a list of object, we split the tuple for easy handling
         target = target_donor_tuple[0]
-        all_donors = target_donor_tuple[1]
+        all_other_vectors = target_donor_tuple[1]
+        #Select a base randomly from the list of potential bases (all other vectors than the target vector)
+        base = rnd.choice(all_other_vectors)
+        all_other_vectors.remove(base)
+        #Choose donor vector 1
+        x1 = rnd.choice(all_other_vectors)
+        #and remove it from the list of potential vectors to choose as donor vectors
+        all_other_vectors.remove(x1)
+        #choose donor vector 2
+        x2 = rnd.choice(all_other_vectors)
+        #calculate the distance between the two vectors and scale it by the scaling factor
+        donor_vector = np.substract(x1.genome,x2.genome) * scaling_factor
+        #now create a new individual from the base and update its fitness
+        final_donor = np.add(target.genome + donor_vector)
+        newindividual = individual(final_donor,0)
+        newindividual.update_revenue()
+        target_trial_associated_list.append(target, newindividual)
         
-        target_donors_associated_list = []
-        for one_donor in all_donors:
-            aux_donors = list(all_donors)
-            
-            aux_donors.pop(one_donor)
-            #After we removed the individual we want to compare our target to from the list, we choose two other vectors from the remaining list
-            x1 = rnd.choice(aux_donors)
-            aux_donors.remove(x1)
-            x2 = rnd.choice(aux_donors)
-            
-            #donor vector is selected by computing the difference between the genome of the randomly chosen individuals and scaling it with the scaling factor
-            donor_vector = np.substract(x1.genome,x2.genome) * scaling_factor
-            
-            final_donor = np.add(target.genome + donor_vector)
-            newindividual = individual(final_donor,0)
-            newindividual.update_revenue()
-            target_donors_associated_list.append(newindividual)
+    return target_trial_associated_list
+        
             
             
             
