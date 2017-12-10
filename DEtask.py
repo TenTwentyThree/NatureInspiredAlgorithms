@@ -169,6 +169,7 @@ def trial_generation(target_and_donors, scaling_factor):
     profit = revenue - totalCost
     revenue = soldQuantitiy * sellingPrice
     totalCost = plantTypeCost + purchasingCost
+    productionCost = generatedQuantity * costFactor
     puchasingCost = max(soldQuantity - generatedQuantity, 0) * costPrice
 
     sellingPrice = price at which we sell the energy to customers
@@ -176,7 +177,23 @@ def trial_generation(target_and_donors, scaling_factor):
     purchasingCost = what we pay if we don't produce enough and have to buy energy from other suppliers
     costPrice = what it costs us to produce the energy
 """
+def purchasingCost(e1, e2, e3, s1, s2, s3):
+    sumE = e1 + e2 + e3
+    sumS = s1 + s2 + s3
+    
+    purchCost = max((sumS - sumE), 0) * 0.6
+    
+    return purchCost
 
+def profitModel(e1, e2, e3, s1, s2, s3, p1, p2, p3):
+    
+    
+    
+    purchasingCost = max(soldQuantity - generatedQuantity, 0) * costPrice
+    totalCost = plantTypeCost() + purchasingCost
+    revenue = soldQuantitiy * sellingPrice
+    profit = revenue - totalCost
+    
 
 # - - - - - - - - - - - - - - - PLANT COST MODEL - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
