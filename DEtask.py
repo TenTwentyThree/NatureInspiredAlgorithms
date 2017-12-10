@@ -168,7 +168,7 @@ def trial_generation(target_and_donors, scaling_factor):
 """
     profit = revenue - totalCost
     revenue = soldQuantitiy * sellingPrice
-    totalCost = plantTypeCost + purchasingCost
+    totalCost = plantTypeCost(all types) + purchasingCost
     productionCost = generatedQuantity * costFactor
     puchasingCost = max(soldQuantity - generatedQuantity, 0) * costPrice
 
@@ -184,6 +184,18 @@ def purchasingCost(e1, e2, e3, s1, s2, s3):
     purchCost = max((sumS - sumE), 0) * 0.6
     
     return purchCost
+
+def productionCost(e1, e2, e3):
+    prodCost = 0
+    for i in range(3):
+        prodCost = prodCost + plantTypeCost(e)   #how to call plantTypeCost for all types of plants?
+    
+    return prodCost
+
+def totalCost(e1, e2, e3, s1, s2, s3):
+    
+    return productionCost(e1, e2, e3) + purchasingCost(e1, e2, e3, s1, s2, s3)
+
 
 def profitModel(e1, e2, e3, s1, s2, s3, p1, p2, p3):
     
