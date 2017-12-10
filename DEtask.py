@@ -177,49 +177,49 @@ def trial_generation(target_and_donors, scaling_factor):
     purchasingCost = what we pay if we don't produce enough and have to buy energy from other suppliers
     costPrice = what it costs us to produce the energy
 """
-def purchasingCost(e1, e2, e3, s1, s2, s3):
-    sumE = e1 + e2 + e3
-    sumS = s1 + s2 + s3
+class problem():
+    class powerplant():
+        def __init__(self, planttype):
+            if planttype == 1:
+                self.kwhPerPlants = 50000
+                self.costPerPlant = 10000
+                self.maxPlants = 100
+                
+            if planttype == 2:
+                self.kwhPerPlants = 600000
+                self.costPerPlant = 80000
+                self.maxPlants = 50
+                
+            if planttype == 3:
+                self.kwhPerPlants = 4000000
+                self.costPerPlant = 400000
+                self.maxPlants = 3
+            
+    class market():
+        def __init__(self, market):
+            if market == 1:
+                self.maxPrice = 0.45
+                self.maxDemand = 2000000
+            
+            if market == 2:
+                self.maxPrice = 0.25
+                self.maxDemand = 30000000
+                
+            if market == 3:
+                self.maxPrice = 0.2
+                self.maxDemand = 20000000
     
-    purchCost = max((sumS - sumE), 0) * 0.6
     
-    return purchCost
+    def plantTypeCost(x, kwhPerPlant, costPerPlant, maxPlants):
+        """ 
+        calculates the cost we will have to build n plants of type p
+    
+        INPUT
+        - x (desired amount of energy)
+        - kwherPlant (how much energy one plant provides)
+        - maxPlants (maximum amount of plants we can have)
 
-def productionCost(e1, e2, e3):
-    prodCost = 0
-    for i in range(3):
-        prodCost = prodCost + plantTypeCost(e)   #how to call plantTypeCost for all types of plants?
-    
-    return prodCost
-
-def totalCost(e1, e2, e3, s1, s2, s3):
-    
-    return productionCost(e1, e2, e3) + purchasingCost(e1, e2, e3, s1, s2, s3)
-
-
-def profitModel(e1, e2, e3, s1, s2, s3, p1, p2, p3):
-    
-    
-    
-    purchasingCost = max(soldQuantity - generatedQuantity, 0) * costPrice
-    totalCost = plantTypeCost() + purchasingCost
-    revenue = soldQuantitiy * sellingPrice
-    profit = revenue - totalCost
-    
-
-# - - - - - - - - - - - - - - - PLANT COST MODEL - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-
-def plantTypeCost(x, kwhPerPlant, costPerPlant, maxPlants):
-    """ 
-    calculates the cost we will have to build n plants of type p
-    
-    INPUT
-    - x (desired amount of energy)
-    - kwhPerPlant (how much energy one plant provides)
-    - maxPlants (maximum amount of plants we can have)
-
-    """
+        """
     
     # if x non-positive, return 0
     if(x <= 0):
@@ -234,6 +234,34 @@ def plantTypeCost(x, kwhPerPlant, costPerPlant, maxPlants):
     
     #return cost (amount of plants * cost per plant)
     return plantsNeeded * costPerPlant
+
+
+
+
+    def purchasingCost(planttype):
+        #sumE = e1 + e2 + e3
+        #sumS = s1 + s2 + s3
+    
+        #purchCost = max((sumS - sumE), 0) * 0.6
+        return purchCost
+
+    def productionCost(planttype):
+    
+        return plantTypeCost(1) + plantTypeCost(2) + plantTypeCost(e)
+
+    def totalCost(planttype):
+    
+        return productionCost(planttype) + purchasingCost(planttype)
+
+    def revenue
+    
+    
+    
+    
+    
+    
+    
+
 
 
 # - - - - - - - - - - - - - - - MARKET MODEL - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
