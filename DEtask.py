@@ -168,7 +168,8 @@ def trial_generation(target_and_donors, scaling_factor):
 """
     profit = revenue - totalCost
     revenue = soldQuantitiy * sellingPrice
-    totalCost = plantTypeCost + purchasingCost
+    totalCost = plantTypeCost(all types) + purchasingCost
+    productionCost = generatedQuantity * costFactor
     puchasingCost = max(soldQuantity - generatedQuantity, 0) * costPrice
 
     sellingPrice = price at which we sell the energy to customers
@@ -176,35 +177,112 @@ def trial_generation(target_and_donors, scaling_factor):
     purchasingCost = what we pay if we don't produce enough and have to buy energy from other suppliers
     costPrice = what it costs us to produce the energy
 """
+class problem():
+    class powerplant():
+        def __init__(self, planttype):
+            if planttype == 1:
+                self.kwhPerPlants = 50000
+                self.costPerPlant = 10000
+                self.maxPlants = 100
+                
+            if planttype == 2:
+                self.kwhPerPlants = 600000
+                self.costPerPlant = 80000
+                self.maxPlants = 50
+                
+            if planttype == 3:
+                self.kwhPerPlants = 4000000
+                self.costPerPlant = 400000
+                self.maxPlants = 3
+            
+    class market():
+        def __init__(self, market):
+            if market == 1:
+                self.maxPrice = 0.45
+                self.maxDemand = 2000000
+            
+            if market == 2:
+                self.maxPrice = 0.25
+                self.maxDemand = 30000000
+                
+            if market == 3:
+                self.maxPrice = 0.2
+                self.maxDemand = 20000000
+    
+    
+    def plantTypeCost(s, planttype):
+        """ 
+        calculates the cost we will have to build n plants of type p
+    
+        INPUT
+        - s (desired amount of energy)
+        - planttype
+
+        """
+    
+        # if s non-positive, return 0
+        if(s <= 0):
+            return 0
+    
+        #if x larger than possible generation, return infinite
+        if(s > kwhPerPlant * maxPlants):
+            return float('Inf')
+    
+        #otherwise find amount of plants needed to generate s
+        plantsNeeded = math.ceil(s / kwhPerPlant)
+    
+        #return cost (amount of plants * cost per plant)
+        return plantsNeeded * costPerPlant
+    
+    
+    def production(s, planttype):
+        """
+        calculates how much energy we get from all plants of type i
+        """
+        return plantsNeeded * kwhPerPlant
 
 
-# - - - - - - - - - - - - - - - PLANT COST MODEL - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+    def purchasingCost(s):
+        """
+        if energy has to be bought from another company
+        """
+        
+        # what we produce with the above calculated amount of plants we need
+        sumE = production(s, 1) + production(s, 2) + production(s, 3)
+       
+        return max((s - sumE), 0) * 0.6
+        
 
-def plantTypeCost(x, kwhPerPlant, costPerPlant, maxPlants):
-    """ 
-    calculates the cost we will have to build n plants of type p
+    def productionCost(planttype):
+        """
+        cost to build all desired plants
+        """
     
-    INPUT
-    - x (desired amount of energy)
-    - kwhPerPlant (how much energy one plant provides)
-    - maxPlants (maximum amount of plants we can have)
+        return plantTypeCost(1) + plantTypeCost(2) + plantTypeCost(e)
+    
 
-    """
+    def totalCost():
+        """
+        total cost we have for buildings plants and potentially buying extra energy
+        """
     
-    # if x non-positive, return 0
-    if(x <= 0):
-        return 0
+        return productionCost(planttype) + purchasingCost(s)
+
+    def revenue         #??
     
-    #if x larger than possible generation, return infinite
-    if(x > kwhPerPlant * maxPlants):
-        return float('Inf')
     
-    #otherwise find amount of plants needed to generate x
-    plantsNeeded = math.ceil(x / kwhPerPlant)
+    def profit():
+        
+        return revenue() - totalCost()
     
-    #return cost (amount of plants * cost per plant)
-    return plantsNeeded * costPerPlant
+    
+    
+    
+    
+    
+    
+
 
 
 # - - - - - - - - - - - - - - - MARKET MODEL - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
