@@ -210,50 +210,71 @@ class problem():
                 self.maxDemand = 20000000
     
     
-    def plantTypeCost(x, kwhPerPlant, costPerPlant, maxPlants):
+    def plantTypeCost(s, planttype):
         """ 
         calculates the cost we will have to build n plants of type p
     
         INPUT
-        - x (desired amount of energy)
-        - kwherPlant (how much energy one plant provides)
-        - maxPlants (maximum amount of plants we can have)
+        - s (desired amount of energy)
+        - planttype
 
         """
     
-    # if x non-positive, return 0
-    if(x <= 0):
-        return 0
+        # if s non-positive, return 0
+        if(s <= 0):
+            return 0
     
-    #if x larger than possible generation, return infinite
-    if(x > kwhPerPlant * maxPlants):
-        return float('Inf')
+        #if x larger than possible generation, return infinite
+        if(s > kwhPerPlant * maxPlants):
+            return float('Inf')
     
-    #otherwise find amount of plants needed to generate x
-    plantsNeeded = math.ceil(x / kwhPerPlant)
+        #otherwise find amount of plants needed to generate s
+        plantsNeeded = math.ceil(s / kwhPerPlant)
     
-    #return cost (amount of plants * cost per plant)
-    return plantsNeeded * costPerPlant
+        #return cost (amount of plants * cost per plant)
+        return plantsNeeded * costPerPlant
+    
+    
+    def production(s, planttype):
+        """
+        calculates how much energy we get from all plants of type i
+        """
+        return plantsNeeded * kwhPerPlant
 
 
 
-
-    def purchasingCost(planttype):
-        #sumE = e1 + e2 + e3
-        #sumS = s1 + s2 + s3
-    
-        #purchCost = max((sumS - sumE), 0) * 0.6
-        return purchCost
+    def purchasingCost(s):
+        """
+        if energy has to be bought from another company
+        """
+        
+        # what we produce with the above calculated amount of plants we need
+        sumE = production(s, 1) + production(s, 2) + production(s, 3)
+       
+        return max((s - sumE), 0) * 0.6
+        
 
     def productionCost(planttype):
+        """
+        cost to build all desired plants
+        """
     
         return plantTypeCost(1) + plantTypeCost(2) + plantTypeCost(e)
-
-    def totalCost(planttype):
     
-        return productionCost(planttype) + purchasingCost(planttype)
 
-    def revenue
+    def totalCost():
+        """
+        total cost we have for buildings plants and potentially buying extra energy
+        """
+    
+        return productionCost(planttype) + purchasingCost(s)
+
+    def revenue         #??
+    
+    
+    def profit():
+        
+        return revenue() - totalCost()
     
     
     
