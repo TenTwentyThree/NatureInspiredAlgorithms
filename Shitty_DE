@@ -440,7 +440,7 @@ def demand(sellingPrice, maxPrice, maxDemand):
         
 # - - - - - - - - - - - - - - - U S E R   I N P U T - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 def user_input():
-    #by Yannic(?)
+    #by Yannic
     """
     Output List with control Parameters: [crossoverRate,scalingFactor,populationSize]
     """
