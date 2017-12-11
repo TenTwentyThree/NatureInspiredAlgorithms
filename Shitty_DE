@@ -26,27 +26,42 @@ class individual():
     def __init__(self, genome):
         self.genome = np.array(genome)
         self.revenue = self.update_revenue()
-        self.profit = self.revenue  - self.cost()
+        self.profit = self.revenue - self.cost()
+        
     def update_revenue(self):
-        revenue = self.genome[3] * 0.45 + self.genome[4] * 0.25 + self.genome[5] * 0.2
+        
+        revenue_list = []
+        
+        demand1 = min(demand(0.45, 0.45, 2000000),self.genome[3])
+        revenue_list.append(demand1)
+        
+        demand2 = min(demand(0.25, 0.25, 30000000),self.genome[4])
+        revenue_list.append(demand2)
+        
+        demand3 = min(demand(0.2, 0.2, 20000000),self.genome[5])
+        revenue_list.append(demand3)
+        
+        revenue = np.sum(revenue_list)
         return revenue
     
     def cost(self):
-        cost1 = self.genome[0] * 10000
-        cost2 = self.genome[1] * 80000
-        cost3 = self.genome[2] * 400000
         
-        overall_cost = cost1 + cost2 + cost3
+        costs = 0
+        #production costs
+        cost1 = math.ceil(self.genome[0]/50000)*10000
+        cost2 = math.ceil(self.genome[1]/600000)*80000
+        cost3 = math.ceil(self.genome[2]/4000000)*400000 
         
-        if self.genome[3] > 2000000:
-            overall_cost =+ (self.genome[3] - 2000000)*0.6
-        if self.genome[4] > 30000000:
-            overall_cost =+ (self.genome[4] - 30000000)*0.6
-        if self.genome[5] > 20000000:
-            overall_cost =+ (self.genome[5] - 20000000)*0.6
+        #purchasing costs
+        produced = self.genome[0]+self.genome[1]+self.genome[2]
+        sold = self.genome[3]+self.genome[4]+self.genome[5]
         
-        return overall_cost
-            
+        if sold > produced:
+            costs =+ max(sold - produced,0)*0.6
+        
+        costs =+ cost1 +cost2 +cost3
+        
+        return costs
 
 # - - - - - - - - - - - - - - - P O P U L A T I O N   I N I T I A L I Z A T I O N - - - - - - - - - - - - - - -
 def initialise(agentnmbr):
@@ -125,7 +140,7 @@ def __MAIN__():
         generations_best = find_best(population)
         
         print("Currently expected maximal Profit: ",generations_best.profit)
-        print("Currently best Genome: ", generations_best.genome)
+        #print("Currently best Genome: ", generations_best.genome)
         
         if current_best.revenue >= generations_best.revenue:
             counter += 1
@@ -281,127 +296,6 @@ def find_best(population):
             
     return best
             
-            
-            
-# - - - - - - - - - - - - - - - HIGH LEVEL PROFIT MODEL - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-"""
-    profit = revenue - totalCost
-    revenue = soldQuantitiy * sellingPrice
-    totalCost = plantTypeCost(all types) + purchasingCost
-    productionCost = generatedQuantity * costFactor
-    puchasingCost = max(soldQuantity - generatedQuantity, 0) * costPrice
-
-    sellingPrice = price at which we sell the energy to customers
-    plantTypeCost = cost we will have to build n plants of type p
-    purchasingCost = what we pay if we don't produce enough and have to buy energy from other suppliers
-    costPrice = what it costs us to produce the energy
-"""
-class problem():
-    #by Saran
-    class powerplant():
-        def __init__(self, planttype):
-            if planttype == 1:
-                self.kwhPerPlants = 50000
-                self.costPerPlant = 10000
-                self.maxPlants = 100
-                
-            if planttype == 2:
-                self.kwhPerPlants = 600000
-                self.costPerPlant = 80000
-                self.maxPlants = 50
-                
-            if planttype == 3:
-                self.kwhPerPlants = 4000000
-                self.costPerPlant = 400000
-                self.maxPlants = 3
-            
-    class market():
-        def __init__(self, market):
-            if market == 1:
-                self.maxPrice = 0.45
-                self.maxDemand = 2000000
-            
-            if market == 2:
-                self.maxPrice = 0.25
-                self.maxDemand = 30000000
-                
-            if market == 3:
-                self.maxPrice = 0.2
-                self.maxDemand = 20000000
-    
-    
-    def plantTypeCost(s, planttype):
-        """ 
-        calculates the cost we will have to build n plants of type p
-    
-        INPUT
-        - s (desired amount of energy)
-        - planttype
-
-        """
-    
-        # if s non-positive, return 0
-        if(s <= 0):
-            return 0
-    
-        #if x larger than possible generation, return infinite
-        if(s > kwhPerPlant * maxPlants):
-            return float('Inf')
-    
-        #otherwise find amount of plants needed to generate s
-        plantsNeeded = math.ceil(s / kwhPerPlant)
-    
-        #return cost (amount of plants * cost per plant)
-        return plantsNeeded * costPerPlant
-    
-    
-    def production(s, planttype):
-        """
-        calculates how much energy we get from all plants of type i
-        """
-        return plantsNeeded * kwhPerPlant
-
-
-
-    def purchasingCost(s):
-        """
-        if energy has to be bought from another company
-        """
-        
-        # what we produce with the above calculated amount of plants we need
-        sumE = production(s, 1) + production(s, 2) + production(s, 3)
-       
-        return max((s - sumE), 0) * 0.6
-        
-
-    def productionCost(planttype):
-        """
-        cost to build all desired plants
-        """
-    
-        return plantTypeCost(1) + plantTypeCost(2) + plantTypeCost(e)
-    
-
-    def totalCost():
-        """
-        total cost we have for buildings plants and potentially buying extra energy
-        """
-    
-        return productionCost(planttype) + purchasingCost(s)
-    
-    
-    def profit():
-        
-        return revenue() - totalCost()
-    
-    
-    
-    
-    
-    
-    
-
-
 
 # - - - - - - - - - - - - - - - MARKET MODEL - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     
@@ -440,7 +334,7 @@ def demand(sellingPrice, maxPrice, maxDemand):
         
 # - - - - - - - - - - - - - - - U S E R   I N P U T - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 def user_input():
-    #by Yannic
+    #by Yannic(?)
     """
     Output List with control Parameters: [crossoverRate,scalingFactor,populationSize]
     """
@@ -461,7 +355,7 @@ def user_input():
             #scalingFactor
             output.append(0.5)
             #populationSize
-            output.append(5)
+            output.append(20)
     else:
         print("")
         #Crossover Rate Cr e [0,1]
