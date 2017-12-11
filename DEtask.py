@@ -14,7 +14,7 @@ class individual():
     def __init__(self, genome, revenue):
         self.genome = np.array(genome)
         self.revenue = revenue
-    def update_revenue():
+    def update_revenue(self):
         self.revenue = 0
 
 # - - - - - - - - - - - - - - - P O P U L A T I O N   I N I T I A L I Z A T I O N - - - - - - - - - - - - - - -
