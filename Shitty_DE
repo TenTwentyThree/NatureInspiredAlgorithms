@@ -1,5 +1,12 @@
 # -*- coding: utf-8 -*-
 """
+Created on Mon Dec 11 16:32:15 2017
+
+@author: Till
+"""
+
+# -*- coding: utf-8 -*-
+"""
 Created on Thu Dec  7 14:27:24 2017
 
 @authors:
@@ -16,11 +23,30 @@ import math
 
 # - - - - - - - - - - - - - - - I N D I V I D U A L   D E F I N I T I O N - - - - - - - - - - - - - - - - - - 
 class individual():
-    def __init__(self, genome, revenue):
+    def __init__(self, genome):
         self.genome = np.array(genome)
-        self.revenue = revenue
+        self.revenue = self.update_revenue()
+        self.profit = self.revenue  - self.cost()
     def update_revenue(self):
-        self.revenue = 0
+        revenue = self.genome[3] * 0.45 + self.genome[4] * 0.25 + self.genome[5] * 0.2
+        return revenue
+    
+    def cost(self):
+        cost1 = self.genome[0] * 10000
+        cost2 = self.genome[1] * 80000
+        cost3 = self.genome[2] * 400000
+        
+        overall_cost = cost1 + cost2 + cost3
+        
+        if self.genome[3] > 2000000:
+            overall_cost =+ (self.genome[3] - 2000000)*0.6
+        if self.genome[4] > 30000000:
+            overall_cost =+ (self.genome[4] - 30000000)*0.6
+        if self.genome[5] > 20000000:
+            overall_cost =+ (self.genome[5] - 20000000)*0.6
+        
+        return overall_cost
+            
 
 # - - - - - - - - - - - - - - - P O P U L A T I O N   I N I T I A L I Z A T I O N - - - - - - - - - - - - - - -
 def initialise(agentnmbr):
@@ -36,9 +62,9 @@ def initialise(agentnmbr):
     m1 = 0.45
     m2 = 0.25
     m3 = 0.20
-    kwh1 = 5
-    kwh2 = 10
-    kwh3 = 20
+    kwh1 = 50000
+    kwh2 = 600000
+    kwh3 = 4000000
     population = []
     for i in range(0,agentnmbr):
         p1 = rnd.randint(0,100)
@@ -55,8 +81,12 @@ def initialise(agentnmbr):
         ttlsum = ttlsum - s2
         #print(sum)
         s3 = ttlsum
+        
+        e1 = p1 * kwh1
+        e2 = p2 * kwh2
+        e3 = p3 * kwh3
         #assigning random values for each market, depending on the overall produced energy
-        new_agent = individual([p1,p2,p3,s1,s2,s3,m1,m2,m3],0)
+        new_agent = individual([e1,e2,e3,s1,s2,s3,m1,m2,m3])
         #print(new_agent)
         population.append(new_agent)
     
@@ -94,7 +124,8 @@ def __MAIN__():
         
         generations_best = find_best(population)
         
-        print("Currently expected maximal revenue: ",generations_best.revenue)
+        print("Currently expected maximal Profit: ",generations_best.profit)
+        print("Currently best Genome: ", generations_best.genome)
         
         if current_best.revenue >= generations_best.revenue:
             counter += 1
@@ -192,7 +223,7 @@ def trial_generation(target_and_donors, scaling_factor, crossover):
             else:
                 new_genome.append(target_genome[gene_pos])
             gene_pos += 1
-        child = individual(new_genome, 0)
+        child = individual(new_genome)
         child.update_revenue()
         newtuple = (target, child)
         target_trial_associated_list.append(newtuple)
@@ -409,7 +440,7 @@ def demand(sellingPrice, maxPrice, maxDemand):
         
 # - - - - - - - - - - - - - - - U S E R   I N P U T - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 def user_input():
-    #by Yannic(?)
+    #by Yannic
     """
     Output List with control Parameters: [crossoverRate,scalingFactor,populationSize]
     """
@@ -430,7 +461,7 @@ def user_input():
             #scalingFactor
             output.append(0.5)
             #populationSize
-            output.append(20)
+            output.append(5)
     else:
         print("")
         #Crossover Rate Cr e [0,1]
@@ -460,9 +491,9 @@ def user_input():
     print("")
     print("####---------Initialize Differential Evolution with: ---------###")
     print("")
-    print("Crossover Rate: ",crossoverRate)
-    print("Scaling Factor: ",scalingFactor)
-    print("Population Size: ",populationSize)
+    print("Crossover Rate: ",output[0])
+    print("Scaling Factor: ",output[1])
+    print("Population Size: ",output[2])
     print("")
     print("####----------------------------------------------------------###")
     print("")
