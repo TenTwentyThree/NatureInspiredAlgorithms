@@ -80,10 +80,12 @@ def __MAIN__():
     
     counter = 0
     
+    popcounter = 0
+    
     # 2. Mainloop
     population = initialise(populationSize)
     
-    current_best = rnd.chocie(population)
+    current_best = rnd.choice(population)
     
     while counter < 20:
         
@@ -95,12 +97,13 @@ def __MAIN__():
         
         generations_best = find_best(population)
         
-        print("Currently expected maximal revenue: ",generations_best.fitness)
+        print("Currently expected maximal revenue: ",generations_best.revenue)
         
-        if current_best.fitness >= generations_best.fitness:
+        if current_best.revenue >= generations_best.revenue:
             counter += 1
         else:
             current_best = generations_best
+        popcounter += 1
         
         
         
@@ -108,7 +111,7 @@ def __MAIN__():
         
         
     
-    
+    print("Convergence termination reached after",popcounter,"generations.")
     # 3. Best
     return current_best 
             
@@ -134,7 +137,6 @@ def donor_selection(population):
         target = population[target_position]
         del target_donors[target_position]
         target_and_donors = (target, target_donors)
-        print(target_and_donors)
         target_and_donors_list.append(target_and_donors)
         target_position += 1
     return target_and_donors_list
@@ -154,7 +156,7 @@ def trial_generation(target_and_donors, scaling_factor, crossover):
     - A constant scaling factor to be applied to the difference between base and target to generate trial objects
     OUTPUT:
     - A list containing tuples
-    - tuples contain the original target as well as a trial individual that then can be compared by the fitness function
+    - tuples contain the original target as well as a trial individual that then can be compared by the revenue function
     """
     
 
@@ -173,9 +175,9 @@ def trial_generation(target_and_donors, scaling_factor, crossover):
         #choose donor vector 2
         x2 = rnd.choice(all_other_vectors)
         #calculate the distance between the two vectors and scale it by the scaling factor
-        donor_vector = np.substract(x1.genome,x2.genome) * scaling_factor
-        #now create a new individual from the base and update its fitness
-        final_donor = np.add(target.genome + donor_vector)
+        donor_vector = np.subtract(x1.genome,x2.genome) * scaling_factor
+        #now create a new individual from the base and update its revenue.
+        final_donor = np.add(target.genome, donor_vector)
         
         
         
@@ -193,7 +195,8 @@ def trial_generation(target_and_donors, scaling_factor, crossover):
             gene_pos += 1
         child = individual(new_genome, 0)
         child.update_revenue()
-        target_trial_associated_list.append(target, child)
+        newtuple = (target, child)
+        target_trial_associated_list.append(newtuple)
         
     return target_trial_associated_list
         
@@ -214,10 +217,10 @@ def selection(overpopulation):
         target = pair[0]
         child = pair[1]
         
-        target.updated_fitness()
-        child.update_fitness()
+        target.update_revenue()
+        child.update_revenue()
         
-        if target.fitness > child.fitness:
+        if target.revenue > child.revenue:
             new_population.append(target)
         else:
             new_population.append(child)
@@ -232,16 +235,16 @@ def find_best(population):
     INPUT:
     - A list of individuals, the population
     OUTPUT:
-    - An object of the type "individual" that has the highest fitness value
+    - An object of the type "individual" that has the highest revenue value
     """
     
     best = rnd.choice(population)
-    best.update_fitness()
+    best.update_revenue()
     
     for individual in population:
-        individual.update_fitness()
+        individual.update_revenue()
         
-        if individual.fitness > best.fitness:
+        if individual.revenue > best.revenue:
             best = individual
             
     return best
@@ -464,6 +467,6 @@ def user_input():
     return output
 
 
-
+__MAIN__()
 
 
