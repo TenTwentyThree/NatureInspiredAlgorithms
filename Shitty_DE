@@ -25,32 +25,29 @@ import math
 class individual():
     def __init__(self, genome):
         self.genome = np.array(genome)
-        self.revenue = self.update_revenue()
+        self.revenue = self.genome[3]*self.genome[6] + self.genome[4]*self.genome[7] + self.genome[5]*self.genome[8]
         self.profit = self.revenue - self.cost()
         
     def update_revenue(self):
         
-        revenue_list = []
-        
-        demand1 = min(demand(0.45, 0.45, 2000000),self.genome[3])
-        revenue_list.append(demand1)
-        
-        demand2 = min(demand(0.25, 0.25, 30000000),self.genome[4])
-        revenue_list.append(demand2)
-        
-        demand3 = min(demand(0.2, 0.2, 20000000),self.genome[5])
-        revenue_list.append(demand3)
-        
-        revenue = np.sum(revenue_list)
-        return revenue
+        if self.genome[3] > 2000000:
+            self.revenue = -100000
+            
+        if self.genome[4] > 30000000:
+            self.revenue = -100000
+            
+        if self.genome[5] > 20000000:
+            self.revenue = -100000
+       
+        return self.revenue
     
     def cost(self):
         
         costs = 0
         #production costs
-        cost1 = math.ceil(self.genome[0]/50000)*10000
-        cost2 = math.ceil(self.genome[1]/600000)*80000
-        cost3 = math.ceil(self.genome[2]/4000000)*400000 
+        cost1 = (self.genome[0]/50000)*10000
+        cost2 = (self.genome[1]/600000)*80000
+        cost3 = (self.genome[2]/4000000)*400000 
         
         #purchasing costs
         produced = self.genome[0]+self.genome[1]+self.genome[2]
@@ -60,6 +57,7 @@ class individual():
             costs =+ max(sold - produced,0)*0.6
         
         costs =+ cost1 +cost2 +cost3
+        #print("COSTS ARE THIS HIGH!!: ",costs)
         
         return costs
 
@@ -105,7 +103,7 @@ def initialise(agentnmbr):
         #print(new_agent)
         population.append(new_agent)
     
-    print(population)           
+    #print(population)           
     return population
         
     
@@ -139,7 +137,7 @@ def __MAIN__():
         
         generations_best = find_best(population)
         
-        print("Currently expected maximal Profit: ",generations_best.profit)
+        #print("Currently expected maximal Profit: ",generations_best.profit)
         #print("Currently best Genome: ", generations_best.genome)
         
         if current_best.revenue >= generations_best.revenue:
@@ -155,6 +153,7 @@ def __MAIN__():
         
     
     print("Convergence termination reached after",popcounter,"generations.")
+    print("Best Profit found!: ",generations_best.profit)
     # 3. Best
     return current_best 
             
@@ -351,9 +350,9 @@ def user_input():
 
     if default == 0:
             #crossoverRate
-            output.append(0.5)
+            output.append(0.1)
             #scalingFactor
-            output.append(0.5)
+            output.append(0.1)
             #populationSize
             output.append(20)
     else:
