@@ -29,7 +29,7 @@ class individual():
         
     def update_revenue(self):
         profit = 0
-        costs = self.cost()
+        costs = self.costs()
         
         if self.genome[3] > 2000000:
             self.revenue = 0
@@ -42,25 +42,48 @@ class individual():
         profit = self.revenue-costs
         return profit
     
-    def cost(self):
+    def costs(self):
         
-        costs = 0
+        c = 0
         #production costs
-        cost1 = (self.genome[0]/50000)*10000
-        cost2 = (self.genome[1]/600000)*80000
-        cost3 = (self.genome[2]/4000000)*400000 
+        cost1 = self.building_cost(self.genome[0],kwh1,10000,100)
+        cost2 = self.building_cost(self.genome[1],kwh2,80000,50)
+        cost3 = self.building_cost(self.genome[2],kwh3,400000,3)        
         
         #purchasing costs
         produced = self.genome[0]+self.genome[1]+self.genome[2]
         sold = self.genome[3]+self.genome[4]+self.genome[5]
         
         if sold > produced:
-            costs =+ max(sold - produced,0)*0.6
+            c =+ (sold - produced)*0.6
+            
+        if self.genome[0] > 100* kwh1:
+            c =+ 1000000000
         
-        costs =+ cost1 +cost2 +cost3
+        if self.genome[1] > 50* kwh2:
+            c =+ 1000000000
+        
+        if self.genome[2] > 3* kwh3:
+            c =+ 1000000000
+        
+        c =+ cost1 +cost2 +cost3
         #print("COSTS ARE THIS HIGH!!: ",costs)
         
-        return costs
+        return c
+    
+    def building_cost(self,x, kwhPerPlant, costPerPlant, maxPlants):
+        """
+        Nicos functions of costs
+        """
+        if x <= 0:
+            return 0
+        
+        if x > kwhPerPlant * maxPlants:
+            return 100000000
+        
+        plantsNeeded = math.ceil(x / kwhPerPlant)
+        
+        return plantsNeeded * costPerPlant
 
 # - - - - - - - - - - - - - - - P O P U L A T I O N   I N I T I A L I Z A T I O N - - - - - - - - - - - - - - -
 def initialise(agentnmbr):
@@ -76,10 +99,13 @@ def initialise(agentnmbr):
     m1 = 0.45
     m2 = 0.25
     m3 = 0.20
+    global kwh1 
+    global kwh2
+    global kwh3
+    population = []
     kwh1 = 50000
     kwh2 = 600000
     kwh3 = 4000000
-    population = []
     for i in range(0,agentnmbr):
         p1 = rnd.randint(0,100)
         p2 = rnd.randint(0,50)
@@ -138,7 +164,7 @@ def __MAIN__():
         
         generations_best = find_best(population)
         
-        print("Currently expected maximal Profit: ",generations_best.update_revenue())
+        #print("Currently expected maximal Profit: ",generations_best.update_revenue())
         #print("Currently best Genome: ", generations_best.genome)
         
         if current_best.revenue >= generations_best.revenue:
@@ -351,11 +377,11 @@ def user_input():
 
     if default == 0:
             #crossoverRate
-            output.append(0.5)
+            output.append(0.1)
             #scalingFactor
-            output.append(0.5)
+            output.append(0.1)
             #populationSize
-            output.append(5)
+            output.append(10)
     else:
         print("")
         #Crossover Rate Cr e [0,1]
