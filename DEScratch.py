@@ -20,9 +20,9 @@ class Population(object):
         takes the price of the market (m1,m2,m3) as given as a global variable
         """
         agentnmbr = self.agentnmbr
-        m1 = 0.45
-        m2 = 0.25
-        m3 = 0.20
+        # m1 = 0.45
+        # m2 = 0.25
+        # m3 = 0.20
         kwh1 = 5
         kwh2 = 10
         kwh3 = 20
@@ -38,6 +38,9 @@ class Population(object):
             s2 = rnd.randint(0, sum)
             sum = sum - s2
             s3 = sum
+            # m1 = np.random.uniform(0,1)
+            # m2 = np.random.uniform(0,1)
+            # m3 = np.random.uniform(0,1)
             # assigning random values for each market, depending on the overall produced energy
             new_agent = (p1, p2, p3, s1, s2, s3, m1, m2, m3)
             self.population.append(new_agent)
@@ -56,7 +59,7 @@ class Population(object):
 
         self.population[del_idx] = best_trial  # Just replace
 
-        print("61 UPDATED POPULATION", self.population)
+        # print("61 UPDATED POPULATION", self.population)
 
         return self.population
 
@@ -138,10 +141,143 @@ def trial_generation(target_and_donor, CR=0.5):
 
     return z
 
+#------------------------------------------PROBLEM CONSTANTS---------------------------------
+
+class problem():
+    # by Marieke
+    class powerplant():
+        def __init__(self, planttype):
+            if planttype == 1:
+                self.kwhPerPlants = 50000
+                self.costPerPlant = 10000
+                self.maxPlants = 100
+
+            if planttype == 2:
+                self.kwhPerPlants = 600000
+                self.costPerPlant = 80000
+                self.maxPlants = 50
+
+            if planttype == 3:
+                self.kwhPerPlants = 4000000
+                self.costPerPlant = 400000
+                self.maxPlants = 3
+
+    class market():
+        def __init__(self, market):
+            if market == 1:
+                self.maxPrice = 0.45
+                self.maxDemand = 2000000
+
+            if market == 2:
+                self.maxPrice = 0.25
+                self.maxDemand = 30000000
+
+            if market == 3:
+                self.maxPrice = 0.2
+                self.maxDemand = 20000000
+
+
 #---------------------------------------- MARKET REVENUE FUNCTION ----------------------------
 
 # Function returns the revenues
 # Pass the revenues into selection function below
+def calculate_profit(individual):
+    genes = individual
+
+    energy_produced = genes[:3]
+    market_distribution = genes[2:5]
+    price_distribution = genes[5:8]
+
+    plant1 = problem.powerplant(1)
+    plant2 = problem.powerplant(2)
+    plant3 = problem.powerplant(3)
+
+    market1 = problem.market(1)
+    market2 = problem.market(2)
+    market3 = problem.market(3)
+
+    total_energy_produced = sum(energy_produced)
+    total_energy_distributed = sum(market_distribution)
+
+    purchasing_cost = 0
+    if total_energy_produced < total_energy_distributed:
+        difference_in_production = total_energy_distributed - total_energy_produced
+        purchasing_cost = difference_in_production * 0.6   # CostPrice
+
+    productioncosts = plantTypeCost(energy_produced[0], plant1)
+    productioncosts += plantTypeCost(energy_produced[1], plant2)
+    productioncosts += plantTypeCost(energy_produced[2], plant3)
+
+    cost = purchasing_cost + productioncosts
+
+    total_revenue = price_distribution[0] * min(market_distribution[0], demand(price_distribution[0], market1))
+    total_revenue += price_distribution[1] * min(market_distribution[1], demand(price_distribution[1], market2))
+    total_revenue += price_distribution[2] * min(market_distribution[2], demand(price_distribution[2], market3))
+
+    profit = total_revenue - cost
+
+    return profit
+
+
+def plantTypeCost(s, plant):
+    """
+    calculates the cost we will have to build n plants of type p
+
+    INPUT
+    - s (desired amount of energy)
+    - planttype
+
+    """
+    kwhPerPlant = plant.kwhPerPlants
+    maxPlants = plant.maxPlants
+    costPerPlant = plant.costPerPlant
+    # if s non-positive, return 0
+    if (s <= 0):
+        return 0
+
+    # if x larger than possible generation, return infinite
+    if (s > kwhPerPlant * maxPlants):
+        return float('Inf')
+
+    # otherwise find amount of plants needed to generate s
+    plantsNeeded = math.ceil(s / kwhPerPlant)
+
+    # return cost (amount of plants * cost per plant)
+    return plantsNeeded * costPerPlant
+
+
+def demand(sellingPrice, market):
+    # by Marieke
+
+    """
+    gives us the open demand of a market
+
+    INPUT
+    - sellingPrice (the price at which we sell energy)
+    - maxPrice (maximum price customers are willing to pay)
+    - maxDemand (total demand of a market)
+
+    OUTPUT
+    -
+
+    """
+
+    maxPrice = market.maxPrice
+    maxDemand = market.maxDemand
+
+    # if the selling price is greater than what customers want to pay, return 0
+    if (sellingPrice > maxPrice):
+        return 0
+
+    # if nothing is produced for market
+    if (sellingPrice <= 0):
+        return maxDemand
+
+    # else determine the demand based on the selling price
+    demand = maxDemand - sellingPrice ** 2 * maxDemand / maxPrice ** 2
+
+    return demand
+
 
 # --------------------------------------- SELECTION--------------------------------------------
 
@@ -256,11 +392,11 @@ if __name__ == '__main__':
     # a initialize population
     pop = Population(populationSize)
     population = pop.initialise()
-    print("254 INITIAL POPULATION", population)
+    # print("254 INITIAL POPULATION", population)
 
     # search = True
     # while search:
-    for i in range(10):
+    for i in range(200):
         # b donor selection
         targets_and_donors_list = donor_selection(population, scalingFactor)
 
@@ -270,15 +406,18 @@ if __name__ == '__main__':
             trials.append(trial_generation(target_and_donor, CR=crossoverRate))
 
         # GET THE LIST OF REVENUES FROM EACH TRIALS
-        # SHOULD BE FROM MARKET REVENUE MEASURE
-        # but for time being i just took some random revenue values for each trials
-        # and pass them inside the selection function
-        list_revenues = np.random.randint(0, 15, len(trials))
+        list_revenues = []
+        for i in range(len(trials)):
+            profit = calculate_profit(trials[i])
+            list_revenues.append(profit)
+
+        # list_revenues = np.random.randint(0, 15, len(trials))
 
         # d selection
+        print("Maximum revenue acheived so far", max(list_revenues))
         best_trial = selection(list_revenues)
 
         # e update the population
         population = pop.update_population(best_trial)
 
-        print("276 Population of iteration %d is %s" % (i, population))
+        # print("276 Population of iteration %d is %s" % (i, population))

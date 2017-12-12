@@ -15,6 +15,7 @@ import random as rnd
 import math
 
 # - - - - - - - - - - - - - - - I N D I V I D U A L   D E F I N I T I O N - - - - - - - - - - - - - - - - - - 
+
 class individual():
     def __init__(self, genome, revenue):
         self.genome = np.array(genome)
@@ -23,11 +24,9 @@ class individual():
     def update_revenue(self):
         self.revenue = calculate_profit(self.genome)
             
-            
-        
-        
 
 # - - - - - - - - - - - - - - - P O P U L A T I O N   I N I T I A L I Z A T I O N - - - - - - - - - - - - - - -
+
 def initialise(agentnmbr):
     #by Yannic(?), Till(?), Saran(?), Marieke(?)
     """
@@ -110,11 +109,7 @@ def __MAIN__():
         popcounter += 1
         
         
-        
-        
-        
-        
-    
+
     print("Convergence termination reached after",popcounter,"generations.")
     # 3. Best
     return current_best 
