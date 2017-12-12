@@ -26,20 +26,21 @@ class individual():
     def __init__(self, genome):
         self.genome = np.array(genome)
         self.revenue = self.genome[3]*self.genome[6] + self.genome[4]*self.genome[7] + self.genome[5]*self.genome[8]
-        self.profit = self.revenue - self.cost()
         
     def update_revenue(self):
+        profit = 0
+        costs = self.cost()
         
         if self.genome[3] > 2000000:
-            self.revenue = -100000
-            
+            self.revenue = 0
         if self.genome[4] > 30000000:
-            self.revenue = -100000
-            
+            self.revenue = 0
         if self.genome[5] > 20000000:
-            self.revenue = -100000
-       
-        return self.revenue
+            self.revenue = 0
+        #print(self.revenue)
+        
+        profit = self.revenue-costs
+        return profit
     
     def cost(self):
         
@@ -137,7 +138,7 @@ def __MAIN__():
         
         generations_best = find_best(population)
         
-        #print("Currently expected maximal Profit: ",generations_best.profit)
+        print("Currently expected maximal Profit: ",generations_best.update_revenue())
         #print("Currently best Genome: ", generations_best.genome)
         
         if current_best.revenue >= generations_best.revenue:
@@ -153,7 +154,7 @@ def __MAIN__():
         
     
     print("Convergence termination reached after",popcounter,"generations.")
-    print("Best Profit found!: ",generations_best.profit)
+    print("Best Profit found!: ",generations_best.update_revenue())
     # 3. Best
     return current_best 
             
@@ -350,11 +351,11 @@ def user_input():
 
     if default == 0:
             #crossoverRate
-            output.append(0.1)
+            output.append(0.5)
             #scalingFactor
-            output.append(0.1)
+            output.append(0.5)
             #populationSize
-            output.append(20)
+            output.append(5)
     else:
         print("")
         #Crossover Rate Cr e [0,1]
