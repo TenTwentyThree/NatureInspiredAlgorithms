@@ -72,6 +72,13 @@ def __MAIN__():
     # 1. userinput of type List: [crossoverRate,scalingFactor,populationSize]
     userinput = user_input()
     global CostPrice
+    global upper_energy_bound
+    md1 = problem.market(1).maxDemand
+    md2 = problem.market(2).maxDemand
+    md3 = problem.market(3).maxDemand
+    
+    upper_energy_bound = md1 + md2 + md3
+    
     
     crossoverRate = userinput[0]
     scalingFactor = userinput[1]
@@ -104,6 +111,7 @@ def __MAIN__():
             current_best = generations_best
             counter = 0
         popcounter += 1
+        print("Currently best individual profit: ",current_best.revenue)
         
     print("\n")    
     print("####----------------------------------------------------------###")
@@ -235,18 +243,46 @@ def selection(overpopulation):
     - new population that contains the fittest individuals
     """
     new_population = []
+    m1p = problem.market(1).maxPrice
+    m2p = problem.market(2).maxPrice
+    m3p = problem.market(3).maxPrice
+                        
     for pair in overpopulation:
         breakargument = False
+        
         target = pair[0]
         child = pair[1]
         
-        for gene in child.genome:
-            if gene < 0:
-                breakargument = True
+        
+        genecounter = 0
+        
+        child_gene = []
+        
+        for gene in child_gene:
+          
+            if genecounter < 5:
+                if gene > upper_energy_bound:
+                    new_gene = upper_energy_bound
+                    child_gene.append(new_gene)
+                    
+            if genecounter == 6:
+                if gene > m1p or gene < 0:
+                    new_gene = m1p
+                    child_gene.append(new_gene)
+                    
+            if genecounter == 7:
+                if gene > m2p or gene < 0:
+                    new_gene = m2p
+                    child_gene.append(new_gene)
+                    
+            if genecounter == 8:
+                if gene > m3p or gene < 0:
+                    new_gene = m3p
+                    child_gene.append(new_gene)
+            genecounter += 1
+            child.genome = child_gene
+            
                 
-        """if breakargument:
-            target.update_revenue()
-            new_population.append(target)"""
         if breakargument:
             newchild = initialise(1)
             child = newchild[0]
