@@ -154,20 +154,19 @@ def __MAIN__():
 def plot(current_best,iterations,userinput):
     #by Yannic
 
+    #set Iteration list global
     global it
     it = iterations
 
     #BarChart
     if userinput[4] == 0:
+        #config Plot
         plt.figure(figsize=(17,2))
+        #hold indices for chart
         index = np.arange(3)
         bar_width = 0.3
 
-        market = {1:('Market 1','r'),
-              2:('Market 2','g'),
-              3:('Market 3','b')}
-
-        #Genome 0-2
+        #Plot Genome 0-2 in subplot 1
         plt.subplot(1,3,1)
         plt.bar(index, current_best.genome[0:3], bar_width)
         plt.xticks(index, current_best.genome[0:3]);
@@ -175,14 +174,14 @@ def plot(current_best,iterations,userinput):
         plt.title('Produced with Plant 1, 2 ,3')
         plt.ylabel('Units of kwh')
 
-        #Genome 3-5
+        #Plot Genome 3-5 in subplot 2
         plt.subplot(1,3,2)
         plt.bar(index,current_best.genome[3:6], bar_width)
         plt.xticks(index, current_best.genome[3:6]);
             #Title
         plt.title('Selled to Marked 1, 2 ,3')
 
-        #Genome 6-8
+        #Plot Genome 6-8 in subplot 3
         plt.subplot(1,3,3)
         plt.bar(index,current_best.genome[6:9], bar_width)
         plt.xticks(index, current_best.genome[6:9]);
@@ -190,46 +189,62 @@ def plot(current_best,iterations,userinput):
         plt.title('Price per kwh for market 1, 2, 3 (Close Window to Terminate)')
         plt.ylabel('Price')
 
-        #output
+        #output the subplots
         plt.show()
 
     #Graph
     if userinput[5] == 0:
+        #configurate plot
         fig = plt.figure(figsize=(10,5))
+        #ad subplot
         ax1 = fig.add_subplot(1,1,1)
 
+        #function to determine the next y value
         def getNewPrice(count):
             if count < len(it):
                 return it[count]
             else:
                 return it[len(it)-1]
 
+        #some Values for the animation
         global t,counter
         counter = 0
         price = [100]
         t = [0]
 
         def animate(i):
+            """
+            i : frame
+            """
             global counter
+            #initialize x,y values
             x = t
             y = price
+            #add counter
             counter += 1
+            #add iteration(counter) to x values
             x.append(counter)
+            #add new price to y values
             y.append(getNewPrice(counter))
             ax1.clear()
+            #set color of graph and plot it
             plt.plot(x,y,color="blue")
+            #set title of plot, if 'it' is end, stop the animation
             if counter < len(it):
-                best = str(it[counter])
+                best = str(int(it[counter]))
                 ax1.set_title(r'Profit over Iterations | Curren Best: '+ best)
             else:
-                best = str(it[len(it)-1])
+                best = str(int(it[len(it)-1]))
                 cnt = str(counter)
                 ax1.set_title(r'Profit over Iterations | Best Profit: '+ best +' found after '+cnt+' iterations.  (Close Window to Terminate)')
                 ani.event_source.stop()
+            #set x,y labels
             plt.ylabel('Profit')
             plt.xlabel('Iteration')
 
+        #execute animation
         ani = animation.FuncAnimation(fig,animate,interval=50)
+        #show animation
         plt.show()
 
 
