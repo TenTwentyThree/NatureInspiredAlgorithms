@@ -187,7 +187,7 @@ def plot(current_best,iterations,userinput):
         plt.bar(index,current_best.genome[6:9], bar_width)
         plt.xticks(index, current_best.genome[6:9]);
             #Title
-        plt.title('Price per kwh for market 1, 2, 3')
+        plt.title('Price per kwh for market 1, 2, 3 (Close Window to Terminate)')
         plt.ylabel('Price')
 
         #output
@@ -224,7 +224,7 @@ def plot(current_best,iterations,userinput):
             else:
                 best = str(it[len(it)-1])
                 cnt = str(counter)
-                ax1.set_title(r'Profit over Iterations | Best Profit: '+ best +' found after '+cnt+' iterations.')
+                ax1.set_title(r'Profit over Iterations | Best Profit: '+ best +' found after '+cnt+' iterations.  (Close Window to Terminate)')
                 ani.event_source.stop()
             plt.ylabel('Profit')
             plt.xlabel('Iteration')
