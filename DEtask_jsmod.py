@@ -22,13 +22,14 @@ class individual():
         self.revenue = revenue
         
     def update_revenue(self):
+        
         self.revenue = calculate_profit(self.genome)
             
 
 # - - - - - - - - - - - - - - - P O P U L A T I O N   I N I T I A L I Z A T I O N - - - - - - - - - - - - - - -
 
 def initialise(agentnmbr):
-    #by Yannic(?), Till(?), Saran(?), Marieke(?)
+    #by Till, modded by Johannes
     """
     input: agentnmbr = number of agents defined by the user (for our problem 20 should be more than sufficient)
     output: either none, or if needed the array of agents. I would suggest however to make the array global.
@@ -37,12 +38,12 @@ def initialise(agentnmbr):
     randomly divides the overall energy created over all the markets
     takes the price of the market (m1,m2,m3) as given as a global variable
     """
-    m1 = 0.45
-    m2 = 0.25
-    m3 = 0.20
-    kwh1 = 5
-    kwh2 = 10
-    kwh3 = 20
+    m1 = rnd.uniform(0.0, 0.45)
+    m2 = rnd.uniform(0.0, 0.25)
+    m3 = rnd.uniform(0.0, 0.20)
+    kwh1 = 50000
+    kwh2 = 600000
+    kwh3 = 4000000
     population = []
     for i in range(0,agentnmbr):
         p1 = rnd.randint(0,100)
@@ -51,20 +52,16 @@ def initialise(agentnmbr):
         #randomly choosing how many powerplants we have for each agent
         
         ttlsum = p1*kwh1 + p2*kwh2 + p3*kwh3
-        #print(sum)
         s1 = rnd.randint(0,ttlsum)
-        ttlsum = ttlsum - s1
         #print(sum)
         s2 = rnd.randint(0,ttlsum)
-        ttlsum = ttlsum - s2
         #print(sum)
-        s3 = ttlsum
+        s3 = rnd.randint(0,ttlsum)
         #assigning random values for each market, depending on the overall produced energy
         new_agent = individual([p1,p2,p3,s1,s2,s3,m1,m2,m3],0)
         #print(new_agent)
         population.append(new_agent)
-    
-    print(population)           
+          
     return population
         
     
@@ -75,11 +72,11 @@ def __MAIN__():
     # 1. userinput of type List: [crossoverRate,scalingFactor,populationSize]
     userinput = user_input()
     global CostPrice
-    CostPrice = 0.6
     
     crossoverRate = userinput[0]
     scalingFactor = userinput[1]
     populationSize = userinput[2]
+    CostPrice = userinput[3]
     
     counter = 0
     
@@ -90,7 +87,7 @@ def __MAIN__():
     
     current_best = rnd.choice(population)
     
-    while counter < 50:
+    while counter < 500:
         
         target_and_donors_list = donor_selection(population)
         
@@ -100,19 +97,41 @@ def __MAIN__():
         
         generations_best = find_best(population)
         
-        print("Currently expected maximal revenue: ",generations_best.revenue)
         
         if current_best.revenue >= generations_best.revenue:
             counter += 1
         else:
             current_best = generations_best
+            counter = 0
         popcounter += 1
         
-        
-
+    print("\n")    
+    print("####----------------------------------------------------------###")
     print("Convergence termination reached after",popcounter,"generations.")
-    # 3. Best
-    return current_best 
+    print("####----------------------------------------------------------###")
+    print("some Data:")
+    print("\n")
+    print("total energy produced: ",current_best.genome[0] + current_best.genome[1] + current_best.genome[2] ,"units of energy")
+    print("\n")
+    print("Plant 1 produced ",current_best.genome[0],"units of energy")
+    print("Plant 2 produced ",current_best.genome[1],"units of energy")
+    print("Plant 3 produced ",current_best.genome[2],"units of energy")
+    print("\n")
+    print("total energy distributed: ",current_best.genome[3] + current_best.genome[4] + current_best.genome[5] ,"units of energy")
+    print("Market 1 received ",current_best.genome[3],"units of energy for a price of ",current_best.genome[6])
+    print("Market 2 received ",current_best.genome[4],"units of energy for a price of ",current_best.genome[7])
+    print("Market 3 received ",current_best.genome[5],"units of energy for a price of ",current_best.genome[8])
+    print("\n")
+    print("leaving ",(current_best.genome[0] + current_best.genome[1] + current_best.genome[2])-(current_best.genome[3] + current_best.genome[4] + current_best.genome[5]),"of energy units undistributed!!")
+    print("\n")
+    print("Best value attained: ",int(round(current_best.revenue)))
+    print("")
+    print("Crossover Rate: ",crossoverRate)
+    print("Scaling Factor: ",scalingFactor)
+    print("Population Size: ",populationSize)
+    print("Cost Price: ",CostPrice)
+    print("")
+    print("####----------------------------------------------------------###")
             
         
         
@@ -142,7 +161,7 @@ def donor_selection(population):
     return target_and_donors_list
 
 # - - - - - - - - - - - - - - - T R I A L   G E N E R A T I O N - - - - - - - - - - - - - - - - - - - - - - - -
-def trial_generation(target_and_donors, scaling_factor, crossover):
+def trial_generation(target_and_donors, scaling_factor, crossover_rate):
     #by Johannes
     """
     
@@ -176,8 +195,9 @@ def trial_generation(target_and_donors, scaling_factor, crossover):
         #choose donor vector 2
         x2 = rnd.choice(all_other_vectors)
         #calculate the distance between the two vectors and scale it by the scaling factor
-        donor_vector = np.subtract(x1.genome,x2.genome) * scaling_factor
-        #now create a new individual from the base and update its revenue.
+        donor_vector = np.subtract(x1.genome,x2.genome)
+        donor_vector * scaling_factor
+        #now create a new individual from the base.
         final_donor = np.add(target.genome, donor_vector)
         
         
@@ -189,7 +209,7 @@ def trial_generation(target_and_donors, scaling_factor, crossover):
         new_genome = []
         while gene_pos != len(target_genome):
             crossover = rnd.uniform(0,1)
-            if crossover < 0.5:
+            if crossover < crossover_rate:
                 new_genome.append(final_donor[gene_pos])
             else:
                 new_genome.append(target_genome[gene_pos])
@@ -216,9 +236,22 @@ def selection(overpopulation):
     """
     new_population = []
     for pair in overpopulation:
+        breakargument = False
         target = pair[0]
         child = pair[1]
         
+        for gene in child.genome:
+            if gene < 0:
+                breakargument = True
+                
+        """if breakargument:
+            target.update_revenue()
+            new_population.append(target)"""
+        if breakargument:
+            newchild = initialise(1)
+            child = newchild[0]
+        
+    
         target.update_revenue()
         child.update_revenue()
         
@@ -226,6 +259,7 @@ def selection(overpopulation):
             new_population.append(target)
         else:
             new_population.append(child)
+        
     return new_population
         
         
@@ -304,12 +338,8 @@ def calculate_profit(individual):
     profit = total_revenue - cost
     
     return profit
-    
-    
-    
-    
-        
-    
+
+
     
 class problem():
     #by Marieke
@@ -362,8 +392,9 @@ def plantTypeCost(s, plant):
         return 0
 
     #if x larger than possible generation, return infinite
-    if(s > kwhPerPlant * maxPlants):
-        return float('Inf')
+    psblgen = kwhPerPlant * maxPlants
+    if(s > psblgen):
+        return float('inf')
 
     #otherwise find amount of plants needed to generate s
     plantsNeeded = math.ceil(s / kwhPerPlant)
@@ -394,6 +425,9 @@ def demand(sellingPrice, market):
     if (sellingPrice > maxPrice):
         return 0
     
+    if sellingPrice < 0:
+        return 0
+    
     #if nothing is produced for market
     if (sellingPrice <= 0):
         return maxDemand
@@ -418,6 +452,7 @@ def user_input():
     crossoverRate = -1
     scalingFactor = -1
     populationSize = -1
+    costprice = -1
     #output = [crossoverRate,scalingFactor,populationSize]
     output = []
 
@@ -431,6 +466,8 @@ def user_input():
             output.append(0.5)
             #populationSize
             output.append(20)
+            #costprice
+            output.append(0.6)
     else:
         print("")
         #Crossover Rate Cr e [0,1]
@@ -444,9 +481,9 @@ def user_input():
         #Scaling factor F e (0,1)
         while (scalingFactor <= 0) or (scalingFactor >= 1):
             if scalingFactor == -1:
-                scalingFactor = float(input("Please specify Scaling Factor in (0,1): "))
+                scalingFactor = float(input("Please specify Scaling Factor in [0,1]: "))
             else:
-                scalingFactor = float(input("Scaling Factor must be must be in (0,1): "))
+                scalingFactor = float(input("Scaling Factor must be must be in [0,1]: "))
         output.append(scalingFactor)
         print("")
         #population size N > 4
@@ -457,15 +494,14 @@ def user_input():
             else:
                 populationSize = int(input("Population Size must be bigger than 4: "))
         output.append(populationSize)
-    print("")
-    print("####---------Initialize Differential Evolution with: ---------###")
-    print("")
-    print("Crossover Rate: ",crossoverRate)
-    print("Scaling Factor: ",scalingFactor)
-    print("Population Size: ",populationSize)
-    print("")
-    print("####----------------------------------------------------------###")
-    print("")
+        #Scaling factor F e (0,1)
+        while (costprice <= 0) or (costprice > 1):
+            if costprice == -1:
+                costprice = float(input("Please specify Cost Price in [0,1[: "))
+            else:
+                costprice = float(input("Cost Price must be must be in [0,1[: "))
+        output.append(costprice)
+
 
 
     return output
