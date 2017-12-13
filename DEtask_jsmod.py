@@ -13,18 +13,21 @@ Created on Thu Dec  7 14:27:24 2017
 import numpy as np
 import random as rnd
 import math
+import matplotlib.pyplot as plt
+import matplotlib.animation as animation
+import random
 
-# - - - - - - - - - - - - - - - I N D I V I D U A L   D E F I N I T I O N - - - - - - - - - - - - - - - - - - 
+# - - - - - - - - - - - - - - - I N D I V I D U A L   D E F I N I T I O N - - - - - - - - - - - - - - - - - -
 
 class individual():
     def __init__(self, genome, revenue):
         self.genome = np.array(genome)
         self.revenue = revenue
-        
+
     def update_revenue(self):
-        
+
         self.revenue = calculate_profit(self.genome)
-            
+
 
 # - - - - - - - - - - - - - - - P O P U L A T I O N   I N I T I A L I Z A T I O N - - - - - - - - - - - - - - -
 
@@ -33,7 +36,7 @@ def initialise(agentnmbr):
     """
     input: agentnmbr = number of agents defined by the user (for our problem 20 should be more than sufficient)
     output: either none, or if needed the array of agents. I would suggest however to make the array global.
-    
+
     creates as many agents as user defines. randomly assigns values to the number of powerplants.
     randomly divides the overall energy created over all the markets
     takes the price of the market (m1,m2,m3) as given as a global variable
@@ -50,7 +53,7 @@ def initialise(agentnmbr):
         p2 = rnd.randint(0,50)
         p3 = rnd.randint(0,3)
         #randomly choosing how many powerplants we have for each agent
-        
+
         ttlsum = p1*kwh1 + p2*kwh2 + p3*kwh3
         s1 = rnd.randint(0,ttlsum)
         #print(sum)
@@ -61,59 +64,64 @@ def initialise(agentnmbr):
         new_agent = individual([p1,p2,p3,s1,s2,s3,m1,m2,m3],0)
         #print(new_agent)
         population.append(new_agent)
-          
+
     return population
-        
-    
+
+
 # - - - - - - - - - - - - - - - M A I N - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 def __MAIN__():
-   #by Johannes, Yannik, Till, Saran, Marieke
-   
+   #by Johannes, Yannic, Till, Saran, Marieke
+
     # 1. userinput of type List: [crossoverRate,scalingFactor,populationSize]
     userinput = user_input()
     global CostPrice
     global upper_energy_bound
+
+    #for plotting
+    iterations = []
+
     md1 = problem.market(1).maxDemand
     md2 = problem.market(2).maxDemand
     md3 = problem.market(3).maxDemand
-    
+
     upper_energy_bound = md1 + md2 + md3
-    
-    
+
+
     crossoverRate = userinput[0]
     scalingFactor = userinput[1]
     populationSize = userinput[2]
     CostPrice = userinput[3]
-    
+
     counter = 0
-    
+
     popcounter = 0
-    
+
     # 2. Mainloop
     population = initialise(populationSize)
-    
+
     current_best = rnd.choice(population)
-    
+
     while counter < 500:
-        
+
         target_and_donors_list = donor_selection(population)
-        
+
         trial = trial_generation(target_and_donors_list, scalingFactor, crossoverRate)
-        
+
         population = selection(trial)
-        
+
         generations_best = find_best(population)
-        
-        
+
+
         if current_best.revenue >= generations_best.revenue:
             counter += 1
         else:
             current_best = generations_best
             counter = 0
+            iterations.append(generations_best.revenue)
         popcounter += 1
         print("Currently best individual profit: ",current_best.revenue)
-        
-    print("\n")    
+
+    print("\n")
     print("####----------------------------------------------------------###")
     print("Convergence termination reached after",popcounter,"generations.")
     print("####----------------------------------------------------------###")
@@ -140,19 +148,99 @@ def __MAIN__():
     print("Cost Price: ",CostPrice)
     print("")
     print("####----------------------------------------------------------###")
-            
-        
-        
-    
-    
-# - - - - - - - - - - - - - - - D O N O R   S E L E C T I O N - - - - - - - - - - - - - - - - - - - - - - - - 
+
+    plot(current_best,iterations,userinput)
+
+def plot(current_best,iterations,userinput):
+    #by Yannic
+
+    global it
+    it = iterations
+
+    #BarChart
+    if userinput[4] == 0:
+        plt.figure(figsize=(17,2))
+        index = np.arange(3)
+        bar_width = 0.3
+
+        market = {1:('Market 1','r'),
+              2:('Market 2','g'),
+              3:('Market 3','b')}
+
+        #Genome 0-2
+        plt.subplot(1,3,1)
+        plt.bar(index, current_best.genome[0:3], bar_width)
+        plt.xticks(index, current_best.genome[0:3]);
+            #Title
+        plt.title('Produced with Plant 1, 2 ,3')
+        plt.ylabel('Units of kwh')
+
+        #Genome 3-5
+        plt.subplot(1,3,2)
+        plt.bar(index,current_best.genome[3:6], bar_width)
+        plt.xticks(index, current_best.genome[3:6]);
+            #Title
+        plt.title('Selled to Marked 1, 2 ,3')
+
+        #Genome 6-8
+        plt.subplot(1,3,3)
+        plt.bar(index,current_best.genome[6:9], bar_width)
+        plt.xticks(index, current_best.genome[6:9]);
+            #Title
+        plt.title('Price per kwh for market 1, 2, 3')
+        plt.ylabel('Price')
+
+        #output
+        plt.show()
+
+    #Graph
+    if userinput[5] == 0:
+        fig = plt.figure(figsize=(10,5))
+        ax1 = fig.add_subplot(1,1,1)
+
+        def getNewPrice(count):
+            if count < len(it):
+                return it[count]
+            else:
+                return it[len(it)-1]
+
+        global t,counter
+        counter = 0
+        price = [100]
+        t = [0]
+
+        def animate(i):
+            global counter
+            x = t
+            y = price
+            counter += 1
+            x.append(counter)
+            y.append(getNewPrice(counter))
+            ax1.clear()
+            plt.plot(x,y,color="blue")
+            if counter < len(it):
+                best = str(it[counter])
+                ax1.set_title(r'Profit over Iterations | Curren Best: '+ best)
+            else:
+                best = str(it[len(it)-1])
+                cnt = str(counter)
+                ax1.set_title(r'Profit over Iterations | Best Profit: '+ best +' found after '+cnt+' iterations.')
+                ani.event_source.stop()
+            plt.ylabel('Profit')
+            plt.xlabel('Iteration')
+
+        ani = animation.FuncAnimation(fig,animate,interval=50)
+        plt.show()
+
+
+# - - - - - - - - - - - - - - - D O N O R   S E L E C T I O N - - - - - - - - - - - - - - - - - - - - - - - -
 def donor_selection(population):
     #by Johannes
     """
-    
+
     This function basically generates a number of permutations of the population where one element is chosen as the target vector and the others as donors or bases
-    
-    
+
+
     INPUT: Population, a list of objects containing vectors as a representation for genome projecting into the search-space
     OUTPUT: A list of tuples. Each tuple contains the target at position 1 (0) and the list of donor objects at position 2 (1)
     """
@@ -172,21 +260,21 @@ def donor_selection(population):
 def trial_generation(target_and_donors, scaling_factor, crossover_rate):
     #by Johannes
     """
-    
+
     for each target vector (all vectors in our population are defined as target vectors), we select a base
     the base vector is then removed from the available population pool and two other individuals (except target and base)
     are chosen. These then provide the donor vector for the trial vector / trial individual.
     The trial vector is then generated and its coordinates (genes) are recombined with the genes of the target to form a child
     The program then returns a list with tuples containing the target vector and the generated offspring to be evaluted by a selection function
-    
-    INPUT: 
+
+    INPUT:
     - A list of tuples which contain the target and a list of base vectors
     - A constant scaling factor to be applied to the difference between base and target to generate trial objects
     OUTPUT:
     - A list containing tuples
     - tuples contain the original target as well as a trial individual that then can be compared by the revenue function
     """
-    
+
 
     target_trial_associated_list = []
     for target_donor_tuple in target_and_donors:
@@ -207,11 +295,11 @@ def trial_generation(target_and_donors, scaling_factor, crossover_rate):
         donor_vector * scaling_factor
         #now create a new individual from the base.
         final_donor = np.add(target.genome, donor_vector)
-        
-        
-        
+
+
+
         # R E C O M B I N A T I O N   S T A R T S   H E R E
-        
+
         target_genome = target.genome
         gene_pos = 0
         new_genome = []
@@ -226,19 +314,19 @@ def trial_generation(target_and_donors, scaling_factor, crossover_rate):
         child.update_revenue()
         newtuple = (target, child)
         target_trial_associated_list.append(newtuple)
-        
+
     return target_trial_associated_list
-        
-              
+
+
 # - - - - - - - - - - - - - - - S E L E C T I O N - - - - - - - - - - - - - - - - - - - - - - - -
 def selection(overpopulation):
     #by Johannes
     """
     This function selects between the original target vector and a child generated by trial_generation.
-    
+
     INPUT:
     - A list of tuples, each containing a pair of original target vector and a child
-    
+
     OUTPUT:
     - new population that contains the fittest individuals
     """
@@ -246,59 +334,59 @@ def selection(overpopulation):
     m1p = problem.market(1).maxPrice
     m2p = problem.market(2).maxPrice
     m3p = problem.market(3).maxPrice
-                        
+
     for pair in overpopulation:
         breakargument = False
-        
+
         target = pair[0]
         child = pair[1]
-        
-        
+
+
         genecounter = 0
-        
+
         child_gene = []
-        
+
         for gene in child_gene:
-          
+
             if genecounter < 5:
                 if gene > upper_energy_bound:
                     new_gene = upper_energy_bound
                     child_gene.append(new_gene)
-                    
+
             if genecounter == 6:
                 if gene > m1p or gene < 0:
                     new_gene = m1p
                     child_gene.append(new_gene)
-                    
+
             if genecounter == 7:
                 if gene > m2p or gene < 0:
                     new_gene = m2p
                     child_gene.append(new_gene)
-                    
+
             if genecounter == 8:
                 if gene > m3p or gene < 0:
                     new_gene = m3p
                     child_gene.append(new_gene)
             genecounter += 1
             child.genome = child_gene
-            
-                
+
+
         if breakargument:
             newchild = initialise(1)
             child = newchild[0]
-        
-    
+
+
         target.update_revenue()
         child.update_revenue()
-        
+
         if target.revenue > child.revenue:
             new_population.append(target)
         else:
             new_population.append(child)
-        
+
     return new_population
-        
-        
+
+
 # - - - - - - - - - - - - - - - F I N D  B E S T  I N D I V I D U A L - - - - - - - - - - - - - - - - - - - - - -
 
 def find_best(population):
@@ -310,21 +398,21 @@ def find_best(population):
     OUTPUT:
     - An object of the type "individual" that has the highest revenue value
     """
-    
+
     best = rnd.choice(population)
     best.update_revenue()
-    
+
     for individual in population:
         individual.update_revenue()
-        
+
         if individual.revenue > best.revenue:
             best = individual
-            
+
     return best
-            
-            
-            
-# - - - - - - - - - - - - - - - HIGH LEVEL PROFIT MODEL - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+
+
+# - - - - - - - - - - - - - - - HIGH LEVEL PROFIT MODEL - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 """
     profit = revenue - totalCost
     revenue = soldQuantitiy * sellingPrice
@@ -338,45 +426,46 @@ def find_best(population):
     costPrice = what it costs us to produce the energy
 """
 def calculate_profit(individual):
+    #by Johannes , Yannic
     genes = individual
-    
+
     energy_produced = genes[:3]
     market_distribution = genes[3:6]
     price_distribution = genes[6:9]
-    
+
     plant1 = problem.powerplant(1)
     plant2 = problem.powerplant(2)
     plant3 = problem.powerplant(3)
-    
+
     market1 = problem.market(1)
     market2 = problem.market(2)
     market3 = problem.market(3)
-    
-    
+
+
     total_energy_produced = sum(energy_produced)
     total_energy_distributed = sum(market_distribution)
-    
+
     purchasing_cost = 0
     if total_energy_produced < total_energy_distributed:
         difference_in_production = total_energy_distributed - total_energy_produced
         purchasing_cost = difference_in_production * CostPrice
-    
+
     productioncosts = plantTypeCost(energy_produced[0],plant1)
     productioncosts += plantTypeCost(energy_produced[1],plant2)
     productioncosts += plantTypeCost(energy_produced[2],plant3)
-    
+
     cost = purchasing_cost + productioncosts
-    
+
     total_revenue = price_distribution[0]* min(market_distribution[0], demand(price_distribution[0],market1))
     total_revenue += price_distribution[1]* min(market_distribution[1], demand(price_distribution[1],market2))
     total_revenue += price_distribution[2]* min(market_distribution[2], demand(price_distribution[2],market3))
-    
+
     profit = total_revenue - cost
-    
+
     return profit
 
 
-    
+
 class problem():
     #by Marieke
     class powerplant():
@@ -385,34 +474,34 @@ class problem():
                 self.kwhPerPlants = 50000
                 self.costPerPlant = 10000
                 self.maxPlants = 100
-                
+
             if planttype == 2:
                 self.kwhPerPlants = 600000
                 self.costPerPlant = 80000
                 self.maxPlants = 50
-                
+
             if planttype == 3:
                 self.kwhPerPlants = 4000000
                 self.costPerPlant = 400000
                 self.maxPlants = 3
-            
+
     class market():
         def __init__(self, market):
             if market == 1:
                 self.maxPrice = 0.45
                 self.maxDemand = 2000000
-            
+
             if market == 2:
                 self.maxPrice = 0.25
                 self.maxDemand = 30000000
-                
+
             if market == 3:
                 self.maxPrice = 0.2
                 self.maxDemand = 20000000
 
 # - - - - - - - - - - - - - - - MARKET MODEL - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 def plantTypeCost(s, plant):
-    """ 
+    """
     calculates the cost we will have to build n plants of type p
 
     INPUT
@@ -440,46 +529,46 @@ def plantTypeCost(s, plant):
 
 def demand(sellingPrice, market):
     #by Marieke
-    
+
     """
     gives us the open demand of a market
-    
+
     INPUT
     - sellingPrice (the price at which we sell energy)
     - maxPrice (maximum price customers are willing to pay)
     - maxDemand (total demand of a market)
-    
+
     OUTPUT
-    - 
-    
+    -
+
     """
-    
+
     maxPrice = market.maxPrice
     maxDemand = market.maxDemand
-    
+
     #if the selling price is greater than what customers want to pay, return 0
     if (sellingPrice > maxPrice):
         return 0
-    
+
     if sellingPrice < 0:
         return 0
-    
+
     #if nothing is produced for market
-    if (sellingPrice <= 0):
+    if (sellingPrice == 0):
         return maxDemand
-    
+
     #else determine the demand based on the selling price
     demand = maxDemand - sellingPrice**2 * maxDemand / maxPrice**2
-    
+
     return demand
-        
-        
-        
-        
-        
+
+
+
+
+
 # - - - - - - - - - - - - - - - U S E R   I N P U T - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 def user_input():
-    #by Yannic(?)
+    #by Yannic
     """
     Output List with control Parameters: [crossoverRate,scalingFactor,populationSize]
     """
@@ -489,7 +578,9 @@ def user_input():
     scalingFactor = -1
     populationSize = -1
     costprice = -1
-    #output = [crossoverRate,scalingFactor,populationSize]
+    barChart = -1
+    graph = -1
+    #output = [crossoverRate,scalingFactor,populationSize,barChart,graph
     output = []
 
 
@@ -497,13 +588,17 @@ def user_input():
 
     if default == 0:
             #crossoverRate
-            output.append(0.5)
+            output.append(0.6)
             #scalingFactor
-            output.append(0.5)
+            output.append(0.2)
             #populationSize
-            output.append(20)
+            output.append(50)
             #costprice
             output.append(0.6)
+            #print bar chart
+            output.append(0)
+            #print graph
+            output.append(0)
     else:
         print("")
         #Crossover Rate Cr e [0,1]
@@ -538,11 +633,19 @@ def user_input():
                 costprice = float(input("Cost Price must be must be in [0,1[: "))
         output.append(costprice)
 
+        #BarChart [0]
+        if barChart == -1:
+            barChart = float(input("Do you want to print Genome [0]yes [else]no: "))
+        output.append(barChart)
+
+        #graph [0]
+        if graph == -1:
+            graph = float(input("Do you want to print Graph [0]yes [else]no "))
+        output.append(graph)
+
 
 
     return output
 
 
 __MAIN__()
-
-
