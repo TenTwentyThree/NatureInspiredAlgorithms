@@ -341,8 +341,8 @@ def calculate_profit(individual):
     genes = individual
     
     energy_produced = genes[:3]
-    market_distribution = genes[2:5]
-    price_distribution = genes[5:8]
+    market_distribution = genes[3:6]
+    price_distribution = genes[6:9]
     
     plant1 = problem.powerplant(1)
     plant2 = problem.powerplant(2)

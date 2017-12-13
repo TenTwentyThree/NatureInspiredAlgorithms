@@ -7,6 +7,7 @@ Created on Wed Dec 13 15:08:00 2017
 
 import random as rnd
 import numpy as np
+import math
 
 # - - - - - - - - - - - - - - - - - - - - - - - D E F I N I N G  C L A S S E S - - - - - - - - - - - - - - - - - - - - - - - - - -
 class individual():
@@ -68,11 +69,12 @@ class problem():
             if market == 3:
                 self.maxPrice = 0.2
                 self.maxDemand = 20000000
-
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 def init():
     global powerplant1
     global powerplant2
     global powerplant3
+    
     global max_power
     global max_demand
     
@@ -94,7 +96,7 @@ def init():
     powerplant3.kwhPerPlants * powerplant3.maxPlants )
     
     max_demand = (
-    market1.maxDemand + market2.maxDemand + market3.maxDemand)
+    market1.maxDemand + market2.maxDemand + market3.maxDemand )
     
     
     
@@ -106,7 +108,6 @@ def initalize_population(agentcount):
     population = []
     while agentcount != 0:
         
-        new_gene = [e1,e2,e3,s1,s2,s3,p1,p2,p3]
         e1 = rnd.randint(0,max_power)
         e2 = rnd.randint(0,max_power)
         e3 = rnd.randint(0,max_power)
@@ -123,10 +124,16 @@ def initalize_population(agentcount):
         new_individual.update_profit
         
         population.append(new_individual)
+    return population
         
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+"""
+donor_selection -> differential_mutation -> genetic_crossover - > gene_edit - > selection
+"""
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         
-        
-def donor_selection(population):
+def donor_selection(population, scaling_factor):
     new_population = []
     for individual in population:
         copy_population = population
@@ -134,20 +141,99 @@ def donor_selection(population):
         base_vector = rnd.choice(copy_population)
         copy_population.remove(base_vector)
         
-        donor_vector_1 = rnd.choice(copy_population)
-        copy_population.remove(donor_vector_1)
+        x1 = rnd.choice(copy_population)
+        copy_population.remove(x1)
         
-        donor_vector_2 = rnd.choice(copy_population)
+        x2 = rnd.choice(copy_population)
         
-        survivor = differential_mutation(individual, base_vector, donor_vector_1, donor_vector_2, scaling_factor)
+        survivor = differential_mutation(individual, base_vector, x1, x2, scaling_factor)
         new_population.append(survivor)
     return new_population
 
-def differential_mutation(target, base_vector, donor_vector_1, donor_vector_2, scaling_factor):
+def differential_mutation(target, base_vector, x1_vector, x2_vector, scaling_factor):
     
-    distance_vector = np.subtract(donor_vector_1.genome,donor_vector_2.genome)
+    target_genes = target.genome
+    
+    distance_vector = np.subtract(x1_vector.genome, x2_vector.genome)
     distance_vector = distance_vector * scaling_factor
     
+    donor_genome = np.add(base_vector.genome,distance_vector)
+    
+    gene_edit(target)
+    
+    child = genetic_crossover(target_genes, donor_genome)
+    
+    gene_edit(child)
+    
+    fighting_pit = selection(target,child)
+    return fighting_pit
+    
+    
+    
+def genetic_crossover(target_genes, donor_genes):
+    pointer = 0
+    new_genome = []
+    
+    while pointer != len(target_genes) - 1:
+        
+        cross = rnd.uniform(0,1)
+        
+        if cross > crossoverRate:
+            new_genome.append(target_genes[pointer])
+        else:
+            new_genome.append(donor_genes[pointer])
+        pointer += 1
+    child = individual(new_genome)
+    child.update_profit()
+    return child
+            
+            
+def gene_edit(individual):
+    """
+    This function searchs for genes that project outside of the boundaries of the search space and returns them into the boundaries
+    """
+    edited_genes = []
+    
+    production = individual.genome[:3]
+    distribution = individual.genome[2:5]
+    
+    price1 = individual.genome[6]
+    price2 = individual.genome[7]
+    price3 = individual.genome[8]
+    
+    for product in production:
+        if production > max_power or production < 0:
+            edited_genes.append(max_power)
+        else:
+            edited_genes.append(product)
+            
+    for distributer in distribution:
+        if distributer > max_demand or distributer < 0:
+            edited_genes.append(max_demand)
+        else:
+            edited_genes.append(distributer)
+    
+    if price1 > market1.maxPrice or price1 < 0:
+        edited_genes.append(market1.maxPrice)
+    else:
+        edited_genes.append(price1)
+        
+    if price1 > market2.maxPrice or price2 < 0:
+        edited_genes.append(market2.maxPrice)
+    else:
+        edited_genes.append(price2)
+        
+    if price3 > market3.maxPrice or price3 < 0:
+        edited_genes.append(market3.maxPrice)
+    else:
+        edited_genes.append(price3)
+    
+    individual.genome = edited_genes
+    individual.update_profit()
+    return individual
+
+    
+
     
 def selection(parent, child):
     
@@ -159,9 +245,115 @@ def selection(parent, child):
     else:
         return child
 
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+def find_best(population):
+    #by Johannes
+    """
+    This function simply iterates through a population and returns the fittest individual
+    INPUT:
+    - A list of individuals, the population
+    OUTPUT:
+    - An object of the type "individual" that has the highest revenue value
+    """
+    
+    best = rnd.choice(population)
+    best.update_revenue()
+    
+    for individual in population:
+        individual.update_revenue()
+        
+        if individual.revenue > best.revenue:
+            best = individual
+            
+    return best
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+def evaluate_self(individual):
+    
+    production_genome = individual.genome[:3]
+    distribution_genome = individual.genome[3:6]
+    price_genome = individual.genome[6:9]
+    
+    
+    production_cost = evaluate_production_costs(production_genome)
+    
+    market_demand_1 = demand(price_genome[0], market1)
+    market_demand_2 = demand(price_genome[1], market2)
+    market_demand_3 = demand(price_genome[2], market3)
+    
 
+def evaluate_production_costs(plant_genome):
+    cost_plant_1 = plantTypeCost(plant_genome[0],powerplant1)
+    cost_plant_2 = plantTypeCost(plant_genome[1],powerplant2)
+    cost_plant_3 = plantTypeCost(plant_genome[2],powerplant3)
+    
+    total_production_costs = cost_plant_1 + cost_plant_2 + cost_plant_3
+    return total_production_costs
+
+def plantTypeCost(s, plant):
+    """ 
+    calculates the cost we will have to build n plants of type p
+    
+    INPUT
+    - s (desired amount of energy)
+    - planttype
+    
+    """
+    kwhPerPlant = plant.kwhPerPlants
+    maxPlants =  plant.maxPlants
+    costPerPlant = plant.costPerPlant
+    # if s non-positive, return 0
+    if(s <= 0):
+        return 0
+    
+    #if x larger than possible generation, return infinite
+    psblgen = kwhPerPlant * maxPlants
+    if(s > psblgen):
+        return float('inf')
+    
+    #otherwise find amount of plants needed to generate s
+    plantsNeeded = math.ceil(s / kwhPerPlant)
+    
+    #return cost (amount of plants * cost per plant)
+    return plantsNeeded * costPerPlant
 
     
+
+def demand(sellingPrice, market):
+    #by Marieke
+    
+    """
+    gives us the open demand of a market
+    
+    INPUT
+    - sellingPrice (the price at which we sell energy)
+    - maxPrice (maximum price customers are willing to pay)
+    - maxDemand (total demand of a market)
+    
+    OUTPUT
+    - 
+    
+    """
+    
+    maxPrice = market.maxPrice
+    maxDemand = market.maxDemand
+    
+    #if the selling price is greater than what customers want to pay, return 0
+    if (sellingPrice > maxPrice):
+        return 0
+    
+    if sellingPrice < 0:
+        return 0
+    
+    #if nothing is produced for market
+    if (sellingPrice <= 0):
+        return maxDemand
+    
+    #else determine the demand based on the selling price
+    demand = maxDemand - sellingPrice**2 * maxDemand / maxPrice**2
+    
+    return demand
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
+
 def user_input():
     #by Yannic(?)
     """
@@ -229,6 +421,7 @@ def user_input():
 def __MAIN__():
     init()
     userinput = user_input()
+    global crossoverRate
     
     crossoverRate = userinput[0]
     scalingFactor = userinput[1]
