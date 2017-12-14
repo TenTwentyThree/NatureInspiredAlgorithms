@@ -565,10 +565,11 @@ def demand(sellingPrice, market):
     if (sellingPrice > maxPrice):
         return 0
 
+    #if selling price is below zero, return 0 (ignore negative values)
     if sellingPrice < 0:
         return 0
 
-    #if nothing is produced for market
+    #if we give the energy for free, return maxDemand
     if (sellingPrice == 0):
         return maxDemand
 
