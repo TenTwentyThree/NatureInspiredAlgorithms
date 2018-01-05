@@ -15,7 +15,7 @@ class individual():
         self.genome = genome
         self.profit = 0
     def update_profit(self):
-        "something"
+        self.profit = evaluate_self(self)
 
 class problem():
     #by Marieke
@@ -87,8 +87,8 @@ def init():
     powerplant3 = problem.powerplant(3)
     
     market1 = problem.market(1)
-    market2 = problem.market(1)
-    market3 = problem.market(1)
+    market2 = problem.market(2)
+    market3 = problem.market(3)
     
     max_power = (
     powerplant1.kwhPerPlants * powerplant1.maxPlants +
@@ -108,12 +108,14 @@ def initalize_population(agentcount):
     population = []
     while agentcount != 0:
         
-        e1 = rnd.randint(0,max_power)
-        e2 = rnd.randint(0,max_power)
-        e3 = rnd.randint(0,max_power)
-        s1 = rnd.randint(0,max_demand)
-        s2 = rnd.randint(0,max_demand)
-        s3 = rnd.randint(0,max_demand)
+        e1 = rnd.randint(0,(powerplant1.kwhPerPlants * powerplant1.maxPlants))
+        e2 = rnd.randint(0,(powerplant2.kwhPerPlants * powerplant2.maxPlants))
+        e3 = rnd.randint(0,(powerplant3.kwhPerPlants * powerplant3.maxPlants))
+        
+        s1 = rnd.randint(0,market1.maxDemand)
+        s2 = rnd.randint(0,market2.maxDemand)
+        s3 = rnd.randint(0,market3.maxDemand)
+        
         p1 = rnd.uniform(0,market1.maxPrice)
         p2 = rnd.uniform(0,market2.maxPrice)
         p3 = rnd.uniform(0,market3.maxPrice)
@@ -124,6 +126,7 @@ def initalize_population(agentcount):
         new_individual.update_profit
         
         population.append(new_individual)
+        agentcount -= 1
     return population
         
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -136,7 +139,7 @@ donor_selection -> differential_mutation -> genetic_crossover - > gene_edit - > 
 def donor_selection(population, scaling_factor):
     new_population = []
     for individual in population:
-        copy_population = population
+        copy_population = list(population)
         
         base_vector = rnd.choice(copy_population)
         copy_population.remove(base_vector)
@@ -166,6 +169,7 @@ def differential_mutation(target, base_vector, x1_vector, x2_vector, scaling_fac
     gene_edit(child)
     
     fighting_pit = selection(target,child)
+    gene_edit(fighting_pit)
     return fighting_pit
     
     
@@ -174,7 +178,7 @@ def genetic_crossover(target_genes, donor_genes):
     pointer = 0
     new_genome = []
     
-    while pointer != len(target_genes) - 1:
+    while pointer != len(target_genes):
         
         cross = rnd.uniform(0,1)
         
@@ -195,30 +199,49 @@ def gene_edit(individual):
     edited_genes = []
     
     production = individual.genome[:3]
-    distribution = individual.genome[2:5]
+    
+    distributer1 = individual.genome[3]
+    distributer2 = individual.genome[4]
+    distributer3 = individual.genome[5]
     
     price1 = individual.genome[6]
     price2 = individual.genome[7]
     price3 = individual.genome[8]
     
     for product in production:
-        if production > max_power or production < 0:
+        if product > max_power or product < 0:
             edited_genes.append(max_power)
         else:
             edited_genes.append(product)
-            
-    for distributer in distribution:
-        if distributer > max_demand or distributer < 0:
-            edited_genes.append(max_demand)
-        else:
-            edited_genes.append(distributer)
+    
+    
+    if distributer1 > market1.maxDemand:
+        edited_genes.append(rnd.uniform(0,market1.maxDemand))
+    elif distributer1 < 0:
+        edited_genes.append(0)
+    else:
+        edited_genes.append(distributer1)
+        
+    if distributer2 > market2.maxDemand:
+        edited_genes.append(rnd.uniform(0,market2.maxDemand))
+    elif distributer2 < 0:
+        edited_genes.append(0)
+    else:
+        edited_genes.append(distributer2)
+        
+    if distributer3 > market3.maxDemand:
+        edited_genes.append(rnd.uniform(0,market3.maxDemand))
+    elif distributer3 < 0:
+        edited_genes.append(0)
+    else:
+        edited_genes.append(distributer3)
     
     if price1 > market1.maxPrice or price1 < 0:
         edited_genes.append(market1.maxPrice)
     else:
         edited_genes.append(price1)
         
-    if price1 > market2.maxPrice or price2 < 0:
+    if price2 > market2.maxPrice or price2 < 0:
         edited_genes.append(market2.maxPrice)
     else:
         edited_genes.append(price2)
@@ -238,7 +261,7 @@ def gene_edit(individual):
 def selection(parent, child):
     
     parent.update_profit()
-    child.update_proft()
+    child.update_profit()
     
     if parent.profit >= child.profit:
         return parent
@@ -257,12 +280,12 @@ def find_best(population):
     """
     
     best = rnd.choice(population)
-    best.update_revenue()
+    best.update_profit()
     
     for individual in population:
-        individual.update_revenue()
+        individual.update_profit()
         
-        if individual.revenue > best.revenue:
+        if individual.profit > best.profit:
             best = individual
             
     return best
@@ -280,7 +303,39 @@ def evaluate_self(individual):
     market_demand_2 = demand(price_genome[1], market2)
     market_demand_3 = demand(price_genome[2], market3)
     
+    bias = 0
+    
+    total_distribution = distribution_genome[0] + distribution_genome[1] + distribution_genome[2]
+    
 
+        
+    
+    bought_cost = (
+    purchasing_cost(distribution_genome[0],market_demand_1) +
+    purchasing_cost(distribution_genome[1],market_demand_2) +
+    purchasing_cost(distribution_genome[2],market_demand_3) * costprice)
+    
+    total_costs = production_cost + bought_cost + bias
+    
+    revenue = (
+    min(distribution_genome[0],market_demand_1) * price_genome[0] +
+    min(distribution_genome[1],market_demand_2) * price_genome[1] +
+    min(distribution_genome[2],market_demand_3) * price_genome[2] )
+    
+    profit = revenue - total_costs
+    return profit
+            
+    
+    
+
+
+
+def purchasing_cost(distribution, demand):
+    if distribution >= demand:
+        return 0
+    else:
+        cost = (demand - distribution)
+        return cost
 def evaluate_production_costs(plant_genome):
     cost_plant_1 = plantTypeCost(plant_genome[0],powerplant1)
     cost_plant_2 = plantTypeCost(plant_genome[1],powerplant2)
@@ -409,9 +464,9 @@ def user_input():
         #Scaling factor F e (0,1)
         while (costprice <= 0) or (costprice > 1):
             if costprice == -1:
-                costprice = float(input("Please specify Cost Price in [0,1[: "))
+                costprice = float(input("Please specify Cost Price in [0,1]: "))
             else:
-                costprice = float(input("Cost Price must be must be in [0,1[: "))
+                costprice = float(input("Cost Price must be must be in [0,1]: "))
         output.append(costprice)
 
 
@@ -421,14 +476,55 @@ def user_input():
 def __MAIN__():
     init()
     userinput = user_input()
+    global costprice
     global crossoverRate
     
     crossoverRate = userinput[0]
     scalingFactor = userinput[1]
-    populationSize = userinput[2]
-    CostPrice = userinput[3]
+    agentcount = userinput[2]
+    costprice = userinput[3] 
+    
+    gencount = 500
     
     pop = initalize_population(agentcount)
-    newpop = donor_selection(pop,scalingFactor)
+    current_best = rnd.choice(pop)
+    while gencount != 0:
+        pop = donor_selection(pop,scalingFactor)
+        gen_best = find_best(pop)
+        if gen_best.profit > current_best.profit:
+            current_best = gen_best
+            print("Found new individual with fitness: ",current_best.profit)
+        else:
+            gencount -= 1
+            
+            
+            
+            
+    print("some Data:")
+    print("\n")
+    print("total energy produced: ",current_best.genome[0] + current_best.genome[1] + current_best.genome[2] ,"units of energy")
+    print("\n")
+    print("Plant 1 produced ",gen_best.genome[0],"units of energy")
+    print("Plant 2 produced ",gen_best.genome[1],"units of energy")
+    print("Plant 3 produced ",gen_best.genome[2],"units of energy")
+    print("\n")
+    print("total energy distributed: ",gen_best.genome[3] + gen_best.genome[4] + gen_best.genome[5] ,"units of energy")
+    print("\n")
+    print("Energy bought:",(gen_best.genome[3] + gen_best.genome[4] + gen_best.genome[5]) - (current_best.genome[0] + current_best.genome[1] + current_best.genome[2]))
+    print("\n")
+    print("Market 1 received ",gen_best.genome[3],"units of energy for a price of ",gen_best.genome[6])
+    print("Market 2 received ",gen_best.genome[4],"units of energy for a price of ",gen_best.genome[7])
+    print("Market 3 received ",gen_best.genome[5],"units of energy for a price of ",gen_best.genome[8])
+    print("\n")
+    print("\n")
+    print("Best value attained: ",int(round(gen_best.profit)))
+    print("")
+    print("Crossover Rate: ",crossoverRate)
+    print("Scaling Factor: ",scalingFactor)
+    print("Population Size: ",agentcount)
+    print("Cost Price: ",costprice)
+    print("")
+    print("####----------------------------------------------------------###")
+    
     
 __MAIN__()

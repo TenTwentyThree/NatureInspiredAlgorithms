@@ -101,6 +101,8 @@ def __MAIN__():
         trial = trial_generation(target_and_donors_list, scalingFactor, crossoverRate)
         
         population = selection(trial)
+        for individual in population:
+            cleanse(individual)
         
         generations_best = find_best(population)
         
@@ -229,8 +231,18 @@ def trial_generation(target_and_donors, scaling_factor, crossover_rate):
         
     return target_trial_associated_list
         
-              
+# - - - - - - - - - - - - - - - B O U N D I N G - - - - - - - - - - - - - - - - - - - - - - - -
+def cleanse(individual):
+    newgenes = []
+    genes = individual.genome
+    for gene in genes:
+        if gene < 0:
+            newgenes.append(- gene)
+        else:
+            newgenes.append(gene)
+    individual.genome = newgenes
 # - - - - - - - - - - - - - - - S E L E C T I O N - - - - - - - - - - - - - - - - - - - - - - - -
+
 def selection(overpopulation):
     #by Johannes
     """
@@ -359,7 +371,7 @@ def calculate_profit(individual):
     purchasing_cost = 0
     if total_energy_produced < total_energy_distributed:
         difference_in_production = total_energy_distributed - total_energy_produced
-        purchasing_cost = difference_in_production * CostPrice
+        purchasing_cost = difference_in_production *(1 + CostPrice)
     
     productioncosts = plantTypeCost(energy_produced[0],plant1)
     productioncosts += plantTypeCost(energy_produced[1],plant2)
