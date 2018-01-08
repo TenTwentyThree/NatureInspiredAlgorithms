@@ -363,7 +363,6 @@ def selection(overpopulation):
         child_gene = []
 
         for gene in original_genes:
-
             if genecounter <= 5:
                 if gene > upper_energy_bound or gene < 0:
                     new_gene = random.randint(0,upper_energy_bound)
