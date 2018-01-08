@@ -70,7 +70,7 @@ def initialise(agentnmbr):
 
 # - - - - - - - - - - - - - - - M A I N - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 def __MAIN__():
-   #by Johannes, Yannic, Till, Saran, Marieke
+    #by Johannes, Yannic, Till, Saran, Marieke
 
     # 1. userinput of type List: [crossoverRate,scalingFactor,populationSize]
     userinput = user_input()
@@ -363,6 +363,7 @@ def selection(overpopulation):
         child_gene = []
 
         for gene in original_genes:
+
             if genecounter <= 5:
                 if gene > upper_energy_bound or gene < 0:
                     new_gene = random.uniform(0,upper_energy_bound)
