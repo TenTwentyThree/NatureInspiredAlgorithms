@@ -509,17 +509,31 @@ class problem():
 
     class market():
         def __init__(self, market):
-            if market == 1:
-                self.maxPrice = 0.45
-                self.maxDemand = 2000000
-
-            if market == 2:
-                self.maxPrice = 0.25
-                self.maxDemand = 30000000
-
-            if market == 3:
-                self.maxPrice = 0.2
-                self.maxDemand = 20000000
+            if problemType == 1 or problemType == 2:
+                if market == 1:
+                    self.maxPrice = 0.45
+                    self.maxDemand = 2000000
+    
+                if market == 2:
+                    self.maxPrice = 0.25
+                    self.maxDemand = 30000000
+    
+                if market == 3:
+                    self.maxPrice = 0.2
+                    self.maxDemand = 20000000
+                           
+            if problemType == 3: 
+                if market == 1:
+                    self.maxPrice = 0.5
+                    self.maxDemand = 1000000
+    
+                if market == 2:
+                    self.maxPrice = 0.3
+                    self.maxDemand = 5000000
+    
+                if market == 3:
+                    self.maxPrice = 0.1
+                    self.maxDemand = 5000000
 
 # - - - - - - - - - - - - - - - MARKET MODEL - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 def plantTypeCost(s, plant):
@@ -603,21 +617,31 @@ def user_input():
     costprice = -1
     barChart = -1
     graph = -1
+    
+    global problemType
+    problemType = -1
     #output = [crossoverRate,scalingFactor,populationSize,barChart,graph
     output = []
-
+    
+    if problemType == -1:
+        problemType = int(input("Please specify Problem Type [1,2,3]: "))
+    else:
+        problemType = int(input("Population Size must be in [1,2,3]: "))
 
     default = int(input("Do yo want to use default values? [0]Yes [else]No: "))
 
     if default == 0:
             #crossoverRate
-            output.append(0.6)
+            output.append(0.5)
             #scalingFactor
-            output.append(0.2)
+            output.append(0.32)
             #populationSize
             output.append(50)
-            #costprice
-            output.append(0.6)
+            #Costprice
+            if problemType == 2:
+                output.append(0.1)
+            else:
+                output.append(0.6)
             #print bar chart
             output.append(0)
             #print graph
@@ -648,13 +672,11 @@ def user_input():
             else:
                 populationSize = int(input("Population Size must be bigger than 4: "))
         output.append(populationSize)
-        #Scaling factor F e (0,1)
-        while (costprice <= 0) or (costprice > 1):
-            if costprice == -1:
-                costprice = float(input("Please specify Cost Price in [0,1[: "))
-            else:
-                costprice = float(input("Cost Price must be must be in [0,1[: "))
-        output.append(costprice)
+        #Costprice
+        if problemType == 2:
+            output.append(0.1)
+        else:
+            output.append(0.6)
 
         #BarChart [0]
         if barChart == -1:
