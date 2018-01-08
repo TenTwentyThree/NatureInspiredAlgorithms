@@ -365,28 +365,28 @@ def selection(overpopulation):
         for gene in original_genes:
             if genecounter <= 5:
                 if gene > upper_energy_bound or gene < 0:
-                    new_gene = random.randint(0,upper_energy_bound)
+                    new_gene = random.uniform(0,upper_energy_bound)
                     child_gene.append(new_gene)
                 else:
                     child_gene.append(gene)
 
             if genecounter == 6:
                 if gene > m1p or gene < 0:
-                    new_gene = random.randint(0,m1p)
+                    new_gene = random.uniform(0,m1p)
                     child_gene.append(new_gene)
                 else:
                     child_gene.append(gene)
 
             if genecounter == 7:
                 if gene > m2p or gene < 0:
-                    new_gene = new_gene = random.randint(0,m2p)
+                    new_gene = new_gene = random.uniform(0,m2p)
                     child_gene.append(new_gene)
                 else:
                     child_gene.append(gene)
 
             if genecounter == 8:
                 if gene > m3p or gene < 0:
-                    new_gene = new_gene = random.randint(0,m3p)
+                    new_gene = new_gene = random.uniform(0,m3p)
                     child_gene.append(new_gene)
 
                 else:
