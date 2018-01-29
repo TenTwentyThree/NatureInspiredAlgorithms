@@ -47,7 +47,7 @@ For example, if there are 300 packages, we can get done without truck d so we do
 
 
 ###
-def truck_ration():
+def trucks_used():
 	if total_packages > 409:
 		print("too many packages")
 		
