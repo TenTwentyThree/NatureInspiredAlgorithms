@@ -52,7 +52,7 @@ def trucks_used():
 		print("too many packages")
 		
 	if total_packages <= 180:
-		only use truck a
+		only use truck a			# in other words, send ant colonies representing truck a
 		
 	if total_packages <= 313:
 		while packages_delivered < 180:
