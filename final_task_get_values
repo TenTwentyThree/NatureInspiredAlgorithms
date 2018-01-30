@@ -1,0 +1,33 @@
+class get_values():
+    '''
+    stores all the parameters that are not changed during the run of the algorithm, that they do not have to be passed
+    on and on.
+    actually only makes sense if you have multiple programs that you want to run, but I wanted to try it
+    '''
+    def __init__(self):
+        self.alpha = 1
+        self.beta = 1
+        self.capacity_s = 10
+        self.capacity_m = 20
+        self.capacity_l = 30
+        self.capacity_xl = 50
+        self.depot_location = (0, 0)
+        self.antnbr = 11
+        self.evap_const = 0.4
+        self.evaporation_coefficient = 0.05
+        self.p_const = 0.5
+        self.iteration = 1
+        self.demand = 500
+
+        # hyper_parameters
+        self.nbr_of_colonies = 10
+        self.nbr_of_iteration = 20
+        self.map = self.read_in()
+
+    def read_in(self):
+        '''
+        reads in the map we have
+        :return: map of all notes
+        '''
+
+
