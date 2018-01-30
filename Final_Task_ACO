@@ -1,24 +1,16 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Thu Jan 25 13:45:02 2018
-
-@author: Till
-"""
-
-"""
-Created on Fri Nov 29 12:33:10 2017
-@author: Yannic Jänike
-"""
-
 import numpy as np
 import random
 import time
+from values import get_values
+values = get_values()
 
+global tspmap
+tspmap = map
 
 class antColony():
     class ant():
 
-        def __init__(self,init_location,possible_locations,pheromone_map,alpha,beta,first_pass,max_load,demand):
+        def __init__(self,possible_locations,pheromone_map, size = 's'):
             """
             Initialite an ant with,
 
@@ -29,66 +21,81 @@ class antColony():
             Alpha(float) : determines impact of the pheromone_map in the path selection
             Beta(float ) : determines impact of the distance between node i and i+1 in the path selection
             first_pass(boolean) : determines if we are in the first iteration or not
+            max_load : maximum capacity of truck
+            demand : array demand of all nodes
+            depot : at the time tuple of coordinates of the depot. default is (0,0)
             """
-            self.init_location = init_location
+            self.init_location = values.depot_location
             self.possible_locations = possible_locations
             self.path = []
             self.path_cost = 0
-            self.current_location = init_location
+            self.current_location = self.init_location
             self.pheromone_map = pheromone_map
-            self.alpha = alpha
-            self.beta = beta
+            self.alpha = values.alpha
+            self.beta = values.beta
             self.first_pass = True
-            self.max_load = load
+            if size == 's':
+                self.max_load = values.capacity_s
+            if size == 'm':
+                self.max_load = values.capacity_m
+            if size == 'l':
+                self.max_load = values.capacity_l
+            if size == 'xl':
+                self.max_load = values.capacity_xl
             self.delivered = 0
-            self.demand = demand
+            self.demand = values.demand
+            self.depot = values.depot_location
+            self.update_path(self.init_location)
 
-            self.update_path(init_location)
 
-#---------------------------------------------SOLUTION CONSTRUCTION--------------------------------------#
+        # ---------------------------------------------SOLUTION CONSTRUCTION--------------------------------------#
         def create_path(self):
             """
             Create a path for the ant self
             """
-            #as long as the list of Possible locations is not empty, we search for the next node
-                while self.possible_locations:
-                    if self.max_load == self.delivered:
-                        break
-                    else:
-                        next = self.pick_path()
-                        self.traverse(self.current_location,next)
+            # as long as the list of Possible locations is not empty, we search for the next node
+            # when delivered all possible packages, we return to the depot
+            while self.possible_locations:
+                if self.max_load == self.delivered:
+                    next = self.depot
+                    self.traverse(self.current_location, next)
+                    break
+                else:
+                    next = self.pick_path()
+                    self.traverse(self.current_location, next)
+                    self.delivered += self.demand[next]
 
         def pick_path(self):
             """
             Pick a path from self.possible_locations and return it
             """
-            #if we are in the first iteration, just take a random path
+            # if we are in the first iteration, just take a random path
             if self.first_pass:
                 self.first_pass = False
                 return random.choice(self.possible_locations)
 
 
-            #else compute the path by the ACO edge selection Heuristic
-            #(pheromoneamount^alpha * (1/distance)^beta)/sum(all alowed moves)
-            #attractiveness is the list of numerators computed by the numerator of the formula above
+            # else compute the path by the ACO edge selection Heuristic
+            # (pheromoneamount^alpha * (1/distance)^beta)/sum(all alowed moves)
+            # attractiveness is the list of numerators computed by the numerator of the formula above
             attractiveness = []
-            #denominator has to be computed
+            # denominator has to be computed
             denominator  = 0.0
 
-            #for every location in the possible location, compute th likeliehood
+            # for every location in the possible location, compute th likeliehood
             for possbible_next_location in self.possible_locations:
-                #safe the values for the computation
+                # safe the values for the computation
                 pheromone_amount = float(self.pheromone_map[self.current_location][possbible_next_location])
                 distance = float(tspmap[self.current_location][possbible_next_location])
 
-                #if (self.alpha == 0) and (self.beta == 0):
-                #attractiveness.append(pheromone_amount*(1/distance))
-                #append the numerator list 'attractiveness' with the numerator of the likelyhood
+                # if (self.alpha == 0) and (self.beta == 0):
+                # attractiveness.append(pheromone_amount*(1/distance))
+                # append the numerator list 'attractiveness' with the numerator of the likelyhood
                 attractiveness.append(pow(pheromone_amount, self.alpha)*pow(1/distance, self.beta))
-            #Compute the denominator by adding up all possible attractivnesses
+            # Compute the denominator by adding up all possible attractivnesses
             denominator = float(sum(attractiveness))
 
-            #we have to avoid zero devisions, so we compute the smallest number not zero, if the denominator is 0
+            # we have to avoid zero devisions, so we compute the smallest number not zero, if the denominator is 0
             if denominator == 0.0:
                 def next_up(x):
                     import math
@@ -113,7 +120,7 @@ class antColony():
                     attractiveness[i] = next_up(attractiveness[i])
                 denominator = next_up(denominator)
 
-            #fill the path Probability list with the computed likeliehoods
+            # fill the path Probability list with the computed likeliehoods
             pathProbabilities = []
             for i in range(len(self.possible_locations)):
                 if denominator != 0.0:
@@ -121,7 +128,7 @@ class antColony():
                 elif denominator == 0.0:
                     pathProbabilities.append(0)
 
-            #Sample the next path from the probabilities
+            # Sample the next path from the probabilities
             toss = random.random()
             cummulative = 0
 
@@ -131,12 +138,11 @@ class antColony():
                     return next_city
                 cummulative += pathProbabilities[i]
 
+            # next city is the city with the highest probability - Old solution
+            # next_city = self.possible_locations[pathProbabilities.index(max(pathProbabilities))]
 
-            #next city is the city with the highest probability - Old solution
-            #next_city = self.possible_locations[pathProbabilities.index(max(pathProbabilities))]
 
-
-#---------------------------------------------SOLUTION CONSTRUCTION Ends--------------------------------------#
+        # ---------------------------------------------SOLUTION CONSTRUCTION Ends--------------------------------------#
         def traverse(self,oldCity,newCity):
             """
             travel from the old node to the new node and update the ant parameters
@@ -146,8 +152,6 @@ class antColony():
             self.update_path(newCity)
             self.update_pathCost(oldCity,newCity)
             self.current_location = newCity
-            
-
 
         def update_path(self,newCity):
             """
@@ -162,7 +166,7 @@ class antColony():
             """
             self.path_cost += tspmap[oldCity][newCity]
 
-    def __init__(self, start, ant_count, alpha, beta,  pheromone_evaporation_coefficient, pheromone_constant, iterations):
+    def __init__(self, size = 's'):
         """
         initialize an ant Colony
         start(int) = the starting position of the
@@ -179,71 +183,24 @@ class antColony():
         # Matrix of pheromone amount in iteration
         self.pheromone_map_iteration = self.init_pheromone_map(len(tspmap))
 
-        #start node is set to city 0
-        if start is None:
-            self.start = 0
-        else:
-            self.start = start
+        self.start = values.depot_location
+        self.ant_count = values.antnbr
+        self.alpha = values.alpha
+        self.beta = values.beta
+        self.pheromone_evaporation_coefficient = values.evaporation_coefficient
+        self.pheromone_constant = values.p_const
+        self.iterations = values.iteration
+        self.size = size
 
-
-        #ant_count
-        if type(ant_count) is not int:
-            raise TypeError("ant_count must be int")
-        if ant_count < 1:
-            raise ValueError("ant_count must be >= 1")
-
-        self.ant_count = ant_count
-
-
-        #alpha
-        if (type(alpha) is not int) and type(alpha) is not float:
-            raise TypeError("alpha must be int or float")
-
-        if alpha < 0:
-            raise ValueError("alpha must be >= 0")
-
-        self.alpha = float(alpha)
-
-        #beta
-        if (type(beta) is not int) and type(beta) is not float:
-            raise TypeError("beta must be int or float")
-
-        if beta < 0:
-            raise ValueError("beta must be >= 0")
-
-        self.beta = float(beta)
-
-        #pheromone_evaporation_coefficient
-        if (type(pheromone_evaporation_coefficient) is not int) and type(pheromone_evaporation_coefficient) is not float:
-            raise TypeError("pheromone_evaporation_coefficient must be int or float")
-
-        self.pheromone_evaporation_coefficient = float(pheromone_evaporation_coefficient)
-
-        #pheromone_constant
-        if (type(pheromone_constant) is not int) and type(pheromone_constant) is not float:
-            raise TypeError("pheromone_constant must be int or float")
-
-        self.pheromone_constant = float(pheromone_constant)
-
-        #iterations
-        if (type(iterations) is not int):
-            raise TypeError("iterations must be int")
-
-        if iterations < 0:
-            raise ValueError("iterations must be >= 0")
-
-        self.iterations = iterations
-
-
-        #other initial variables
+        # other initial variables
         self.first_pass = True
-        #add ants to the colony
-        self.colony = self.init_ants(self.start)
-        #sbest cost we have seen so far
+        # add ants to the colony
+        self.colony = self.init_ants()
+        # sbest cost we have seen so far
         self.shortest_distance = None
-        #shortest path we have seen so far
+        # shortest path we have seen so far
         self.shortest_path_seen = None
-        #best ant in the iteration
+        # best ant in the iteration
         self.shortest_ant_in_iteration = None
         self.FirsAnt = True
 
@@ -265,20 +222,19 @@ class antColony():
             p_map.append([float(value) for x in range(size)])
         return p_map
 
-    def init_ants(self,start):
+    def init_ants(self):
         """
         Create ants, if it is first called, else we just 'reset' the ants with the initial values
         """
-        #If we are in the first iteration, initialize ants
+        # If we are in the first iteration, initialize ants
         if self.first_pass:
-            return [self.ant(start, self.possible_locations(), self.pheromone_map,
-                    self.alpha, self.beta, first_pass=True) for _ in range(self.ant_count)]
-        #else reset every ant in the colony
+            return [self.ant(self.possible_locations(), self.pheromone_map, self.size) for _ in range(self.ant_count)]
+        # else reset every ant in the colony
         for ant in self.colony:
-            ant.__init__(start,self.possible_locations(),self.pheromone_map,self.alpha,self.beta, self.first_pass)
+            ant.__init__(self.possible_locations(), self.pheromone_map, self.size)
 
 
-#---------------------------------- EVAPORATION and INTENSIFICATION--------------------------------#
+    # ---------------------------------- EVAPORATION and INTENSIFICATION--------------------------------#
     def update_pheromone_map(self):
         """
         update the pheromone_map according to the formula
@@ -287,16 +243,16 @@ class antColony():
 
         pheromone_factor = 1 - self.pheromone_evaporation_coefficient
 
-        #EVAPORATION update every entry in the pheromone_map
+        # EVAPORATION update every entry in the pheromone_map
         for i in range(len(self.pheromone_map)):
             for j in range(len(self.pheromone_map)):
                 if i != j:
                     self.pheromone_map[i][j] = self.pheromone_map[i][j] * pheromone_factor
-                #if i=j we set the value to zero, because we dont want
+                # if i=j we set the value to zero, because we dont want
                 else:
                     self.pheromone_map[i][j] = 0
-        #Intensification
-                #add the new pheromone values from the current iteration to the old pheromone_map
+                # Intensification
+                # add the new pheromone values from the current iteration to the old pheromone_map
                 self.pheromone_map[i][j] += self.pheromone_map_iteration[i][j]
 
     def update_pheromone_map_iteration(self,ant):
@@ -307,17 +263,18 @@ class antColony():
         """
         path = ant.path
 
-        #iterate through the path of the ant and update the pheromone_map_iteration at each respective edge the ant has traveled
+        # iterate through the path of the ant and update the pheromone_map_iteration at each
+        # respective edge the ant has traveled
         for i in range(len(path)-1):
             current_pheromone_value = float(self.pheromone_map_iteration[path[i]][path[i + 1]])
 
             new_pheromone_amount = self.pheromone_constant/ant.path_cost
 
-            #because the map is symetrical to the diagonal we only need to copy them with respect to the indizes
+            # because the map is symetrical to the diagonal we only need to copy them with respect to the indizes
             self.pheromone_map_iteration[path[i]][path[i + 1]] = current_pheromone_value + new_pheromone_amount
             self.pheromone_map_iteration[path[i + 1]][path[i]] = current_pheromone_value + new_pheromone_amount
 
-#---------------------------------- EVAPORATION and INTENSIFICATION ENDS--------------------------------#
+    # ---------------------------------- EVAPORATION and INTENSIFICATION ENDS--------------------------------#
     def mainloop(self):
         """
         mainloop which loops through the differnet steps:
@@ -334,23 +291,22 @@ class antColony():
         """
         terminate = 0
 
-        #Plotting Lists
+        # Plotting Lists
         iteration_results = []
         iteration = []
         shortest_in_iteration = []
 
-
         while terminate < self.iterations:
             terminate += 1
-            #SOLUTION FINDING
+            # SOLUTION FINDING
             for ant in self.colony:
                 ant.create_path()
 
-            #COMPUTE INTENSIFICATION VALUES
+            # COMPUTE INTENSIFICATION VALUES
             for ant in self.colony:
                 self.update_pheromone_map_iteration(ant)
 
-                #set best path to an initial value
+                # set best path to an initial value
                 if self.FirsAnt:
                     self.shortest_ant_in_iteration = ant.path_cost
                     self.FirsAnt = False
@@ -360,12 +316,12 @@ class antColony():
                 if not self.shortest_path_seen:
                     self.shortest_path_seen = ant.path_cost
 
-                #find the best path in all the ants in the iteration
+                # find the best path in all the ants in the iteration
                 if ant.path_cost < self.shortest_ant_in_iteration:
                     self.shortest_ant_in_iteration = ant.path_cost
-                #find overall best path
+                # find overall best path
                 if ant.path_cost < self.shortest_distance:
-                    #fill Iteartion List for Plot
+                    # fill Iteartion List for Plot
                     iteration_results.append(ant.path_cost)
                     iteration.append(len(shortest_in_iteration))
 
@@ -376,170 +332,22 @@ class antColony():
                     print("#-------------------# Shortest Path : ", ant.path_cost,"   #------#")
 
             print("Shortest Path: ", self.shortest_ant_in_iteration,"     Iterations left: ",self.iterations - terminate )
-            #save shortest ant in iteration for plot
+            # save shortest ant in iteration for plot
             shortest_in_iteration.append(self.shortest_ant_in_iteration)
-            #restet FirstAnt for next iteration
+            # restet FirstAnt for next iteration
             self.FirsAnt = True
-            #EVAPORATION and INTENSIFCATION
+            # EVAPORATION and INTENSIFCATION
             self.update_pheromone_map()
 
             if self.first_pass:
                 self.first_pass = False
 
-            #Reset the ants in the colony
-            self.init_ants(self.start)
+            # Reset the ants in the colony
+            self.init_ants()
 
-            #reset the pheromone_map_iteration matrix
+            # reset the pheromone_map_iteration matrix
             self.pheromone_map_iteration = self.init_pheromone_map()
 
-        #return the shortest distance and the path of the Shortest distance
+        # return the shortest distance and the path of the Shortest distance
         return self.shortest_distance, self.shortest_path_seen, iteration_results, iteration, shortest_in_iteration
-#---------------------------------------- CLASSES END --------------------------------------#
 
-def read_file(filename):
-    """
-    This function reads in the tsp files and converts them into int matrices. The matrix can be accessed globably with the variable name tspmat
-    """
-    if filename == 1:
-        tspmat = np.loadtxt("1.tsp")
-
-    if filename == 2:
-        tspmat = np.loadtxt("2.tsp")
-
-    if filename == 3:
-        tspmat = np.loadtxt("3.tsp")
-
-    if filename == 4:
-        tspmat = np.loadtxt("4.tsp")
-
-    valuematrix = tspmat.astype(int)
-    return valuematrix
-
-def initalize(benchmark):
-    global tspmap
-    tspmap = read_file(benchmark)
-
-    Colony = antColony(None, antnmbr, al, be,  p_evap_co, p_factor, iterations)
-    shortest_distance, shortest_path, iteration_results, iteration, shortest_in_iteration = Colony.mainloop()
-
-    print("The shortest path has cost: ",shortest_distance)
-    print("Found in Generation: ",len(iteration_results))
-
-
-def user_input():
-    global antnmbr
-    global p_evap_co
-    global p_factor
-    global al
-    global be
-    global iterations
-    global default
-
-    benchmark = -1
-    antnmbr = -1
-    p_evap_co = -1
-    p_factor = -1
-    al = -1
-    be = -1
-    iterations = -1
-    default = -1
-
-
-    print("#----- USERINTERFACE - Input 0 for a default Value -----#")
-
-    #Default
-    while (default != 0) or (default != 1):
-        default = int(input("Do yo want to use default values? [0]Yes  [1]No: "))
-        if default == 0:
-            benchmark = 1
-            antnmbr = 50
-            p_evap_co = 0.4
-            p_factor = 0.4
-            al = 1
-            be = 1
-            iterations = 30
-            print("")
-            print("####---------Initialize ACO with: ---------###")
-            print("")
-            print("Benchamrk: ",benchmark)
-            print("Number of ants: ",antnmbr)
-            print("Evaporation Coefficient: ",p_evap_co)
-            print("Pheromone Constant: ",p_factor)
-            print("Alpha Value: ",al)
-            print("Beta Value: ",be)
-            print("Terminate after  ",iterations," Iterations without improvement.")
-            print("####-----------------------------------------###")
-            print("")
-            time.sleep(1.5)
-            initalize(benchmark)
-            return None
-        if default == 1:
-
-
-            #Benchmark Input
-            while (benchmark != 0) and (benchmark != 1) and (benchmark != 2) and (benchmark != 3):
-                if benchmark == -1:
-                    benchmark = int(input("Please specify TSP benchmark to use [1],[2],[3]: "))
-                else:
-                    benchmark = int(input("Benachmark must be [1],[2],[3]: "))
-                if benchmark == 0:
-                    benchmark = 1
-            #AntNumber Input
-            while antnmbr < 0:
-                if antnmbr == -1:
-                    antnmbr = int(input("Please specify number of ants to be used: "))
-                else:
-                    antnmbr = int(input("Please specify number of ants (must be 0 for default or higher): "))
-                if antnmbr == 0:
-                    antnmbr = 20
-            #Evaporation constant
-            while p_evap_co < 0:
-                if p_evap_co == -1:
-                    p_evap_co = float(input("Please specify Evaporation Constant: "))
-                else:
-                    p_evap_co = float(input("Please specify Evaporation Constant bigger than 0 or zero for default: "))
-                if p_evap_co == 0:
-                    p_evap_co = 0.4
-            #Pheromone Factor
-            while p_factor < 0:
-                if p_factor == -1:
-                    p_factor = float(input("Please specify Intensification Constant: "))
-                else:
-                    p_factor = float(input("Please specify Intensification Constant:  bigger than 0 or zero for default: "))
-                if p_factor == 0:
-                    p_factor = 0.4
-            #Alpha
-            while al < 0:
-                if al == -1:
-                    al = float(input("Please specify Alpha Value(no default): "))
-                else:
-                    al = float(input("Please specify Alpha Value bigger or equal to zero: "))
-            #beta
-            while be < 0:
-                if be == -1:
-                    be = float(input("Please specify Beta Value: "))
-                else:
-                    be = float(input("Please specify Beta Value bigger or equal to zero: "))
-            while iterations < 1:
-                if iterations == -1:
-                    iterations = int(input("Please specify the number of iterations without improvement before termination: "))
-                else:
-                    iterations = int(input("Please specify the number of iterations before termination that is bigger than 0 or 0 for default: "))
-                if iterations == 0:
-                    iterations = 20
-            print("")
-            print("Initialize ACO with:")
-            print("")
-            print("Benchamrk: ",benchmark)
-            print("Number of ants: ",antnmbr)
-            print("Evaporation Coefficient: ",p_evap_co)
-            print("Pheromone Constant: ",p_factor)
-            print("Alpha Value: ",al)
-            print("Beta Value: ",be)
-            print("Terminate after  ",iterations," Iterations without improvement.")
-            print("")
-            initalize(benchmark)
-            return None
-
-
-user_input()
