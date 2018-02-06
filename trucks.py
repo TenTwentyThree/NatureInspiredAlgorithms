@@ -55,16 +55,16 @@ def trucks_used():
 		only use truck a			# in other words, send ant colonies representing truck a
 		
 	if total_packages <= 313:
-		while packages_delivered < 180:
+		while packages_delivered < 181:
 			use truck a
 		use truck b
 		
 	if total_packages <= 373:
-		while packages_delivered < 313:
+		while packages_delivered < 314:
 			use truck a and b
 		use truck c
 	else:
-		while packages_delivered < 373:
+		while packages_delivered < 374:
 			use truck a, b and c
 		use truck d
 
