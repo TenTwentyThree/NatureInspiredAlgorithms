@@ -1,9 +1,13 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Wed Jan 31 19:02:19 2018
+Created on Thu Jan 25 13:45:02 2018
 
-@author: yannicjanike
+@author: Till
+"""
+
+"""
+Created on Fri Nov 29 12:33:10 2017
+@author: Yannic Jänike
 """
 
 import numpy as np
@@ -14,7 +18,7 @@ import time
 class antColony():
     class ant():
 
-        def __init__(self,init_location,possible_locations,pheromone_map,alpha,beta,vehicleType,first_pass):
+        def __init__(self,init_location,possible_locations,pheromone_map,alpha,beta,vehicleType, truck_cost,first_pass):
             """
             Initialite an ant with,
 
@@ -26,7 +30,6 @@ class antColony():
             Beta(float ) : determines impact of the distance between node i and i+1 in the path selection
             first_pass(boolean) : determines if we are in the first iteration or not
             """
-
             self.init_location = init_location
             self.possible_locations = possible_locations
             self.path = []
@@ -39,34 +42,43 @@ class antColony():
             self.capacity = self.getCapacity(vehicleType)#load
             self.delivered = 0
             self.demand = np.copy(demand)
-            
+            self.truck_cost = truck_cost
+
 
             self.update_path(init_location)
 
 #---------------------------------------------SOLUTION CONSTRUCTION--------------------------------------#
         def getCapacity(self,vehicleType):
+
             return truck_types[int(vehicleType)]
-    
-    
+
+
         def create_path(self):
             """
             Create a path for the ant self
             """
             #as long as the list of Possible locations is not empty, we search for the next node
-            while self.capacity != self.delivered:
-                if not self.possible_locations:
+            while self.possible_locations:
+
+                if sum(self.demand) <= 0:
+                    self.traverse_to_end(self.current_location)
+                    break
+
+                elif self.capacity == self.delivered:
+                    self.traverse_to_end(self.current_location)
                     break
                 else:
                     next = self.pick_path()
-                    self.traverse(self.current_location,next)
+                    if self.demand[next-1] != 0:
+                        self.traverse(self.current_location,next)
 
         def pick_path(self):
             """
             Pick a path from self.possible_locations and return it
             """
-            global distance 
-            
-            
+            global distance
+
+
             #if we are in the first iteration, just take a random path
             if self.first_pass:
                 self.first_pass = False
@@ -140,29 +152,56 @@ class antColony():
                 cummulative += pathProbabilities[i]
 
 
-#---------------------------------------------SOLUTION CONSTRUCTION Ends--------------------------------------#
+
+        def traverse_to_end(self,oldCity):
+            """
+            travel from the old node to the new node and update the ant parameters
+            oldCity(int) : the current locations
+            newCity(int) : the City we choose to visit next
+            """
+            self.path.append(0)
+            self.update_demand(0)
+
+            self.update_pathCost(oldCity,0)
+            self.current_location = 0
+
         def traverse(self,oldCity,newCity):
             """
             travel from the old node to the new node and update the ant parameters
             oldCity(int) : the current locations
             newCity(int) : the City we choose to visit next
             """
-            self.update_path(newCity)
             self.update_demand(newCity)
-            
+            self.update_path(newCity)
+
             self.update_pathCost(oldCity,newCity)
             self.current_location = newCity
-            
+
         def update_demand(self,newCity):
+            #print("Demand:", self.demand[newCity-1])
+            #print("Current Capacity: ", self.capacity-self.delivered)
+
+
             delivered_to_city = min(self.demand[newCity-1],(self.capacity-self.delivered))
+
+            #print("Delivered:", delivered_to_city)
+            #print("")
+
             self.demand[newCity-1] -= delivered_to_city
             self.delivered += delivered_to_city
+
 
         def update_path(self,newCity):
             """
             add the new city to the path and remove it from the possible_locations list
             """
             self.path.append(newCity)
+
+            '''
+            delivered_to_city = min(self.demand[newCity-1],(self.capacity-self.delivered))
+            self.demand[newCity-1]
+            '''
+
             if self.demand[newCity-1] == 0:
                 self.possible_locations.remove(newCity)
 
@@ -170,9 +209,10 @@ class antColony():
             """
             add the cost of the path to the new node to the total path_cost
             """
-            self.path_cost += distance[oldCity][newCity]
+            new_cost = self.truck_cost * distance[oldCity][newCity]
+            self.path_cost += new_cost
 
-    def __init__(self, start, ant_count, alpha, beta,  pheromone_evaporation_coefficient, pheromone_constant, iterations, vehicle_type):
+    def __init__(self, start, ant_count, alpha, beta,  pheromone_evaporation_coefficient, pheromone_constant, iterations, vehicle_type, truck_cost, usedNodes):
         """
         initialize an ant Colony
         start(int) = the starting position of the
@@ -243,11 +283,18 @@ class antColony():
             raise ValueError("iterations must be >= 0")
 
         self.iterations = iterations
-        
-        
+
+
         self.vehicleType = vehicle_type
 
+        self.truck_cost = truck_cost
 
+
+        self.used_nodes = []
+        for node in usedNodes:
+            self.used_nodes.append(node)
+
+        self. delivered = 0
         #other initial variables
         self.first_pass = True
         #add ants to the colony
@@ -259,16 +306,24 @@ class antColony():
         #best ant in the iteration
         self.shortest_ant_in_iteration = None
         self.FirsAnt = True
-        
+
         self.bestDemandList = demand
-        
+
+        self.best_ant = None
+
 
     def possible_locations(self):
         """
         create a list of all possible locations
         """
-        possible_locations = list(range(len(distance)))
-        
+        possible_locations = list(range(len(distance)-1))
+        """
+        #print(possible_locations)
+        print(possible_locations)
+        for i in range(len(self.used_nodes)-1):
+            print(self.used_nodes[i])
+            possible_locations.remove(self.used_nodes[i])
+        """
         return possible_locations
 
     def init_pheromone_map(self,value = 0.0):
@@ -286,13 +341,14 @@ class antColony():
         """
         Create ants, if it is first called, else we just 'reset' the ants with the initial values
         """
+
         #If we are in the first iteration, initialize ants
         if self.first_pass:
             return [self.ant(start, self.possible_locations(), self.pheromone_map,
-                    self.alpha, self.beta,self.vehicleType, first_pass=True) for _ in range(self.ant_count)]
+                    self.alpha, self.beta, self.vehicleType, self.truck_cost, first_pass=True) for _ in range(self.ant_count)]
         #else reset every ant in the colony
         for ant in self.colony:
-            ant.__init__(start,self.possible_locations(),self.pheromone_map,self.alpha,self.beta,self.vehicleType, self.first_pass)
+            ant.__init__(start,self.possible_locations(),self.pheromone_map,self.alpha,self.beta,self.vehicleType, self.truck_cost, self.first_pass)
 
 
 #---------------------------------- EVAPORATION and INTENSIFICATION--------------------------------#
@@ -356,7 +412,6 @@ class antColony():
         iteration = []
         shortest_in_iteration = []
 
-
         while terminate < self.iterations:
             terminate += 1
             #SOLUTION FINDING
@@ -388,10 +443,12 @@ class antColony():
 
                     terminate = 0
 
+                    self.delivered = ant.delivered
+
                     self.shortest_distance = ant.path_cost
                     self.shortest_path_seen = ant.path
                     self.bestDemandList = ant.demand
-                    print("#-------------------# Shortest Path : ", ant.path_cost,"   #------#")
+                    #print("#-------------------# Shortest Path : ", ant.path_cost,"   #------#")
 
             #print("Shortest Path: ", self.shortest_ant_in_iteration,"     Iterations left: ",self.iterations - terminate )
             #save shortest ant in iteration for plot
@@ -411,10 +468,10 @@ class antColony():
             self.pheromone_map_iteration = self.init_pheromone_map()
 
         #return the shortest distance and the path of the Shortest distance
-        return self.shortest_path_seen, self.shortest_ant_in_iteration
+        return self.shortest_path_seen, self.shortest_distance, self.delivered
 #---------------------------------------- CLASSES END --------------------------------------#
 
-    
+
 
 def MACO():
     global transportation_cost
@@ -422,92 +479,109 @@ def MACO():
     global capacity
     global distance
     global truck_types
-    
+
     transportation_cost, distance, demand, capacity = read_files()
-    
+
     truck_types = np.unique(capacity)
+    print(truck_types)
     truck_cost = np.unique(transportation_cost)
-    
-    
+
+
     vehicle_list = vehicle_type_list(demand,capacity)
-    
+
     #Store each antColony("Vehicle") in the List("Garage")
     Garage = []
     TotalCost = 0
+
+    usedNodes = []
     for i in range(len(vehicle_list)):
-        
-        print("#-----------------------------------------------------#")
+
+        print("#-------------------------------------------------------------------------#")
         print("#                Vehicle Number {} of {}             ".format(i+1,len(vehicle_list)))
-        print("#                Vehicle Type {}  | {}           ".format(vehicle_list[i],vehicle_list))
-        print("#                Capacity {}  |  Total Demand {}           ".format(truck_types[vehicle_list[i]],sum(demand)))
-        print("#-----------------------------------------------------#")
-        vehicle = antColony(None, antnmbr, al, be,  p_evap_co, p_factor, iterations, vehicle_list[i])
-        
-        shortest_path, shortest_path_cost = vehicle.mainloop()
+        print("#                Vehicle Capacity   {}             ".format(truck_types[vehicle_list[i]]))
+        print("#                Vehicle List {}             ".format(vehicle_list))
+        print("#-------------------------------------------------------------------------#")
+
+
+        vehicle = antColony(None, antnmbr, al, be,  p_evap_co, p_factor, iterations, vehicle_list[i], truck_cost[vehicle_list[i]], usedNodes)
+
+        shortest_path, shortest_path_cost, delivered = vehicle.mainloop()
+
+        if shortest_path:
+            for node in shortest_path:
+                usedNodes.append(node)
+
+
         print(shortest_path)
+        print("")
+
         update_lists(vehicle,shortest_path)
-        
+
+        print(demand)
+        print("")
+
         Garage.append(vehicle)
-        
+
         TotalCost += shortest_path_cost
-        print("\nTotal Cost: {}      This vehicle: {}    Demand: {} \n".format(TotalCost,shortest_path_cost,sum(demand)))
-    
+        print("\no Total Cost: {}      \no This vehicle: {}\no Delivered: {}\n".format(TotalCost,shortest_path_cost, delivered))
+        #print("Demand: ",demand)
+
+    print("#---------------------------------------------------------------------#")
+    print("                              OVERVIEW")
+    print("#---------------------------------------------------------------------#")
     for i in range(len(Garage)):
         print()
-        print("Vehicle: {}".format(i))
-        print("    Path: {}".format(Garage[i].shortest_path_seen))
-        print("    Cost: {}".format(Garage[i].shortest_distance))
-        
-    print("\n \n Demand: ",sum(demand),"      Total Cost: ",TotalCost,"\n")
-    
-    for vehicle in vehicle_list:
-        TotalCost += truck_cost[vehicle]
-    
-    print("Total Cost: ",TotalCost)
-    
-    
+        print("Vehicle: {} | Type: {} | Capacity: {}".format(i, vehicle_list[i],truck_types[vehicle_list[i]] ))
+        print("   o Path: {}".format(Garage[i].shortest_path_seen))
+        print("   o Cost: {}".format(Garage[i].shortest_distance))
 
 
-    
-    
 
-    
+    print("\nDemand: ",sum(demand))
+    print("Total Cost: ",TotalCost,"\n")
+
+    if sum(demand) != 0:
+        print("Damand not 0!")
+    print("")
+    print("#---------------------------------------------------------------------#")
+    print("                              DONE")
+    print("#---------------------------------------------------------------------#")
+
 
 def update_lists(vehicle,shortest_path):
     """
     Updates the demand and available_positions matrix for the shortest path
     """
     global demand
+    #print(vehicle.bestDemandList
     demand = np.copy(vehicle.bestDemandList)
+    print("Demand left: ",sum(demand))
 
-    
-    
-    
 
 
 def vehicle_type_list(demand,capacity):
     print("#Create Vehicle List")
     total_demand = int(sum(demand))
-    
+
     diff_trucks = np.unique(capacity)
-    
+
     probabilities = np.zeros(len(diff_trucks))
     while sum(probabilities) != 1:
         for i in range(len(diff_trucks)):
-            probabilities[i] = 0.25 # float(input("Enter probabilitie for Truck type {} : ".format(i)))
-        
+            probabilities[i] = float(input("Enter probabilitie for Truck type {} : ".format(i)))
+
         if sum(probabilities) != 1:
             print("Probabilities have to add up to 1!")
-    
+
     current_capacity = 0
     vehicle_type_list = []
     while current_capacity < total_demand:
         vehicle = choose_vehicle(probabilities)
         current_capacity += diff_trucks[vehicle]
         vehicle_type_list.append(vehicle)
-    
-    return vehicle_type_list
-        
+
+    return [3,2,1,0,0]#vehicle_type_list
+
 
 def choose_vehicle(probabilities):
         toss = random.random()
@@ -518,10 +592,7 @@ def choose_vehicle(probabilities):
                     truck= i
                     return truck
                 cummulative += probabilities[i]
-    
-    
-    
-    
+
 
 
 def read_files():
@@ -531,23 +602,23 @@ def read_files():
     print("#Read Files")
     #Distance values
     distance = np.loadtxt("distance.txt")
-    
+
     transportation_cost = np.loadtxt("transportation_cost.txt")
-    
+
     demand = np.loadtxt("demand.txt")
-    
+
     capacity = np.loadtxt("capacity.txt")
-    
-    
-    
-    
+
+
+
+
     #cast as integers values
     distance = distance.astype(int)
     transportation_cost = transportation_cost.astype(int)
     demand = demand.astype(int)
     capacity = capacity.astype(int)
-    
-    
+
+
     return transportation_cost, distance, demand, capacity
 
 
@@ -560,13 +631,14 @@ def init():
     global iterations
     global default
 
+    benchmark = 1
     antnmbr = 50
     p_evap_co = 0.4
     p_factor = 0.4
     al = 1
     be = 1
     iterations = 30
-   
+
     MACO()
 
 
