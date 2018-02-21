@@ -1,0 +1,354 @@
+import random
+import numpy as np
+import sys
+import xlsxwriter
+
+# ------------------ P R E D E F I N I T I O N   O F   E X P E R I M E N T   A N D   O B J E C T S --------------------
+class individual:
+    """
+    An individual is a python object that has the values "genome" and "fitness"
+    The genome is a list of capacities that range from 100 to 1000 indicating the vehicle size.
+    The fitness is determined by the total cost of all the vehicles present in the genome. They must be >= the total demand.
+    """
+
+    def __init__(self, genome):
+        self.genome = genome
+        self.fitness = self.update_fitness()
+
+    def update_fitness(self):
+        cost = 0
+        for ind in range(len(self.genome)):
+            for i in range(len(capacity)):
+                if self.genome[ind] == capacity[i]:
+                    cost += costs[i]
+
+        cheesecake = 0
+        delivered = sum(self.genome)
+        if delivered < demand:
+            cheesecake = -100
+        if delivered > 3000:
+            cheesecake = -100
+        if delivered > demand and delivered < 2300:
+            cheesecake = 20
+
+
+        fitness = cost + cheesecake
+        return fitness
+
+# -----------------------I M P L E M E N T A T I O N   O F   P O P U L A T I O N   G E N E R A T I O N ---------------
+
+
+def generate_population_from_genes(listofgenomes):
+    """This function generates individuals from the list of genomes that is passed into it. it returns a list of individuals which is the new population.
+    This function can be used universally across all experiments
+
+    INPUT: A list of chromosoms
+
+    OUTPUT: A list of individuals (population)"""
+    population = []
+    indexofgenomes = len(listofgenomes) - 1
+    while indexofgenomes != -1:
+        genome = listofgenomes[indexofgenomes]
+        newindividual = individual(genome)
+        newindividual.update_fitness()
+        population.append(newindividual)
+        indexofgenomes -= 1
+
+    return population
+
+
+def generate_initial_population(demand):
+    """
+    Generates population of 10 individuals that each consist of random vehicles
+
+    INPUT:
+    total demand of packages
+
+    OUTPUT: A list of random individuals (first population)"""
+    initialgenes = []
+    chromosome = []
+
+    for i in range(500):
+        while sum(chromosome) <= demand:
+            chromosome.append(random.choice(capacity))
+        initialgenes.append(individual(chromosome))
+    return initialgenes
+
+# --------------------------------------- S E L E C T I O N   D E F I N I T I O N -------------------------------------
+
+def selectionTournament(population):
+    competitors = population
+    matingpool = []
+
+    '''
+    #for each individum in the population mapp the fitnessvalue in a list
+    for individum in competitors:
+        currentfitness = individuum.fitness
+        fitnessValues.append(currentfitness)
+    '''
+
+    # defines how many individuals are in the mating pool needs to be an even number
+
+    sizeMatingPool = ((len(population) // 3) * 2)
+    if sizeMatingPool % 2 != 0:
+        sizeMatingPool += 1
+
+    while sizeMatingPool > 0:
+        # store population length for quick excess
+        sizeCompetitors = len(competitors) - 1
+
+        # set parents to invalid values
+        p1_index = -1
+        p2_index = -1
+        # choose different parents untill they are not the same individuals
+        while p1_index == p2_index:
+            p1_index = random.randint(0, sizeCompetitors - 2)
+            p2_index = random.randint(0, sizeCompetitors - 2)
+
+        p1_fit = competitors[p1_index].fitness
+        p2_fit = competitors[p2_index].fitness
+        # p1 is fitter than p2
+        if p1_fit > p2_fit:
+            # append the matingpool with the fitter parent
+            matingpool.append(competitors[p1_index])
+            # delete the winnging parent, because he is no longer a competitor
+            competitors.pop(p1_index)
+            # shrink the size of the matingpool, because we have found a parent
+            sizeMatingPool -= 1
+
+        # p2 is fitter than p1
+        elif p1_fit < p2_fit:
+            # append the matingpool with the fitter parent
+            matingpool.append(competitors[p2_index])
+            # delete the winnging parent, because he is no longer a competitor
+            competitors.pop(p2_index)
+            # shrink the size of the matingpool, because we have found a parent
+            sizeMatingPool -= 1
+        # if nothing holds we have a sting, booth are equaly fit, so we do nothing
+
+        elif p1_fit == p2_fit:
+            matingpool.append(competitors[p2_index])
+            matingpool.append(competitors[p1_index])
+            competitors.pop(p2_index)
+            competitors.pop(p1_index)
+            sizeMatingPool -= 2
+
+
+    if len(matingpool)%2 != 0:
+        sacrefice = random.randint(0,len(matingpool) - 1)
+        matingpool.pop(sacrefice)
+
+    return matingpool
+
+
+# --------------------------------------- M U T A T I O N   F U N C T I O N S -------------------------------------
+
+
+def mutation(population):
+    probability = 0.06
+    populationsize = len(population)
+
+    # if the mutationprobability is matched we mutate the chromosome
+    for i in range(populationsize):
+        mutation = random.uniform(0, 1)
+        if mutation <= probability:
+            mutateRandomResetting(population[i])
+
+    return population
+
+
+# mutates a specific machine to an other at a random place
+# mutates a random allel in a chromosome
+def mutateRandomResetting(chromosome):
+    mutateVehicle = random.choice(capacity)
+    mutatePlace = random.randint(0, len(chromosome) - 1)
+
+    # making sure that w do not mutate the one machine to the same machine
+    while chromosome[mutatePlace] == mutateVehicle:
+        mutatePlace = random.randint(0, len(chromosome) - 1)
+
+    chromosome[mutatePlace] = mutateVehicle
+    return chromosome
+
+# --------------------------------------------- R E C O M B I N A T I O N   O P E R A T I O N S------------------------
+
+
+def onepoint(p1, p2):
+    '''
+    Generate a crossover point and then copy sublist 1 of p1 in c1 and of p2 in c2 and then copy sublist 2 of p1 in c2 and of p2 in c1
+    INPUT:
+    p1: List of Parent one for crossover operation
+    p2: List of Parent two for crossover operation
+
+    OUTPUT:
+    c1: List of Child one, offspring of p1,p2
+    c2: List of Child two, offspring of p1,p2
+    '''
+
+    parentlength = (len(p1) - 1)
+    # create children 1 and 2
+    c1 = []
+    c2 = []
+    # generate random cuttpoint
+    cutpoint = random.randint(1, parentlength)
+    # Copy Sublist into respective parents
+    c1, c2 = (p1[:cutpoint] + p2[cutpoint:], p2[:cutpoint] + p1[cutpoint:])
+    "One Point finished"
+    return c1, c2
+
+
+def recombine(matingpool):
+    '''
+    Generates new offsprings from the matingpool
+    INPUT:
+    matingpool: List of individuals selcted for the mating process
+    OUTPUT:
+    children: List of generated offsprings from the matingpool
+    '''
+
+    children = []
+    # recombine 2 parents from the matingpool untill the mating pool ist empty
+    while len(matingpool) > 0:
+        # in every iteration compute the matingpool size again, because its shrinking
+        sizeMatingPool = (len(matingpool)-1)
+        choice1 = -1
+        choice2 = -1
+
+        # select two random different parents from the mating pool
+        while choice1 == choice2:
+            choice1 = random.randint(0, sizeMatingPool)
+            choice2 = random.randint(0, sizeMatingPool)
+
+        # save the two parents
+        parent1 = matingpool[choice1]
+        parent2 = matingpool[choice2]
+
+        # execute the recombination method of your choice and save the new children in c1 and c2
+        c1, c2 = onepoint(parent1, parent2)
+
+        # add new children to the set of all children
+        children.append(c1)
+        children.append(c2)
+        # remove the parents from the matingpool
+        matingpool.remove(parent1)
+        matingpool.remove(parent2)
+
+    return children
+
+# --------------------------------------------------------------- R E P L A C E R -------------------------------------
+
+
+def mantis(population, children):
+    new_population = population + children
+    return new_population
+
+# ------------------- I M P L E M E N T A T I O N   O F   U S E R   I N P U T   A N D   E X E C U T I O N -------------
+
+
+def evolve(population):
+    """
+    INPUT: population
+
+    OUTPUT: next generation
+    """
+
+    # select the matingpool - still objects
+    matingpool = selectionTournament(population)
+
+    # convert matingpool objects to a list
+    matingpoolList = []
+    for index in range(0, len(matingpool)):
+        matingpoolList.append(matingpool[index].genome)
+
+    populationList = []
+    for index in range(0, len(population)):
+        populationList.append(population[index].genome)
+
+    # recombine and mutate children
+    children = recombine(matingpoolList)
+    children = mutation(children)
+    new_population = mantis(populationList, children)
+
+    # here the program fails
+    new_population = generate_population_from_genes(new_population)
+
+    return new_population
+
+
+def evolution(initialpopulation):
+    """
+    INPUT: initial population
+
+    OUTPUT: best individuum after x generations
+    """
+    countgenerations = 0
+    population = initialpopulation
+    bestindiv = population[0]
+    terminalcount = 0
+    fitestovergenerations = []
+    print("Initalizing with best individual fitness : ", bestindiv.fitness)
+    print("with capacity of: ", bestindiv.genome)
+
+    while terminalcount != maxgeneration:
+        countgenerations += 1
+
+        population = evolve(population)
+
+        onlyfitness = []
+        # save fitnessvalues in a list
+        for index in range(0, len(population) - 1):
+            currentfitness = population[index].fitness
+            onlyfitness.append(currentfitness)
+        # save the best
+        generationsbest = population[onlyfitness.index(max(onlyfitness))]
+        # clear onlyfittness for next generation
+        onlyfitness.clear()
+
+        # if we found a new maximum
+        if generationsbest.fitness > bestindiv.fitness:
+            bestindiv = generationsbest
+            # save fittest indivivudal per iteration
+            print("Better individual found in generation", countgenerations, "!")
+            print("capacity connected to best fitness: ", bestindiv.genome)
+            terminalcount = 0
+        else:
+            terminalcount += 1
+            print(".", sep=' ', end='', flush=True)
+
+        # save fittest indivivudal per iteration
+        fitestovergenerations.append(bestindiv)
+
+    return (bestindiv, countgenerations)
+
+def initalize():
+    global maxgeneration
+    global demand
+    global capacity
+    global nmbr_of_vehicles
+    global costs
+
+    maxgeneration = 10
+    demand = np.loadtxt("demand.txt")
+    demand = sum(demand.astype(int))
+    capacity = np.loadtxt("capacity.txt")
+    capacity = np.unique(capacity.astype(int))
+    nmbr_of_vehicles = len(capacity) - 1
+
+    costs = np.loadtxt('transportation_cost.txt')
+    costs = np.unique(costs.astype(int))
+
+    population = generate_initial_population(demand)
+    bestindividuum, counter = evolution(population)
+
+    print("Found: ", bestindividuum.genome, " after" , counter, "Iterations")
+    print("total capacity of: ", sum(bestindividuum.genome))
+
+    vehicle = []
+
+    for i in range(len(bestindividuum.genome)):
+        for j in range(len(capacity)):
+            if bestindividuum.genome[i] == capacity[j]:
+                vehicle.append(j)
+
+    print(vehicle)
+initalize()
